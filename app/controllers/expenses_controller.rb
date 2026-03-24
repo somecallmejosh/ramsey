@@ -11,6 +11,8 @@ class ExpensesController < ApplicationController
       .includes(:user)
       .order(transacted_on: :desc, created_at: :desc)
     @budget = EnvelopeBudget.find_by(envelope: @envelope, year: @year, month: @month)
+    @weekly_spend = WeeklySpendQuery.new(@envelope).past_eight_weeks
+    @weekly_target = 175.0
   end
 
   def new
