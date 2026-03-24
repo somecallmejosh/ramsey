@@ -1,26 +1,28 @@
-# Phase 5: Budget vs. Actual Graph
+# Phase 6: Work Lunch Tracker
 
 ## Tasks
 
 - [x] Plan approved
-- [x] Write spec: spec/queries/weekly_spend_query_spec.rb
-- [x] Create query object: app/queries/weekly_spend_query.rb
-- [x] Pin chartkick + Chart.js in config/importmap.rb and application.js
-- [x] Load @weekly_spend in ExpensesController#index
-- [x] Add chart to app/views/expenses/index.html.erb
-- [x] Run full RSpec suite — 136 examples, 0 failures
+- [x] Write spec first: spec/models/lunch_log_spec.rb
+- [x] Generate migration + create app/models/lunch_log.rb — make spec pass
+- [x] Add routes: resources :lunch_logs, only: [:index, :create, :destroy]
+- [x] Create app/controllers/lunch_logs_controller.rb (user-scoped)
+- [x] Create app/helpers/lunch_logs_helper.rb (weeks_for_month)
+- [x] Create views: index, _day_cell, _stats, create.turbo_stream, destroy.turbo_stream
+- [x] Add Lunch nav item to app/components/nav_component.html.erb
+- [x] Create spec/factories/lunch_logs.rb
+- [x] Create spec/requests/lunch_logs_spec.rb (user-scoping)
+- [x] Run full RSpec suite — 152 examples, 0 failures
 
 ## Review
 
-Phase 5 complete. All 136 RSpec examples pass (up from 131 in Phase 4).
+Phase 6 complete. All 152 RSpec examples pass (up from 136 in Phase 5).
 
 ### Delivered
-- WeeklySpendQuery object (app/queries/weekly_spend_query.rb) using groupdate's group_by_week
-- 8-week bar chart with dashed $175/week target line overlay on Groceries envelope detail page
-- TDD: spec written first, query built to make it pass
-- Chartkick + Chart.js wired via importmap (CDN pin for Chart.js)
-
-### PostgreSQL + groupdate timezone bug
-- groupdate casts date columns to timestamptz before applying timezone (America/New_York)
-- 2026-03-22 00:00 UTC → 2026-03-21 20:00 EDT (Saturday) → bucketed to previous week
-- Fix: time_zone: false on group_by_week to skip timezone conversion for date-only columns
+- LunchLog model with user_id + logged_on (date), unique per user-day, SAVINGS_PER_LUNCH = 8
+- Mon–Fri weekly grid with one-tap Log/Packed toggle per day via Turbo Stream
+- Monthly stats card: days packed + estimated savings ($8 × days)
+- Work Meals envelope remaining balance displayed alongside savings
+- Month selector (6 months back) matching expenses page pattern
+- User-scoping enforced: current_user.lunch_logs.find() → 404 on other user's record
+- "Lunch" nav item added to bottom nav (check icon)

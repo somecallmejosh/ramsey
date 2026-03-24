@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_021425) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_172522) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_021425) do
     t.check_constraint "amount > 0::numeric", name: "expenses_amount_positive"
   end
 
+  create_table "lunch_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "logged_on", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "logged_on"], name: "index_lunch_logs_on_user_id_and_logged_on", unique: true
+    t.index ["user_id"], name: "index_lunch_logs_on_user_id"
+  end
+
   create_table "meal_plans", force: :cascade do |t|
     t.jsonb "ai_response"
     t.datetime "confirmed_at"
@@ -139,6 +148,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_021425) do
   add_foreign_key "envelope_budgets", "envelopes"
   add_foreign_key "expenses", "envelopes"
   add_foreign_key "expenses", "users"
+  add_foreign_key "lunch_logs", "users"
   add_foreign_key "meal_plans", "users"
   add_foreign_key "meals", "meal_plans"
   add_foreign_key "sessions", "users"

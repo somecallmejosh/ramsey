@@ -1,0 +1,21 @@
+<div id="day_<%= date.to_s %>">
+  <div class="text-center">
+    <p class="<%= ui.label(:secondary) %> text-xs mb-1"><%= date.strftime("%a") %></p>
+    <p class="<%= ui.label %> text-sm mb-2"><%= date.day %></p>
+    <% if date > Date.current %>
+      <div class="h-7"></div>
+    <% elsif log %>
+      <%= button_to lunch_log_path(log), method: :delete,
+            class: "w-full py-1 rounded-lg bg-hs-primary text-white text-xs font-semibold transition-colors",
+            aria: { label: "Unlog #{date.strftime("%b %-d")}" } do %>
+        Packed
+      <% end %>
+    <% else %>
+      <%= button_to lunch_logs_path(logged_on: date.to_s), method: :post,
+            class: "w-full py-1 rounded-lg border border-hs-border text-hs-muted text-xs transition-colors hover:border-hs-primary",
+            aria: { label: "Log packed lunch for #{date.strftime("%b %-d")}" } do %>
+        Log
+      <% end %>
+    <% end %>
+  </div>
+</div>

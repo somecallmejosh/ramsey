@@ -2,7 +2,7 @@ module IconHelper
   VALID_ICONS = %w[
     arrow-right arrow-diagonal-up arrow-diagonal-down
     sleep star quote chevron-down
-    logout settings check close info
+    logout settings check close info budget lock lunch meal
   ].freeze
 
   ICON_CACHE = Concurrent::Map.new

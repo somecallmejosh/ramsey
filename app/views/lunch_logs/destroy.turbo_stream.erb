@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "day_#{@lunch_log.logged_on}" do %>
+  <%= render "day_cell", date: @lunch_log.logged_on, log: nil %>
+<% end %>
+<%= turbo_stream.replace "lunch-stats" do %>
+  <%= render "stats" %>
+<% end %>

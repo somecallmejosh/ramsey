@@ -83,7 +83,7 @@ class MealPlannerService
       }
     end
 
-    content << { type: "text", text: @message }
+    content << { type: "text", text: @message } if @message.present?
     content
   end
 

@@ -1,0 +1,35 @@
+<%# Back link + heading %>
+<div class="flex items-center gap-3 mb-6">
+  <%= link_to root_path, class: "text-hs-muted hover:text-hs-navy transition-colors", aria: { label: "Back to dashboard" } do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  <% end %>
+  <h1 class="<%= ui.page_heading %>">Lunch Tracker</h1>
+</div>
+
+<%# Month selector %>
+<div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
+  <% 6.downto(0) do |n| %>
+    <% d = Date.current.beginning_of_month - n.months %>
+    <% is_current = d.month == @month && d.year == @year %>
+    <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
+          lunch_logs_path(year: d.year, month: d.month),
+          class: "flex-none px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors #{is_current ? "bg-hs-primary text-white" : "bg-white text-hs-slate border border-hs-border hover:border-hs-primary"}" %>
+  <% end %>
+</div>
+
+<%# Weekly Mon–Fri grid %>
+<div class="<%= ui.card %> mb-6">
+  <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B %Y") %></h2>
+  <% weeks_for_month(@year, @month).each do |week| %>
+    <div class="grid grid-cols-5 gap-2 mb-3">
+      <% week.each do |date| %>
+        <%= render "day_cell", date: date, log: @logs.find { |l| l.logged_on == date } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# Stats %>
+<%= render "stats" %>

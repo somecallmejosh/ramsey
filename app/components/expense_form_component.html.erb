@@ -1,7 +1,4 @@
 <div>
-  <h2 class="<%= ui.page_heading %> mb-1">Log Expense</h2>
-  <p class="<%= ui.label(:secondary) %> mb-6"><%= @envelope.name %></p>
-
   <%= form_with model: [@envelope, @expense] do |f| %>
 
     <% if @expense.errors.any? %>
@@ -55,7 +52,7 @@
             aria: { required: true } %>
     </div>
 
-    <div class="fixed bottom-20 left-0 right-0 px-4 max-w-md mx-auto">
+    <div class="mt-6">
       <%= f.submit "Confirm",
             class: "#{ui.button(:primary)} w-full",
             data: { disable_with: "Saving…" } %>

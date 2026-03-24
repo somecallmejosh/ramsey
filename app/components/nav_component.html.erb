@@ -1,14 +1,18 @@
 <nav class="<%= ui.nav_bar %>" aria-label="Main navigation">
   <div class="flex items-center justify-around max-w-md mx-auto">
-
     <%= link_to root_path, class: ui.nav_item(active: active?(root_path)), aria: { label: "Dashboard" } do %>
-      <%= icon "star", classes: "w-6 h-6" %>
+      <%= icon "budget", classes: "w-6 h-6 text-blue-500" %>
       <span>Budget</span>
     <% end %>
 
     <%= link_to new_meal_plan_path, class: ui.nav_item(active: active?(new_meal_plan_path)), aria: { label: "Meal Planner" } do %>
-      <%= icon "quote", classes: "w-6 h-6" %>
+      <%= icon "meal", classes: "w-6 h-6" %>
       <span>Meals</span>
+    <% end %>
+
+    <%= link_to lunch_logs_path, class: ui.nav_item(active: active?(lunch_logs_path)), aria: { label: "Lunch Tracker" } do %>
+      <%= icon "lunch", classes: "w-6 h-6" %>
+      <span>Lunch</span>
     <% end %>
 
     <% if admin? %>
@@ -22,7 +26,7 @@
           class: ui.nav_item,
           aria: { label: "Sign out" },
           form: { "data-turbo-confirm": "Sign out?" } do %>
-      <%= icon "logout", classes: "w-6 h-6" %>
+      <%= icon "lock", classes: "w-6 h-6" %>
       <span>Sign out</span>
     <% end %>
 

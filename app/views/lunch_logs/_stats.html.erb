@@ -1,0 +1,22 @@
+<div id="lunch-stats">
+  <div class="<%= ui.stat_card %> mb-4">
+    <p class="<%= ui.label %> mb-1">Packed lunches</p>
+    <p class="<%= ui.stat_value %>"><%= @days_packed %> days</p>
+    <p class="<%= ui.label(:secondary) %>">
+      Estimated savings: <%= number_to_currency(@estimated_savings) %>
+    </p>
+  </div>
+
+  <% if @work_meals_envelope %>
+    <div class="<%= ui.stat_card %>">
+      <p class="<%= ui.label %> mb-1">Work Meals</p>
+      <p class="<%= ui.stat_value(variant: @work_meals_remaining&.negative? ? :danger : :default) %>">
+        <%= number_to_currency(@work_meals_remaining&.abs) %>
+      </p>
+      <p class="<%= ui.label(:secondary) %>">
+        <%= @work_meals_remaining&.negative? ? "over budget" : "remaining" %>
+        <span class="ml-2 opacity-60">of <%= number_to_currency(@work_meals_budget) %></span>
+      </p>
+    </div>
+  <% end %>
+</div>

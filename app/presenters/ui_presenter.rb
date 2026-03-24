@@ -64,15 +64,15 @@ class UiPresenter
   end
 
   def modal_overlay
-    "fixed inset-0 bg-hs-navy/40 flex items-center justify-center z-50"
+    "fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-start justify-center overflow-y-auto py-16 z-50"
   end
 
   def modal_card
-    "bg-white rounded-xl shadow-[var(--shadow-card)] p-8 w-full max-w-md mx-4 relative"
+    "bg-white rounded-2xl p-8 w-full max-w-md mx-4 my-auto relative animate-modal-in shadow-xl"
   end
 
   def modal_close
-    "absolute top-4 right-4 text-hs-slate hover:text-hs-navy transition-colors"
+    "absolute top-4 right-4 text-hs-muted hover:text-hs-navy transition-colors cursor-pointer"
   end
 
   def dropdown_card

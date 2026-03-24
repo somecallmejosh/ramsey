@@ -37,6 +37,9 @@ Rails.application.routes.draw do
   end
   resources :shopping_items, only: [ :create, :update, :destroy ]
 
+  # Lunch tracker
+  resources :lunch_logs, only: [ :index, :create, :destroy ]
+
   # Cron endpoints
   scope :cron do
     post "monthly_rollover",          to: "cron#monthly_rollover",          as: :cron_monthly_rollover

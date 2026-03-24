@@ -4,7 +4,7 @@
      aria-labelledby="<%= @id %>-title"
      data-controller="modal"
      data-action="keydown.esc->modal#close"
-     class="<%= ui.modal_overlay %> hidden">
+     class="<%= ui.modal_overlay %><%= " hidden" unless @open %>">
 
   <div data-modal-target="card"
        class="<%= ui.modal_card %>">

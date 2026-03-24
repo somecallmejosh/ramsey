@@ -6,16 +6,24 @@ export default class extends Controller {
   connect() {
     this._focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     this._previouslyFocused = null
+
+    // Auto-open when rendered already visible (e.g., loaded via Turbo Frame)
+    if (!this.element.classList.contains("hidden")) {
+      document.body.style.overflow = "hidden"
+      this._trapFocus()
+    }
   }
 
   open() {
     this.element.classList.remove("hidden")
+    document.body.style.overflow = "hidden"
     this._previouslyFocused = document.activeElement
     this._trapFocus()
   }
 
   close() {
     this.element.classList.add("hidden")
+    document.body.style.overflow = ""
     if (this._previouslyFocused) {
       this._previouslyFocused.focus()
       this._previouslyFocused = null

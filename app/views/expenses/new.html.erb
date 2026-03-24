@@ -1,9 +1,11 @@
 <%= turbo_frame_tag "modal" do %>
-  <div class="<%= ui.card %> mb-4">
-    <%= render ExpenseFormComponent.new(expense: @expense, envelope: @envelope) %>
-
-    <div class="mt-4">
-      <%= link_to "Cancel", root_path, class: ui.link(:subtle), data: { turbo_frame: "modal" } %>
-    </div>
-  </div>
+  <%= render ModalComponent.new(title: "Log Expense", id: "expense-modal", open: true) do |m| %>
+    <% m.with_body do %>
+      <p class="<%= ui.label(:secondary) %> -mt-4 mb-6"><%= @envelope.name %></p>
+      <%= render ExpenseFormComponent.new(expense: @expense, envelope: @envelope) %>
+      <div class="mt-4">
+        <%= link_to "Cancel", root_path, class: ui.link(:subtle), data: { turbo_frame: "modal" } %>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>
