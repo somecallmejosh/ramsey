@@ -10,7 +10,7 @@ class CreateExpenses < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :expenses, [:envelope_id, :transacted_on]
+    add_index :expenses, [ :envelope_id, :transacted_on ]
 
     execute "ALTER TABLE expenses ADD CONSTRAINT expenses_amount_positive CHECK (amount > 0)"
   end

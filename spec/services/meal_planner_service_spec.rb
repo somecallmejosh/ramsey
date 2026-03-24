@@ -35,7 +35,7 @@ RSpec.describe MealPlannerService do
         status: 200,
         headers: { "Content-Type" => "application/json" },
         body: {
-          content: [{ type: "text", text: body.to_json }]
+          content: [ { type: "text", text: body.to_json } ]
         }.to_json
       )
   end
@@ -46,7 +46,7 @@ RSpec.describe MealPlannerService do
         status: 200,
         headers: { "Content-Type" => "application/json" },
         body: {
-          content: [{ type: "text", text: "Sorry, I cannot help with that." }]
+          content: [ { type: "text", text: "Sorry, I cannot help with that." } ]
         }.to_json
       )
   end
@@ -139,7 +139,7 @@ RSpec.describe MealPlannerService do
       before { stub_claude_success }
 
       let(:image_data) do
-        [{ content_type: "image/jpeg", data: Base64.strict_encode64("fake-image-bytes") }]
+        [ { content_type: "image/jpeg", data: Base64.strict_encode64("fake-image-bytes") } ]
       end
 
       it "includes images in the API request" do

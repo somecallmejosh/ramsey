@@ -22,7 +22,7 @@ RSpec.describe Envelope, type: :model do
     it "ordered scope returns envelopes by position" do
       e2 = create(:envelope, position: 2)
       e1 = create(:envelope, position: 1)
-      expect(Envelope.ordered.to_a).to eq([e1, e2])
+      expect(Envelope.ordered.to_a).to eq([ e1, e2 ])
     end
   end
 

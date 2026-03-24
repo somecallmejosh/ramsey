@@ -18,9 +18,9 @@ class UiPresenter
       primary:   "bg-hs-primary text-white hover:bg-hs-primary-dark " \
                  "focus-visible:ring-hs-primary disabled:bg-hs-muted disabled:text-white",
       secondary: "bg-transparent text-hs-primary border border-hs-primary " \
-                 "hover:bg-hs-blue-pale focus-visible:ring-hs-primary disabled:opacity-40",
+                 "hover:bg-hs-blue-pale focus-visible:ring-hs-primary disabled:opacity-40"
     }
-    [base, variants[variant], extra].compact.join(" ")
+    [ base, variants[variant], extra ].compact.join(" ")
   end
 
   def input(state = :default)
@@ -28,28 +28,28 @@ class UiPresenter
            "text-hs-navy placeholder:text-hs-muted focus:outline-none focus-visible:ring-2"
     states = {
       default: "border-hs-border focus-visible:border-hs-primary focus-visible:ring-hs-primary",
-      error:   "border-hs-red focus-visible:border-hs-red focus-visible:ring-hs-red",
+      error:   "border-hs-red focus-visible:border-hs-red focus-visible:ring-hs-red"
     }
-    [base, states[state]].join(" ")
+    [ base, states[state] ].join(" ")
   end
 
   def label(variant = :default)
     {
       default:   "text-[13px] font-semibold text-hs-slate",
       secondary: "text-[15px] text-hs-slate leading-[140%]",
-      accent:    "text-xl font-semibold text-hs-primary",
+      accent:    "text-xl font-semibold text-hs-primary"
     }[variant]
   end
 
   def stat_value(variant: :default)
     base = "text-[32px] font-bold leading-[140%]"
-    [base, { default: "text-hs-navy", danger: "text-hs-red" }[variant]].join(" ")
+    [ base, { default: "text-hs-navy", danger: "text-hs-red" }[variant] ].join(" ")
   end
 
   def link(variant = :default)
     {
       default: "text-hs-primary font-semibold underline-offset-2 hover:underline",
-      subtle:  "text-[13px] text-hs-slate hover:text-hs-primary transition-colors",
+      subtle:  "text-[13px] text-hs-slate hover:text-hs-primary transition-colors"
     }[variant]
   end
 
@@ -91,7 +91,7 @@ class UiPresenter
   def nav_item(active: false)
     base = "flex flex-col items-center gap-1 px-3 py-2 text-[13px] font-semibold transition-colors min-w-[44px] min-h-[44px] justify-center"
     state = active ? "text-hs-primary" : "text-hs-muted hover:text-hs-slate"
-    [base, state].join(" ")
+    [ base, state ].join(" ")
   end
 
   def page_heading

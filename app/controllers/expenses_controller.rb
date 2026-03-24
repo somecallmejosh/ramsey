@@ -1,6 +1,6 @@
 class ExpensesController < ApplicationController
   before_action :set_envelope
-  before_action :set_expense, only: [:destroy]
+  before_action :set_expense, only: [ :destroy ]
 
   def index
     @year  = (params[:year]  || Date.current.year).to_i

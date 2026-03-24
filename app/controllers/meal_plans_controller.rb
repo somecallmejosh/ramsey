@@ -1,5 +1,5 @@
 class MealPlansController < ApplicationController
-  before_action :set_meal_plan, only: [:show, :confirm]
+  before_action :set_meal_plan, only: [ :show, :confirm ]
 
   # GET /meal_plans/new
   def new
@@ -116,5 +116,4 @@ class MealPlansController < ApplicationController
       }
     end
   end
-
 end

@@ -1,7 +1,7 @@
 class EnvelopeBudgetsController < ApplicationController
   include RequireAdmin
 
-  before_action :require_admin_role, only: [:update]
+  before_action :require_admin_role, only: [ :update ]
   before_action :set_envelope_budget
 
   def edit

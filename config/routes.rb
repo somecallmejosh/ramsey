@@ -9,15 +9,15 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # Envelope dashboard and detail
-  resources :envelopes, only: [:new, :create, :edit, :update] do
-    resources :expenses, only: [:index, :new, :create, :destroy]
-    resources :envelope_budgets, only: [:edit, :update], shallow: true
+  resources :envelopes, only: [ :new, :create, :edit, :update ] do
+    resources :expenses, only: [ :index, :new, :create, :destroy ]
+    resources :envelope_budgets, only: [ :edit, :update ], shallow: true
   end
 
   # Admin settings
   namespace :admin do
-    resource :settings, only: [:show, :update]
-    resources :envelopes, only: [:index, :new, :create, :edit, :update] do
+    resource :settings, only: [ :show, :update ]
+    resources :envelopes, only: [ :index, :new, :create, :edit, :update ] do
       member do
         patch :deactivate
         patch :reactivate
@@ -30,12 +30,12 @@ Rails.application.routes.draw do
       constraints: { year: /\d{4}/, month: /\d{1,2}/ }
 
   # Meal planner
-  resources :meal_plans, only: [:new, :create, :show] do
+  resources :meal_plans, only: [ :new, :create, :show ] do
     member do
       patch :confirm
     end
   end
-  resources :shopping_items, only: [:update]
+  resources :shopping_items, only: [ :update ]
 
   # Cron endpoints
   scope :cron do

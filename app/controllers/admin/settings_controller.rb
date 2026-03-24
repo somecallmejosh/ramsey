@@ -27,7 +27,7 @@ module Admin
       end
 
       if records.any?
-        EnvelopeBudget.upsert_all(records, unique_by: [:envelope_id, :year, :month])
+        EnvelopeBudget.upsert_all(records, unique_by: [ :envelope_id, :year, :month ])
       end
 
       redirect_to admin_settings_path, notice: "Budgets saved."

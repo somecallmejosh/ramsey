@@ -24,8 +24,8 @@ envelope_data = [
   { name: "Clothing",          position: 5,  budget:  75.00 },
   { name: "Entertainment",     position: 6,  budget:  75.00 },
   { name: "Blow money — Josh", position: 7,  budget:  50.00 },
-  { name: "Blow money — Sally",position: 8,  budget:  50.00 },
-  { name: "Hygiene",           position: 9,  budget:  50.00 },
+  { name: "Blow money — Sally", position: 8,  budget:  50.00 },
+  { name: "Hygiene",           position: 9,  budget:  50.00 }
 ]
 
 year  = Date.current.year

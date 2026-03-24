@@ -37,7 +37,7 @@ gem "rack-attack"
 gem "sentry-ruby"
 gem "sentry-rails"
 
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

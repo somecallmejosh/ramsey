@@ -5,7 +5,7 @@ RSpec.describe "MealPlans", type: :request do
 
   let(:api_stub_body) do
     {
-      content: [{
+      content: [ {
         type: "text",
         text: {
           meals: [
@@ -28,7 +28,7 @@ RSpec.describe "MealPlans", type: :request do
             { name: "Ground beef", quantity: "2 lbs", estimated_cost: 8.00, store: "Aldi" }
           ]
         }.to_json
-      }]
+      } ]
     }.to_json
   end
 

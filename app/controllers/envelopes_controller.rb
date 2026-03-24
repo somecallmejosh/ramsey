@@ -1,8 +1,8 @@
 class EnvelopesController < ApplicationController
   include RequireAdmin
 
-  before_action :require_admin_role, only: [:new, :create, :edit, :update]
-  before_action :set_envelope, only: [:edit, :update]
+  before_action :require_admin_role, only: [ :new, :create, :edit, :update ]
+  before_action :set_envelope, only: [ :edit, :update ]
 
   def new
     @envelope        = Envelope.new

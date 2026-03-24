@@ -16,6 +16,6 @@ class MonthlyRolloverJob < ApplicationJob
           amount: eb.amount, created_at: Time.current, updated_at: Time.current }
       end
 
-    EnvelopeBudget.upsert_all(records, unique_by: [:envelope_id, :year, :month]) if records.any?
+    EnvelopeBudget.upsert_all(records, unique_by: [ :envelope_id, :year, :month ]) if records.any?
   end
 end

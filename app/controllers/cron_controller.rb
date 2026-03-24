@@ -1,7 +1,7 @@
 class CronController < ApplicationController
-  skip_before_action :require_authentication, only: [:monthly_rollover, :purge_unconfirmed_meal_plans]
-  skip_before_action :verify_authenticity_token, only: [:monthly_rollover, :purge_unconfirmed_meal_plans]
-  skip_before_action :check_session_expiry, only: [:monthly_rollover, :purge_unconfirmed_meal_plans]
+  skip_before_action :require_authentication, only: [ :monthly_rollover, :purge_unconfirmed_meal_plans ]
+  skip_before_action :verify_authenticity_token, only: [ :monthly_rollover, :purge_unconfirmed_meal_plans ]
+  skip_before_action :check_session_expiry, only: [ :monthly_rollover, :purge_unconfirmed_meal_plans ]
   before_action :authenticate_cron_token
 
   def monthly_rollover

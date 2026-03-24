@@ -17,7 +17,7 @@ class MealPlannerService
       model:      MODEL,
       max_tokens: MAX_TOKENS,
       system:     system_prompt,
-      messages:   [{ role: "user", content: user_content }]
+      messages:   [ { role: "user", content: user_content } ]
     )
 
     parse_response(response.content.first.text)

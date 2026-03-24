@@ -4,7 +4,7 @@ class EnvelopeBudget < ApplicationRecord
   validates :year, presence: true, numericality: { only_integer: true }
   validates :month, presence: true,
                     numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 12 },
-                    uniqueness: { scope: [:envelope_id, :year] }
+                    uniqueness: { scope: [ :envelope_id, :year ] }
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   before_update :prevent_prior_month_modification

@@ -3,7 +3,7 @@ module Admin
     include RequireAdmin
 
     before_action :require_admin_role
-    before_action :set_envelope, only: [:deactivate, :reactivate]
+    before_action :set_envelope, only: [ :deactivate, :reactivate ]
 
     def deactivate
       @envelope.update!(active: false)

@@ -4,7 +4,7 @@ class EmojiComponent < ApplicationComponent
     2 => "Over budget",
     3 => "On track",
     4 => "Under budget",
-    5 => "Well under budget",
+    5 => "Well under budget"
   }.freeze
 
   def initialize(score:, size: :small)
