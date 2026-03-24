@@ -8,12 +8,16 @@ class MealPlan < ApplicationRecord
   validate  :week_start_must_be_sunday
   validate  :confirmed_at_not_cleared_after_set
 
+  STATUSES = %w[pending processing ready failed].freeze
+
   scope :confirmed,   -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
 
-  def confirmed?
-    confirmed_at.present?
-  end
+  def confirmed? = confirmed_at.present?
+  def pending?   = status == "pending"
+  def processing? = status == "processing"
+  def ready?     = status == "ready"
+  def failed?    = status == "failed"
 
   private
 

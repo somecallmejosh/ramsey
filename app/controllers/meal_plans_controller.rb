@@ -3,10 +3,11 @@ class MealPlansController < ApplicationController
 
   # GET /meal_plans/new
   def new
-    # If a confirmed plan exists for this week, redirect to it
     this_week = Date.current.beginning_of_week(:sunday)
-    if (plan = MealPlan.confirmed.find_by(week_start: this_week))
-      redirect_to meal_plan_path(plan) and return
+
+    # Redirect to any in-progress or confirmed plan for this week
+    if (plan = MealPlan.where(week_start: this_week).first)
+      redirect_to meal_plan_path(plan) and return unless plan.failed?
     end
   end
 
@@ -14,12 +15,11 @@ class MealPlansController < ApplicationController
   def create
     week_start = Date.current.beginning_of_week(:sunday)
 
-    # Destroy any existing unconfirmed plan for this week so Sally can retry immediately
+    # Destroy any existing unconfirmed plan for this week so the user can retry
     MealPlan.unconfirmed.where(week_start: week_start).destroy_all
 
     @meal_plan = MealPlan.new(user: current_user, week_start: week_start)
 
-    # Attach pantry images before saving so Active Storage blobs are associated
     if params[:pantry_images].present?
       @meal_plan.pantry_images.attach(params[:pantry_images])
     end
@@ -29,27 +29,10 @@ class MealPlansController < ApplicationController
       render :new, status: :unprocessable_entity and return
     end
 
-    # Encode any attached images for the API call
-    images = encode_images(@meal_plan)
-
     groceries_remaining = helpers.current_groceries_remaining
-    result = MealPlannerService.new(
-      message:             params[:message].to_s.strip,
-      groceries_remaining: groceries_remaining,
-      images:              images
-    ).call
+    MealPlannerJob.perform_later(@meal_plan.id, params[:message].to_s.strip, groceries_remaining)
 
-    if result.success?
-      @meal_plan.update!(ai_response: {
-        meals:          result.meals,
-        shopping_items: result.shopping_items
-      })
-      redirect_to meal_plan_path(@meal_plan)
-    else
-      @meal_plan.destroy
-      flash.now[:alert] = result.error
-      render :new, status: :unprocessable_entity
-    end
+    redirect_to meal_plan_path(@meal_plan)
   end
 
   # GET /meal_plans/:id  — preview (unconfirmed) or confirmed view
@@ -106,14 +89,4 @@ class MealPlansController < ApplicationController
     @meal_plan = MealPlan.find(params[:id])
   end
 
-  def encode_images(meal_plan)
-    return [] unless meal_plan.pantry_images.attached?
-
-    meal_plan.pantry_images.map do |image|
-      {
-        content_type: image.content_type,
-        data:         Base64.strict_encode64(image.blob.download)
-      }
-    end
-  end
 end

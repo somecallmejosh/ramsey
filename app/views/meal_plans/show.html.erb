@@ -1,4 +1,19 @@
-<% if @meal_plan.confirmed? %>
+<% if @meal_plan.pending? || @meal_plan.processing? %>
+  <%# ── Processing spinner ─────────────────────────────────────────────────── %>
+  <meta http-equiv="refresh" content="3">
+
+  <div class="flex flex-col items-center justify-center py-20 gap-6">
+    <div class="w-10 h-10 border-4 border-hs-blue-light border-t-hs-primary rounded-full animate-spin"></div>
+    <p class="<%= ui.label(:secondary) %>">Building your meal plan…</p>
+  </div>
+
+<% elsif @meal_plan.failed? %>
+  <%# ── Error state ─────────────────────────────────────────────────────────── %>
+  <h1 class="<%= ui.page_heading %> mb-2">Something went wrong</h1>
+  <p class="<%= ui.label(:secondary) %> mb-6"><%= @meal_plan.error_message || "An unexpected error occurred." %></p>
+  <%= link_to "Try again", new_meal_plan_path, class: ui.button(:primary) %>
+
+<% elsif @meal_plan.confirmed? %>
   <%# ── Confirmed plan view ──────────────────────────────────────────────── %>
 
   <div class="flex items-center gap-3 mb-6">
