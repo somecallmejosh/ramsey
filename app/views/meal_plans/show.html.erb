@@ -2,9 +2,12 @@
   <%# ── Processing spinner ─────────────────────────────────────────────────── %>
   <meta http-equiv="refresh" content="3">
 
-  <div class="flex flex-col items-center justify-center py-20 gap-6">
+  <div class="flex flex-col items-center justify-center py-20 gap-4 text-center px-4">
     <div class="w-10 h-10 border-4 border-hs-blue-light border-t-hs-primary rounded-full animate-spin"></div>
-    <p class="<%= ui.label(:secondary) %>">Building your meal plan…</p>
+    <p class="text-lg font-semibold text-hs-navy">Cool, I can work with these!</p>
+    <p class="<%= ui.label(:secondary) %>">Give me a minute to think about it, and I'll have your menu ready shortly.</p>
+    <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
+          class: "mt-6 #{ui.link(:subtle)}" %>
   </div>
 
 <% elsif @meal_plan.failed? %>
@@ -127,8 +130,9 @@
 
   <% end %>
 
-  <div class="text-center mt-4 pb-6">
-    <%= link_to "Start over", new_meal_plan_path, class: ui.link(:subtle) %>
+  <div class="text-center mt-4 pb-6 mb-10">
+    <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
+          class: ui.link(:subtle) %>
   </div>
 
 <% end %>

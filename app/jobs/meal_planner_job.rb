@@ -1,3 +1,5 @@
+require "image_processing/mini_magick"
+
 class MealPlannerJob < ApplicationJob
   queue_as :default
 
@@ -29,14 +31,22 @@ class MealPlannerJob < ApplicationJob
 
   private
 
+  HEIC_TYPES = %w[image/heic image/heif].freeze
+
   def encode_images(meal_plan)
     return [] unless meal_plan.pantry_images.attached?
 
     meal_plan.pantry_images.map do |image|
-      {
-        content_type: image.content_type,
-        data:         Base64.strict_encode64(image.blob.download)
-      }
+      blob = image.blob
+
+      if HEIC_TYPES.include?(blob.content_type.to_s.downcase)
+        blob.open do |tmp|
+          processed = ImageProcessing::MiniMagick.source(tmp).convert("jpeg").call
+          { content_type: "image/jpeg", data: Base64.strict_encode64(processed.read) }
+        end
+      else
+        { content_type: blob.content_type, data: Base64.strict_encode64(blob.download) }
+      end
     end
   end
 end

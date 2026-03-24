@@ -30,7 +30,7 @@ Rails.application.routes.draw do
       constraints: { year: /\d{4}/, month: /\d{1,2}/ }
 
   # Meal planner
-  resources :meal_plans, only: [ :new, :create, :show ] do
+  resources :meal_plans, only: [ :new, :create, :show, :destroy ] do
     member do
       patch :confirm
     end

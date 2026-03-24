@@ -1,5 +1,5 @@
 class MealPlansController < ApplicationController
-  before_action :set_meal_plan, only: [ :show, :confirm ]
+  before_action :set_meal_plan, only: [ :show, :confirm, :destroy ]
 
   # GET /meal_plans/new
   def new
@@ -37,6 +37,12 @@ class MealPlansController < ApplicationController
 
   # GET /meal_plans/:id  — preview (unconfirmed) or confirmed view
   def show
+  end
+
+  # DELETE /meal_plans/:id
+  def destroy
+    @meal_plan.destroy
+    redirect_to new_meal_plan_path
   end
 
   # PATCH /meal_plans/:id/confirm
@@ -88,5 +94,4 @@ class MealPlansController < ApplicationController
   def set_meal_plan
     @meal_plan = MealPlan.find(params[:id])
   end
-
 end
