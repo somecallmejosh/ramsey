@@ -1,0 +1,158 @@
+<% if @meal_plan.confirmed? %>
+  <%# ── Confirmed plan view ──────────────────────────────────────────────── %>
+
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
+      New plan
+    <% end %>
+    <h1 class="<%= ui.page_heading %>">This Week</h1>
+  </div>
+
+  <p class="<%= ui.label(:secondary) %> mb-6">
+    Week of <%= @meal_plan.week_start.strftime("%B %-d") %>
+  </p>
+
+  <%# Meal grid %>
+  <div class="grid grid-cols-1 gap-3 mb-8">
+    <% @meal_plan.meals.order(:day_of_week).each do |meal| %>
+      <div class="<%= ui.card %>">
+        <div class="<%= ui.card_header %>">
+          <h2 class="<%= ui.label %>"><%= meal.day_name %></h2>
+          <% if meal.estimated_cost&.positive? %>
+            <span class="<%= ui.label(:secondary) %>"><%= number_to_currency(meal.estimated_cost) %></span>
+          <% end %>
+        </div>
+        <p class="text-lg font-semibold text-hs-navy"><%= meal.dinner %></p>
+        <p class="<%= ui.label(:secondary) %>">Lunch: <%= meal.lunch %></p>
+        <% if meal.prep_note.present? %>
+          <p class="<%= ui.label(:secondary) %> mt-1 italic"><%= meal.prep_note %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Shopping list %>
+  <% if @meal_plan.shopping_items.any? %>
+    <h2 class="<%= ui.section_heading %>">Shopping List</h2>
+    <% total     = @meal_plan.shopping_items.sum { |i| i.estimated_cost || 0 } %>
+    <% remaining = current_groceries_remaining %>
+
+    <% if total > remaining %>
+      <div class="<%= ui.warning_banner %> mb-4">
+        Estimated cart (<%= number_to_currency(total) %>) exceeds your remaining grocery budget (<%= number_to_currency(remaining) %>).
+      </div>
+    <% end %>
+
+    <div class="<%= ui.card %> mb-4">
+      <% @meal_plan.shopping_items.order(:store, :name).each do |item| %>
+        <div id="shopping_item_<%= item.id %>">
+          <%= form_with model: item, url: shopping_item_path(item), method: :patch do |f| %>
+            <div class="flex items-center gap-3 py-3 border-b border-hs-border last:border-0">
+              <%= f.check_box :checked,
+                    id: "item_#{item.id}",
+                    class: "w-5 h-5 rounded border-hs-border text-hs-primary focus:ring-hs-primary",
+                    onchange: "this.form.requestSubmit()",
+                    checked: item.checked %>
+              <label for="item_<%= item.id %>"
+                     class="flex-1 text-lg <%= item.checked? ? "line-through text-hs-muted" : "text-hs-navy" %>">
+                <%= item.name %>
+                <span class="<%= ui.label(:secondary) %> ml-1"><%= item.quantity %></span>
+              </label>
+              <% if item.estimated_cost&.positive? %>
+                <span class="<%= ui.label(:secondary) %> shrink-0"><%= number_to_currency(item.estimated_cost) %></span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="<%= ui.stat_card %> mb-6">
+      <p class="<%= ui.label %> mb-1">Estimated total</p>
+      <p class="<%= ui.stat_value %>"><%= number_to_currency(total) %></p>
+      <p class="<%= ui.label(:secondary) %>">
+        <%= number_to_currency(remaining) %> remaining in groceries
+      </p>
+    </div>
+  <% end %>
+
+<% else %>
+  <%# ── Preview (unconfirmed) ──────────────────────────────────────────────── %>
+
+  <h1 class="<%= ui.page_heading %> mb-2">Review Your Plan</h1>
+  <p class="<%= ui.label(:secondary) %> mb-6">Edit any meals before confirming.</p>
+
+  <% ai = @meal_plan.ai_response || {} %>
+  <% meals          = ai["meals"]          || [] %>
+  <% shopping_items = ai["shopping_items"] || [] %>
+
+  <%= form_with url: confirm_meal_plan_path(@meal_plan), method: :patch,
+        data: { turbo: false } do |f| %>
+
+    <%# Editable meal rows %>
+    <div class="grid grid-cols-1 gap-3 mb-6">
+      <% meals.each_with_index do |meal, i| %>
+        <% day_name = Meal::DAY_NAMES[meal["day_of_week"].to_i] %>
+        <div class="<%= ui.card %>">
+          <p class="<%= ui.label %> mb-3"><%= day_name %></p>
+
+          <input type="hidden" name="meals[<%= i %>][day_of_week]" value="<%= meal["day_of_week"] %>">
+
+          <div class="mb-2">
+            <label class="<%= ui.label(:secondary) %> block mb-1">Dinner</label>
+            <input type="text"
+                   name="meals[<%= i %>][dinner]"
+                   value="<%= meal["dinner"] %>"
+                   class="<%= ui.input %>" />
+          </div>
+          <div class="mb-2">
+            <label class="<%= ui.label(:secondary) %> block mb-1">Lunch</label>
+            <input type="text"
+                   name="meals[<%= i %>][lunch]"
+                   value="<%= meal["lunch"] %>"
+                   class="<%= ui.input %>" />
+          </div>
+          <% if meal["prep_note"].present? %>
+            <input type="hidden" name="meals[<%= i %>][prep_note]" value="<%= meal["prep_note"] %>">
+          <% end %>
+          <input type="hidden" name="meals[<%= i %>][estimated_cost]" value="<%= meal["estimated_cost"] %>">
+        </div>
+      <% end %>
+    </div>
+
+    <%# Shopping items (read-only in preview) %>
+    <% if shopping_items.any? %>
+      <h2 class="<%= ui.section_heading %>">Shopping List</h2>
+      <div class="<%= ui.card %> mb-6">
+        <% shopping_items.each_with_index do |item, i| %>
+          <div class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+            <div>
+              <p class="text-lg text-hs-navy"><%= item["name"] %></p>
+              <p class="<%= ui.label(:secondary) %>"><%= item["quantity"] %> · <%= item["store"] %></p>
+            </div>
+            <% if item["estimated_cost"]&.positive? %>
+              <span class="<%= ui.label(:secondary) %>"><%= number_to_currency(item["estimated_cost"]) %></span>
+            <% end %>
+          </div>
+          <input type="hidden" name="shopping_items[<%= i %>][name]"           value="<%= item["name"] %>">
+          <input type="hidden" name="shopping_items[<%= i %>][quantity]"       value="<%= item["quantity"] %>">
+          <input type="hidden" name="shopping_items[<%= i %>][estimated_cost]" value="<%= item["estimated_cost"] %>">
+          <input type="hidden" name="shopping_items[<%= i %>][store]"          value="<%= item["store"] %>">
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Confirm button %>
+    <div class="fixed bottom-20 left-0 right-0 px-4 max-w-md mx-auto">
+      <%= f.submit "Confirm plan",
+            class: "#{ui.button(:primary)} w-full",
+            data: { disable_with: "Saving…" } %>
+    </div>
+
+  <% end %>
+
+  <div class="text-center mt-4 pb-6">
+    <%= link_to "Start over", new_meal_plan_path, class: ui.link(:subtle) %>
+  </div>
+
+<% end %>

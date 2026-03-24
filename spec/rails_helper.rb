@@ -1,4 +1,6 @@
 require "spec_helper"
+require "webmock/rspec"
+WebMock.disable_net_connect!(allow_localhost: true)
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 abort("The Rails environment is running in production mode!") if Rails.env.production?

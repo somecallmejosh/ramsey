@@ -6,11 +6,9 @@
       <span>Budget</span>
     <% end %>
 
-    <% if false # meal planner — Phase 3 %>
-      <%= link_to "#", class: ui.nav_item, aria: { label: "Meal Planner" } do %>
-        <%= icon "quote", classes: "w-6 h-6" %>
-        <span>Meals</span>
-      <% end %>
+    <%= link_to new_meal_plan_path, class: ui.nav_item(active: active?(new_meal_plan_path)), aria: { label: "Meal Planner" } do %>
+      <%= icon "quote", classes: "w-6 h-6" %>
+      <span>Meals</span>
     <% end %>
 
     <% if admin? %>

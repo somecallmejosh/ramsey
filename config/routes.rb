@@ -29,6 +29,14 @@ Rails.application.routes.draw do
   get "dashboard(/:year/:month)", to: "dashboard#index", as: :dashboard,
       constraints: { year: /\d{4}/, month: /\d{1,2}/ }
 
+  # Meal planner
+  resources :meal_plans, only: [:new, :create, :show] do
+    member do
+      patch :confirm
+    end
+  end
+  resources :shopping_items, only: [:update]
+
   # Cron endpoints
   scope :cron do
     post "monthly_rollover",          to: "cron#monthly_rollover",          as: :cron_monthly_rollover

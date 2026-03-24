@@ -1,0 +1,46 @@
+<h1 class="<%= ui.page_heading %> mb-2">Meal Planner</h1>
+<p class="<%= ui.label(:secondary) %> mb-6">Describe your week and I'll build a meal plan and shopping list.</p>
+
+<%= form_with url: meal_plans_path, method: :post,
+      html: { enctype: "multipart/form-data" },
+      data: { turbo: false } do |f| %>
+
+  <%# Message input %>
+  <div class="mb-4">
+    <label for="message" class="<%= ui.label %> block mb-1">What are you working with this week?</label>
+    <%= text_area_tag :message,
+          nil,
+          id: "message",
+          placeholder: "e.g. We have chicken breasts and frozen veggies. Keep it simple — busy week.",
+          rows: 4,
+          class: "#{ui.input} resize-none",
+          aria: { required: true } %>
+  </div>
+
+  <%# Photo upload %>
+  <div class="mb-6">
+    <label for="pantry_images" class="<%= ui.label %> block mb-1">
+      Pantry or freezer photos <span class="font-normal text-hs-muted">(optional)</span>
+    </label>
+    <input type="file"
+           id="pantry_images"
+           name="pantry_images[]"
+           multiple
+           accept="image/jpeg,image/png,image/webp"
+           class="w-full text-[15px] text-hs-slate
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-[13px] file:font-semibold
+                  file:bg-hs-blue-pale file:text-hs-primary
+                  hover:file:bg-hs-blue-light" />
+    <p class="<%= ui.label(:secondary) %> mt-1">JPEG, PNG, or WebP · max 3.75 MB each</p>
+  </div>
+
+  <%# Submit %>
+  <div class="fixed bottom-20 left-0 right-0 px-4 max-w-md mx-auto">
+    <%= f.submit "Generate meal plan",
+          class: "#{ui.button(:primary)} w-full",
+          data: { disable_with: "Thinking…" } %>
+  </div>
+
+<% end %>

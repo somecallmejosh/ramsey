@@ -31,6 +31,7 @@
     --color-hs-border: #CBCDD0;
     --color-hs-primary: #4865DB;
     --color-hs-primary-dark: #2A4CD5;
+    --color-hs-blue-light: #C7D3F7;
     --color-hs-blue-pale: #E0E6FA;
     --color-hs-red: #E60013;
     --color-hs-red-soft: #FF9B99;
@@ -310,6 +311,9 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
+  .ml-1 {
+    margin-left: calc(var(--spacing) * 1);
+  }
   .ml-2 {
     margin-left: calc(var(--spacing) * 2);
   }
@@ -406,6 +410,9 @@
   .cursor-pointer {
     cursor: pointer;
   }
+  .resize-none {
+    resize: none;
+  }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
@@ -443,6 +450,9 @@
   }
   .overflow-x-auto {
     overflow-x: auto;
+  }
+  .rounded {
+    border-radius: 0.25rem;
   }
   .rounded-2xl {
     border-radius: var(--radius-2xl);
@@ -564,6 +574,9 @@
   .pb-2 {
     padding-bottom: calc(var(--spacing) * 2);
   }
+  .pb-6 {
+    padding-bottom: calc(var(--spacing) * 6);
+  }
   .pb-24 {
     padding-bottom: calc(var(--spacing) * 24);
   }
@@ -641,6 +654,12 @@
   .capitalize {
     text-transform: capitalize;
   }
+  .italic {
+    font-style: italic;
+  }
+  .line-through {
+    text-decoration-line: line-through;
+  }
   .underline-offset-2 {
     text-underline-offset: 2px;
   }
@@ -662,6 +681,53 @@
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .file\:mr-4 {
+    &::file-selector-button {
+      margin-right: calc(var(--spacing) * 4);
+    }
+  }
+  .file\:rounded-full {
+    &::file-selector-button {
+      border-radius: var(--radius-full);
+    }
+  }
+  .file\:border-0 {
+    &::file-selector-button {
+      border-style: var(--tw-border-style);
+      border-width: 0px;
+    }
+  }
+  .file\:bg-hs-blue-pale {
+    &::file-selector-button {
+      background-color: var(--color-hs-blue-pale);
+    }
+  }
+  .file\:px-4 {
+    &::file-selector-button {
+      padding-inline: calc(var(--spacing) * 4);
+    }
+  }
+  .file\:py-2 {
+    &::file-selector-button {
+      padding-block: calc(var(--spacing) * 2);
+    }
+  }
+  .file\:text-\[13px\] {
+    &::file-selector-button {
+      font-size: 13px;
+    }
+  }
+  .file\:font-semibold {
+    &::file-selector-button {
+      --tw-font-weight: var(--font-weight-semibold);
+      font-weight: var(--font-weight-semibold);
+    }
+  }
+  .file\:text-hs-primary {
+    &::file-selector-button {
+      color: var(--color-hs-primary);
+    }
   }
   .placeholder\:text-hs-muted {
     &::placeholder {
@@ -730,6 +796,15 @@
       }
     }
   }
+  .hover\:file\:bg-hs-blue-light {
+    &:hover {
+      @media (hover: hover) {
+        &::file-selector-button {
+          background-color: var(--color-hs-blue-light);
+        }
+      }
+    }
+  }
   .focus\:not-sr-only {
     &:focus {
       position: static;
@@ -785,6 +860,11 @@
   .focus\:text-white {
     &:focus {
       color: var(--color-white);
+    }
+  }
+  .focus\:ring-hs-primary {
+    &:focus {
+      --tw-ring-color: var(--color-hs-primary);
     }
   }
   .focus\:outline-none {
