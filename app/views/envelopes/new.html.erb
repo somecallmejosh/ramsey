@@ -1,0 +1,42 @@
+<h1 class="<%= ui.page_heading %> mb-6">New Envelope</h1>
+
+<div class="<%= ui.card %>">
+  <%= form_with model: @envelope, url: envelopes_path do |f| %>
+    <% if @envelope.errors.any? %>
+      <div class="<%= ui.warning_banner %> mb-4" role="alert">
+        <% @envelope.errors.full_messages.each do |msg| %>
+          <p><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <label for="envelope_name" class="<%= ui.label %> block mb-1">Name <span aria-hidden="true">*</span></label>
+      <%= f.text_field :name,
+            id: "envelope_name",
+            placeholder: "e.g. Groceries",
+            class: ui.input,
+            aria: { required: true },
+            autofocus: true %>
+    </div>
+
+    <div class="mb-6">
+      <label for="envelope_budget_amount" class="<%= ui.label %> block mb-1">
+        Monthly budget for <%= Date.current.strftime("%B") %> <span aria-hidden="true">*</span>
+      </label>
+      <input type="number"
+             id="envelope_budget_amount"
+             name="envelope_budget_amount"
+             placeholder="0.00"
+             step="0.01"
+             min="0"
+             class="<%= ui.input %>"
+             aria-required="true">
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "Create Envelope", class: ui.button(:primary) %>
+      <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary) %>
+    </div>
+  <% end %>
+</div>

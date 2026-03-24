@@ -1,0 +1,39 @@
+<%# Turbo Frame wraps each card so only this card re-renders on expense submit %>
+<%= turbo_frame_tag "envelope_card_#{@envelope.id}" do %>
+  <div class="<%= ui.stat_card %>" data-envelope-card>
+    <div class="<%= ui.card_header %>">
+      <h3 class="<%= ui.label %>"><%= @envelope.name %></h3>
+      <% if budget_score %>
+        <%= render EmojiComponent.new(score: budget_score, size: :small) %>
+      <% else %>
+        <span class="<%= ui.label(:secondary) %>" aria-label="No budget set">–</span>
+      <% end %>
+    </div>
+
+    <%# aria-live announces balance updates to screen readers without moving focus %>
+    <p class="<%= ui.stat_value(variant: over_budget? ? :danger : :default) %>"
+       aria-live="polite"
+       aria-atomic="true">
+      <%= number_to_currency(remaining.abs) %>
+    </p>
+    <p class="<%= ui.label(:secondary) %>">
+      <%= over_budget? ? "over budget" : "remaining" %>
+      <span class="ml-2 opacity-60">of <%= number_to_currency(@budget) %></span>
+    </p>
+
+    <div class="flex items-center justify-between mt-4">
+      <% if current_month? %>
+        <%= link_to "Log expense",
+              new_envelope_expense_path(@envelope),
+              class: "#{ui.button(:primary, extra: "text-sm px-5 py-2")}",
+              data: { turbo_frame: "modal" } %>
+      <% end %>
+
+      <% if admin? && (eb = envelope_budget_for_edit) %>
+        <%= link_to "Edit budget",
+              edit_envelope_budget_path(eb),
+              class: ui.link(:subtle) %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

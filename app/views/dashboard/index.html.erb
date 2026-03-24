@@ -1,0 +1,37 @@
+<%= render PageHeadingComponent.new(current_user: current_user, selected_date: @selected_date) %>
+
+<%# Month selector %>
+<div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
+  <% 6.downto(0) do |n| %>
+    <% d = Date.current.beginning_of_month - n.months %>
+    <% is_current = d.month == @month && d.year == @year %>
+    <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
+          dashboard_path(year: d.year, month: d.month),
+          class: "flex-none px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors #{is_current ? "bg-hs-primary text-white" : "bg-white text-hs-slate border border-hs-border hover:border-hs-primary"}" %>
+  <% end %>
+</div>
+
+<%# Envelope cards %>
+<div class="grid grid-cols-1 gap-4">
+  <% @envelopes.each do |envelope| %>
+    <%= render EnvelopeCardComponent.new(
+          envelope:     envelope,
+          budget:       @budgets[envelope.id] || 0,
+          spent:        @totals[envelope.id]  || 0,
+          current_user: current_user,
+          year:         @year,
+          month:        @month) %>
+  <% end %>
+
+  <% if @envelopes.empty? %>
+    <div class="<%= ui.card %> text-center py-12">
+      <p class="<%= ui.label(:secondary) %>">No envelopes yet.</p>
+      <% if current_user&.admin? %>
+        <%= link_to "Add your first envelope", new_envelope_path, class: "#{ui.button(:primary)} mt-4 inline-block" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# Inline modal frame for expense form %>
+<%= turbo_frame_tag "modal" %>

@@ -1,0 +1,25 @@
+<h1 class="<%= ui.page_heading %> mb-6">Edit Envelope</h1>
+
+<div class="<%= ui.card %>">
+  <%= form_with model: @envelope, url: envelope_path(@envelope), method: :patch do |f| %>
+    <div class="mb-4">
+      <label for="envelope_name" class="<%= ui.label %> block mb-1">Name</label>
+      <%= f.text_field :name,
+            id: "envelope_name",
+            class: ui.input,
+            autofocus: true %>
+    </div>
+
+    <div class="mb-6">
+      <label class="<%= ui.tag_label %>">
+        <%= f.check_box :active, id: "envelope_active" %>
+        Active
+      </label>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "Save", class: ui.button(:primary) %>
+      <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary) %>
+    </div>
+  <% end %>
+</div>

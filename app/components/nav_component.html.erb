@@ -1,0 +1,32 @@
+<nav class="<%= ui.nav_bar %>" aria-label="Main navigation">
+  <div class="flex items-center justify-around max-w-md mx-auto">
+
+    <%= link_to root_path, class: ui.nav_item(active: active?(root_path)), aria: { label: "Dashboard" } do %>
+      <%= icon "star", classes: "w-6 h-6" %>
+      <span>Budget</span>
+    <% end %>
+
+    <% if false # meal planner — Phase 3 %>
+      <%= link_to "#", class: ui.nav_item, aria: { label: "Meal Planner" } do %>
+        <%= icon "quote", classes: "w-6 h-6" %>
+        <span>Meals</span>
+      <% end %>
+    <% end %>
+
+    <% if admin? %>
+      <%= link_to admin_settings_path, class: ui.nav_item(active: active?("/admin")), aria: { label: "Settings" } do %>
+        <%= icon "settings", classes: "w-6 h-6" %>
+        <span>Settings</span>
+      <% end %>
+    <% end %>
+
+    <%= button_to session_path, method: :delete,
+          class: ui.nav_item,
+          aria: { label: "Sign out" },
+          form: { "data-turbo-confirm": "Sign out?" } do %>
+      <%= icon "logout", classes: "w-6 h-6" %>
+      <span>Sign out</span>
+    <% end %>
+
+  </div>
+</nav>

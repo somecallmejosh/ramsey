@@ -1,0 +1,9 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="<%= ui.card %> mb-4">
+    <%= render ExpenseFormComponent.new(expense: @expense, envelope: @envelope) %>
+
+    <div class="mt-4">
+      <%= link_to "Cancel", root_path, class: ui.link(:subtle), data: { turbo_frame: "modal" } %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,21 @@
+{
+  "name": "ramsey",
+  "version": "1.0.0",
+  "description": "This README would normally document whatever steps are necessary to get the application up and running.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i app/assets/stylesheets/application.css -o app/assets/builds/application.css --minify",
+    "watch:css": "tailwindcss -i app/assets/stylesheets/application.css -o app/assets/builds/application.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
+  }
+}

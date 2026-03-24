@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@source "../../../app/views/**/*.html.erb";
+@source "../../../app/components/**/*.html.erb";
+@source "../../../app/javascript/**/*.js";
+
+@theme {
+  /* Font */
+  --font-sans: "Reddit Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Colors — neutral scale */
+  --color-hs-navy:       #21214D;
+  --color-hs-slate:      #57577B;
+  --color-hs-muted:      #9393B7;
+  --color-hs-border:     #CBCDD0;
+  --color-hs-white:      #FFFFFF;
+
+  /* Colors — blue / brand */
+  --color-hs-primary:      #4865DB;
+  --color-hs-primary-dark: #2A4CD5;
+  --color-hs-blue-light:   #C7D3F7;
+  --color-hs-blue-pale:    #E0E6FA;
+
+  /* Colors — semantic */
+  --color-hs-red:       #E60013;
+  --color-hs-red-soft:  #FF9B99;
+  --color-hs-indigo:    #B8B1FF;
+  --color-hs-sky:       #89CAFF;
+  --color-hs-green:     #89E780;
+  --color-hs-amber:     #FFC97C;
+
+  /* Border radius */
+  --radius-sm:   4px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 2px 16px rgba(33, 33, 77, 0.08);
+
+  /* Type scale */
+  --text-preset-1: 52px;
+  --text-preset-3: 32px;
+  --text-preset-7: 15px;
+  --text-preset-8: 13px;
+}
+
+/* Page background */
+body {
+  background: linear-gradient(180deg, #F5F5FF 72.99%, #E0E0FF 100%);
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  color: var(--color-hs-navy);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

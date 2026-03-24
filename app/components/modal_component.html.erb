@@ -1,0 +1,26 @@
+<div id="<%= @id %>"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="<%= @id %>-title"
+     data-controller="modal"
+     data-action="keydown.esc->modal#close"
+     class="<%= ui.modal_overlay %> hidden">
+
+  <div data-modal-target="card"
+       class="<%= ui.modal_card %>">
+
+    <h2 id="<%= @id %>-title"
+        class="text-[32px] font-bold text-hs-navy mb-6">
+      <%= @title %>
+    </h2>
+
+    <%= body %>
+
+    <button data-action="click->modal#close"
+            aria-label="Close dialog"
+            class="<%= ui.modal_close %>">
+      <%= icon "close", classes: "w-5 h-5", decorative: false %>
+    </button>
+
+  </div>
+</div>

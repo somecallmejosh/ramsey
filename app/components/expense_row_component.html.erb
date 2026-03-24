@@ -1,0 +1,24 @@
+<div class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+  <div class="flex-1 min-w-0">
+    <p class="text-lg font-semibold text-hs-navy">
+      <%= number_to_currency(@expense.amount) %>
+    </p>
+    <p class="<%= ui.label(:secondary) %> truncate">
+      <%= @expense.transacted_on.strftime("%-m/%-d") %>
+      · <%= @expense.user.email_address.split("@").first.capitalize %>
+      <% if @expense.note.present? %>
+        · <%= @expense.note %>
+      <% end %>
+    </p>
+  </div>
+
+  <% if can_delete? %>
+    <%= button_to envelope_expense_path(envelope, @expense),
+          method: :delete,
+          class: "ml-3 p-2 text-hs-muted hover:text-hs-red transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
+          aria: { label: "Delete expense of #{number_to_currency(@expense.amount)}" },
+          form: { "data-turbo-confirm": "Delete this expense?" } do %>
+      <%= icon "close", classes: "w-4 h-4" %>
+    <% end %>
+  <% end %>
+</div>

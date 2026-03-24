@@ -1,0 +1,50 @@
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+
+    <div class="text-center mb-8">
+      <h1 class="<%= ui.page_heading %>">Ramsey</h1>
+      <p class="<%= ui.label(:secondary) %> mt-2">Sign in to your account</p>
+    </div>
+
+    <% if flash[:alert].present? %>
+      <div class="<%= ui.warning_banner %> mb-4" role="alert">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="<%= ui.card %>">
+      <%= form_with url: session_path, data: { turbo: false } do |f| %>
+
+        <div class="mb-4">
+          <label for="email_address" class="<%= ui.label %> block mb-1">Email address</label>
+          <%= f.email_field :email_address,
+                id: "email_address",
+                required: true,
+                autofocus: true,
+                autocomplete: "username",
+                placeholder: "you@example.com",
+                value: params[:email_address],
+                class: ui.input %>
+        </div>
+
+        <div class="mb-6">
+          <label for="password" class="<%= ui.label %> block mb-1">Password</label>
+          <%= f.password_field :password,
+                id: "password",
+                required: true,
+                autocomplete: "current-password",
+                maxlength: 72,
+                class: ui.input %>
+        </div>
+
+        <%= f.submit "Sign in", class: "#{ui.button(:primary)} w-full" %>
+
+      <% end %>
+
+      <div class="mt-4 text-center">
+        <%= link_to "Forgot password?", new_password_path, class: ui.link(:subtle) %>
+      </div>
+    </div>
+
+  </div>
+</div>

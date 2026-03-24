@@ -1,0 +1,10 @@
+<%# Update the envelope card after deletion %>
+<%= turbo_stream.replace "envelope_card_#{@envelope.id}" do %>
+  <%= render EnvelopeCardComponent.new(
+        envelope:     @envelope,
+        budget:       @envelope.budget_for(year: Date.current.year, month: Date.current.month),
+        spent:        @envelope.spent_in(year: Date.current.year, month: Date.current.month),
+        current_user: current_user,
+        year:         Date.current.year,
+        month:        Date.current.month) %>
+<% end %>

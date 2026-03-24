@@ -1,0 +1,21 @@
+<%# Update the envelope card with new balance %>
+<%= turbo_stream.replace "envelope_card_#{@envelope.id}" do %>
+  <%= render EnvelopeCardComponent.new(
+        envelope:     @envelope,
+        budget:       @envelope.budget_for(year: Date.current.year, month: Date.current.month),
+        spent:        @envelope.spent_in(year: Date.current.year, month: Date.current.month),
+        current_user: current_user,
+        year:         Date.current.year,
+        month:        Date.current.month) %>
+<% end %>
+
+<%# Clear the modal frame %>
+<%= turbo_stream.update "modal", "" %>
+
+<%# Flash notice %>
+<%= turbo_stream.prepend "flash-messages" do %>
+  <div class="fixed top-4 right-4 z-50 bg-hs-green/90 text-hs-navy text-sm font-semibold px-4 py-3 rounded-xl shadow-card"
+       role="status">
+    Expense logged.
+  </div>
+<% end %>

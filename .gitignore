@@ -1,0 +1,37 @@
+# Bundler
+/.bundle
+
+# Environment files
+/.env*
+
+# Logs and temp files
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+!/tmp/pids/
+!/tmp/pids/.keep
+!/tmp/storage/
+!/tmp/storage/.keep
+
+# Uploaded files
+/storage/*
+!/storage/.keep
+
+# Compiled assets
+/public/assets
+
+# Credentials keys
+/config/*.key
+
+# Capybara screenshots
+/tmp/capybara/
+
+# Docker / Kamal (not used in this deployment)
+Dockerfile
+.dockerignore
+.kamal/
+
+# OS and editor artifacts
+.DS_Store
+node_modules/

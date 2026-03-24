@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+# Run Tailwind CSS watcher and Rails server in parallel
+pids = []
+
+pids << spawn("npm run watch:css")
+pids << spawn("./bin/rails server #{ARGV.join(" ")}")
+
+trap("INT")  { pids.each { |pid| Process.kill("INT",  pid) rescue nil } }
+trap("TERM") { pids.each { |pid| Process.kill("TERM", pid) rescue nil } }
+
+pids.each { |pid| Process.wait(pid) rescue nil }

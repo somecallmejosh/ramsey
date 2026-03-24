@@ -1,0 +1,26 @@
+<h1 class="<%= ui.page_heading %> mb-2">Edit Budget</h1>
+<p class="<%= ui.label(:secondary) %> mb-6">
+  <%= @envelope_budget.envelope.name %> — <%= Date::MONTHNAMES[@envelope_budget.month] %> <%= @envelope_budget.year %>
+</p>
+
+<div class="<%= ui.card %>">
+  <%= form_with model: @envelope_budget, url: envelope_budget_path(@envelope_budget), method: :patch do |f| %>
+    <div class="mb-6">
+      <label for="envelope_budget_amount" class="<%= ui.label %> block mb-1">
+        Budget amount <span aria-hidden="true">*</span>
+      </label>
+      <%= f.number_field :amount,
+            id: "envelope_budget_amount",
+            step: "0.01",
+            min: "0",
+            class: ui.input,
+            aria: { required: true },
+            autofocus: true %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "Save", class: ui.button(:primary) %>
+      <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary) %>
+    </div>
+  <% end %>
+</div>
