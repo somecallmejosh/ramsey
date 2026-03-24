@@ -1,0 +1,9 @@
+<% if @shopping_item.errors.any? %>
+  <%= turbo_stream.replace "add-shopping-item-form" do %>
+    <%= render "shopping_items/form", shopping_item: @shopping_item, meal_plan: @meal_plan %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace "shopping-list" do %>
+    <%= render "meal_plans/shopping_list", meal_plan: @meal_plan %>
+  <% end %>
+<% end %>

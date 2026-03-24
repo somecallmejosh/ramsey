@@ -35,7 +35,7 @@ Rails.application.routes.draw do
       patch :confirm
     end
   end
-  resources :shopping_items, only: [ :update ]
+  resources :shopping_items, only: [ :create, :update, :destroy ]
 
   # Cron endpoints
   scope :cron do

@@ -34,46 +34,7 @@
   <%# Shopping list %>
   <% if @meal_plan.shopping_items.any? %>
     <h2 class="<%= ui.section_heading %>">Shopping List</h2>
-    <% total     = @meal_plan.shopping_items.sum { |i| i.estimated_cost || 0 } %>
-    <% remaining = current_groceries_remaining %>
-
-    <% if total > remaining %>
-      <div class="<%= ui.warning_banner %> mb-4">
-        Estimated cart (<%= number_to_currency(total) %>) exceeds your remaining grocery budget (<%= number_to_currency(remaining) %>).
-      </div>
-    <% end %>
-
-    <div class="<%= ui.card %> mb-4">
-      <% @meal_plan.shopping_items.order(:store, :name).each do |item| %>
-        <div id="shopping_item_<%= item.id %>">
-          <%= form_with model: item, url: shopping_item_path(item), method: :patch do |f| %>
-            <div class="flex items-center gap-3 py-3 border-b border-hs-border last:border-0">
-              <%= f.check_box :checked,
-                    id: "item_#{item.id}",
-                    class: "w-5 h-5 rounded border-hs-border text-hs-primary focus:ring-hs-primary",
-                    onchange: "this.form.requestSubmit()",
-                    checked: item.checked %>
-              <label for="item_<%= item.id %>"
-                     class="flex-1 text-lg <%= item.checked? ? "line-through text-hs-muted" : "text-hs-navy" %>">
-                <%= item.name %>
-                <span class="<%= ui.label(:secondary) %> ml-1"><%= item.quantity %></span>
-              </label>
-              <% if item.estimated_cost&.positive? %>
-                <span class="<%= ui.label(:secondary) %> shrink-0"><%= number_to_currency(item.estimated_cost) %></span>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-
-    <div class="<%= ui.stat_card %> mb-6">
-      <p class="<%= ui.label %> mb-1">Estimated total</p>
-      <p class="<%= ui.stat_value %>"><%= number_to_currency(total) %></p>
-      <p class="<%= ui.label(:secondary) %>">
-        <%= number_to_currency(remaining) %> remaining in groceries
-      </p>
-    </div>
+    <%= render "shopping_list", meal_plan: @meal_plan %>
   <% end %>
 
 <% else %>

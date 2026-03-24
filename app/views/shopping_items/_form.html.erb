@@ -1,0 +1,59 @@
+<%= form_with model: shopping_item, url: shopping_items_path, method: :post,
+      id: "add-shopping-item-form" do |f| %>
+  <%= f.hidden_field :meal_plan_id, value: meal_plan.id %>
+
+  <% if shopping_item.errors.any? %>
+    <div class="<%= ui.warning_banner %> mb-3" role="alert">
+      <% shopping_item.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="<%= ui.card %>">
+    <h3 class="<%= ui.label %> mb-4">Add item</h3>
+
+    <div class="mb-3">
+      <label for="new_item_name" class="<%= ui.label(:secondary) %> block mb-1">
+        Name <span aria-hidden="true">*</span>
+      </label>
+      <%= f.text_field :name,
+            id: "new_item_name",
+            placeholder: "e.g. Chicken breast",
+            class: ui.input(shopping_item.errors[:name].any? ? :error : :default),
+            required: false,
+            aria: { required: true } %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <div>
+        <label for="new_item_quantity" class="<%= ui.label(:secondary) %> block mb-1">Qty</label>
+        <%= f.text_field :quantity,
+              id: "new_item_quantity",
+              placeholder: "e.g. 2 lbs",
+              class: ui.input %>
+      </div>
+      <div>
+        <label for="new_item_store" class="<%= ui.label(:secondary) %> block mb-1">Store</label>
+        <%= f.select :store,
+              ShoppingItem::STORES,
+              { selected: shopping_item.store.presence || "Aldi" },
+              id: "new_item_store",
+              class: ui.input %>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="new_item_cost" class="<%= ui.label(:secondary) %> block mb-1">Est. cost (optional)</label>
+      <%= f.number_field :estimated_cost,
+            id: "new_item_cost",
+            placeholder: "0.00",
+            step: "0.01",
+            min: "0",
+            class: ui.input %>
+    </div>
+
+    <%= f.submit "Add to list",
+          class: "#{ui.button(:secondary, extra: "text-base px-6 py-2")} w-full" %>
+  </div>
+<% end %>
