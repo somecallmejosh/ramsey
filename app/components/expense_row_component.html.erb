@@ -1,4 +1,4 @@
-<div class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+<div id="<%= dom_id(@expense) %>" class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
   <div class="flex-1 min-w-0">
     <p class="text-lg font-semibold text-hs-navy">
       <%= number_to_currency(@expense.amount) %>

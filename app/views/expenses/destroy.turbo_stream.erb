@@ -1,3 +1,6 @@
+<%# Remove the expense row immediately %>
+<%= turbo_stream.remove dom_id(@expense) %>
+
 <%# Update the envelope card after deletion %>
 <%= turbo_stream.replace "envelope_card_#{@envelope.id}" do %>
   <%= render EnvelopeCardComponent.new(

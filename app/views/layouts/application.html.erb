@@ -3,6 +3,7 @@
   <head>
     <title><%= content_for(:title) || "Ramsey" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="application-name" content="Ramsey">
@@ -32,7 +33,6 @@
        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-hs-primary focus:text-white focus:rounded">
       Skip to main content
     </a>
-
     <%= render "layouts/nav" if authenticated? %>
 
     <%= turbo_frame_tag "flash-messages" %>
@@ -59,7 +59,10 @@
       </div>
     <% end %>
 
-    <main id="main-content" tabindex="-1" class="max-w-md mx-auto px-4 pb-24 pt-6">
+    <main id="main-content" class="max-w-md mx-auto px-4 pb-24">
+    <div class="flex items-center bg-white/50 mb-6 -mx-4 p-4 sticky top-0 z-50 backdrop-blur-md">
+    <%= icon "ramsey2", classes: "w-12 h-12 text-white" %>
+     <span class="text-xl font-semibold text-hs-primary">Ramsey</span></div>
       <%= yield %>
     </main>
 

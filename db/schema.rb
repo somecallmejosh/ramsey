@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_172522) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_185117) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,6 +111,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_172522) do
     t.check_constraint "estimated_cost IS NULL OR estimated_cost >= 0::numeric", name: "meals_estimated_cost_non_negative"
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.string "auth", null: false
+    t.datetime "created_at", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -151,6 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_172522) do
   add_foreign_key "lunch_logs", "users"
   add_foreign_key "meal_plans", "users"
   add_foreign_key "meals", "meal_plans"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "shopping_items", "meal_plans"
 end

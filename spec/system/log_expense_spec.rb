@@ -30,9 +30,9 @@ RSpec.describe "Log expense journey", type: :system do
     expect(page).to have_text("Log Expense")
     expect(page).to have_text("Groceries")
 
-    # Fill in the form
+    # Fill in the form (Chrome 146: use requestSubmit via JS after number-input JS set)
     find("#expense_amount").set("47.23")
-    find("#expense_amount").send_keys(:return)
+    page.execute_script("document.querySelector('#expense_amount').form.requestSubmit()")
 
     # Balance updates in the card via Turbo Stream — no full page reload
     expect(page).to have_text("$652.77")
