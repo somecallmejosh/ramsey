@@ -10,14 +10,19 @@ Rails.application.routes.draw do
 
   # Envelope dashboard and detail
   resources :envelopes, only: [:new, :create, :edit, :update] do
-    resources :expenses, only: [:new, :create, :destroy]
+    resources :expenses, only: [:index, :new, :create, :destroy]
     resources :envelope_budgets, only: [:edit, :update], shallow: true
   end
 
   # Admin settings
   namespace :admin do
-    resource :settings, only: [:show]
-    resources :envelopes, only: [:index, :new, :create, :edit, :update]
+    resource :settings, only: [:show, :update]
+    resources :envelopes, only: [:index, :new, :create, :edit, :update] do
+      member do
+        patch :deactivate
+        patch :reactivate
+      end
+    end
   end
 
   # Dashboard with month selector

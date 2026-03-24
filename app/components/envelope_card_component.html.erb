@@ -29,11 +29,18 @@
               data: { turbo_frame: "modal" } %>
       <% end %>
 
-      <% if admin? && (eb = envelope_budget_for_edit) %>
-        <%= link_to "Edit budget",
-              edit_envelope_budget_path(eb),
-              class: ui.link(:subtle) %>
-      <% end %>
+      <div class="flex items-center gap-3 ml-auto">
+        <%= link_to "History",
+              envelope_expenses_path(@envelope),
+              class: ui.link(:subtle),
+              data: { turbo_frame: "_top" } %>
+
+        <% if admin? && (eb = envelope_budget_for_edit) %>
+          <%= link_to "Edit budget",
+                edit_envelope_budget_path(eb),
+                class: ui.link(:subtle) %>
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>

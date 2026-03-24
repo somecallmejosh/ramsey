@@ -1,0 +1,49 @@
+<%# Back link + heading %>
+<div class="flex items-center gap-3 mb-6">
+  <%= link_to root_path, class: "text-hs-muted hover:text-hs-navy transition-colors", aria: { label: "Back to dashboard" } do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  <% end %>
+  <h1 class="<%= ui.page_heading %>"><%= @envelope.name %></h1>
+</div>
+
+<%# Month selector %>
+<div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
+  <% 6.downto(0) do |n| %>
+    <% d = Date.current.beginning_of_month - n.months %>
+    <% is_current = d.month == @month && d.year == @year %>
+    <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
+          envelope_expenses_path(@envelope, year: d.year, month: d.month),
+          class: "flex-none px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors #{is_current ? "bg-hs-primary text-white" : "bg-white text-hs-slate border border-hs-border hover:border-hs-primary"}" %>
+  <% end %>
+</div>
+
+<%# Budget summary %>
+<% if @budget %>
+  <div class="<%= ui.stat_card %> mb-6">
+    <% spent = @expenses.sum(&:amount) %>
+    <% remaining = @budget.amount - spent %>
+    <p class="<%= ui.label %> mb-1">
+      <%= @selected_date.strftime("%B %Y") %>
+    </p>
+    <p class="<%= ui.stat_value(variant: remaining.negative? ? :danger : :default) %>">
+      <%= number_to_currency(remaining.abs) %>
+    </p>
+    <p class="<%= ui.label(:secondary) %>">
+      <%= remaining.negative? ? "over budget" : "remaining" %>
+      <span class="ml-2 opacity-60">of <%= number_to_currency(@budget.amount) %></span>
+    </p>
+  </div>
+<% end %>
+
+<%# Expense list %>
+<div class="<%= ui.card %>">
+  <% if @expenses.empty? %>
+    <p class="<%= ui.label(:secondary) %> text-center py-8">No expenses this month.</p>
+  <% else %>
+    <% @expenses.each do |expense| %>
+      <%= render ExpenseRowComponent.new(expense: expense, current_user: current_user) %>
+    <% end %>
+  <% end %>
+</div>

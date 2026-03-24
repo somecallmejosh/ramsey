@@ -2,6 +2,17 @@ class ExpensesController < ApplicationController
   before_action :set_envelope
   before_action :set_expense, only: [:destroy]
 
+  def index
+    @year  = (params[:year]  || Date.current.year).to_i
+    @month = (params[:month] || Date.current.month).to_i
+    @selected_date = Date.new(@year, @month)
+    @expenses = @envelope.expenses
+      .for_month(@year, @month)
+      .includes(:user)
+      .order(transacted_on: :desc, created_at: :desc)
+    @budget = EnvelopeBudget.find_by(envelope: @envelope, year: @year, month: @month)
+  end
+
   def new
     @expense = @envelope.expenses.build(transacted_on: Date.current)
   end
