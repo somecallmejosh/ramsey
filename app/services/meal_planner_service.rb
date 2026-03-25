@@ -88,7 +88,8 @@ class MealPlannerService
   end
 
   def parse_response(text)
-    data = JSON.parse(text)
+    json_text = text.strip.sub(/\A```(?:json)?\n?/, "").sub(/\n?```\z/, "")
+    data = JSON.parse(json_text)
 
     meals = Array(data["meals"]).map do |m|
       {
