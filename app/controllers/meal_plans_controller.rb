@@ -92,6 +92,7 @@ class MealPlansController < ApplicationController
   private
 
   def set_meal_plan
-    @meal_plan = MealPlan.find(params[:id])
+    @meal_plan = MealPlan.find_by(id: params[:id])
+    redirect_to new_meal_plan_path unless @meal_plan
   end
 end
