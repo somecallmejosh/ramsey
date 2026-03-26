@@ -5,9 +5,9 @@ class MealPlansController < ApplicationController
   def new
     this_week = Date.current.beginning_of_week(:sunday)
 
-    # Redirect to any in-progress or confirmed plan for this week
+    # Redirect to any in-progress plan for this week (don't block if already confirmed)
     if (plan = MealPlan.where(week_start: this_week).first)
-      redirect_to meal_plan_path(plan) and return unless plan.failed?
+      redirect_to meal_plan_path(plan) and return if plan.pending? || plan.processing?
     end
   end
 
