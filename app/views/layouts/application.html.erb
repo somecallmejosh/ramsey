@@ -61,24 +61,22 @@
 
     <main id="main-content" class="px-4 pb-24">
       <div class="bg-hs-blue-pale/50 sticky top-0 z-50 mb-6 -mx-4 p-4 outline outline-1 outline-hs-primary/[15%] backdrop-blur-xl flex items-center justify-between">
-        <%= link_to root_path, class: "flex items-center items-center gap-2", aria: { label: "Dashboard" } do %>
-          <span class="flex items-center justify-center bg-hs-blue-pale rounded-full size-12 outline outline-1 outline-hs-primary/[5%]">
-            <%= icon "ramsey2", classes: "size-10 translate-y-1 translate-x-1" %>
-          </span>
-          <span class="text-xl font-semibold text-hs-primary-dark">ramsey<span class="text-hs-primary-dark/50">beeps</span></span>
+        <%= link_to root_path, class: "flex items-center items-center", aria: { label: "Dashboard" } do %>
+          <%= icon "ramsey2", classes: "size-12 translate-y-1" %>
+          <span class="text-xl font-semibold text-hs-primary-dark -translate-x-1">ramsey</span>
         <% end %>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center">
           <%= button_to session_path, method: :delete,
             class: ui.nav_item,
             aria: { label: "Sign out" },
             form: { "data-turbo-confirm": "Sign out?" } do %>
             <%= icon "lock", classes: "w-6 h-6" %>
-            <span>Sign out</span>
+            <span class="sr-only">Sign out</span>
           <% end %>
           <% if current_user&.admin? %>
             <%= link_to admin_settings_path, class: ui.nav_item, aria: { label: "Settings" } do %>
               <%= icon "settings", classes: "w-6 h-6" %>
-              <span>Settings</span>
+              <span class="sr-only">Settings</span>
             <% end %>
           <% end %>
         </div>

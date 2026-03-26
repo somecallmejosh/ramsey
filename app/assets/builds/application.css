@@ -37,6 +37,7 @@
     --radius-xl: 20px;
     --radius-2xl: 1rem;
     --animate-spin: spin 1s linear infinite;
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     --blur-sm: 8px;
     --blur-xl: 24px;
     --default-transition-duration: 150ms;
@@ -420,6 +421,10 @@
     width: calc(var(--spacing) * 12);
     height: calc(var(--spacing) * 12);
   }
+  .size-14 {
+    width: calc(var(--spacing) * 14);
+    height: calc(var(--spacing) * 14);
+  }
   .h-2 {
     height: calc(var(--spacing) * 2);
   }
@@ -510,8 +515,36 @@
   .shrink-0 {
     flex-shrink: 0;
   }
+  .-translate-x-1 {
+    --tw-translate-x: calc(var(--spacing) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .-translate-x-2 {
+    --tw-translate-x: calc(var(--spacing) * -2);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
   .translate-x-1 {
     --tw-translate-x: calc(var(--spacing) * 1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .translate-x-1\.5 {
+    --tw-translate-x: calc(var(--spacing) * 1.5);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .translate-x-\[1px\] {
+    --tw-translate-x: 1px;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .translate-x-\[2px\] {
+    --tw-translate-x: 2px;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .translate-x-\[3px\] {
+    --tw-translate-x: 3px;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .translate-x-\[5px\] {
+    --tw-translate-x: 5px;
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
   .translate-y-1 {
@@ -526,6 +559,9 @@
   }
   .animate-modal-in {
     animation: modal-in 200ms ease-out both;
+  }
+  .animate-pulse {
+    animation: var(--animate-pulse);
   }
   .animate-spin {
     animation: var(--animate-spin);
@@ -713,6 +749,9 @@
   .bg-hs-primary {
     background-color: var(--color-hs-primary);
   }
+  .bg-hs-primary-dark {
+    background-color: var(--color-hs-primary-dark);
+  }
   .bg-hs-red-soft\/30 {
     background-color: color-mix(in srgb, #ff9b99 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -730,6 +769,9 @@
   }
   .bg-white {
     background-color: var(--color-white);
+  }
+  .fill-current {
+    fill: currentcolor;
   }
   .p-1 {
     padding: calc(var(--spacing) * 1);
@@ -906,6 +948,9 @@
   }
   .text-green-700 {
     color: var(--color-green-700);
+  }
+  .text-hs-indigo {
+    color: var(--color-hs-indigo);
   }
   .text-hs-muted {
     color: var(--color-hs-muted);
@@ -1483,6 +1528,11 @@ body {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
   }
 }
 @layer properties {
