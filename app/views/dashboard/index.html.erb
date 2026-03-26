@@ -12,7 +12,7 @@
 </div>
 
 <%# Envelope cards %>
-<div class="grid grid-cols-1 gap-4">
+<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
   <% @envelopes.each do |envelope| %>
     <%= render EnvelopeCardComponent.new(
           envelope:     envelope,
@@ -33,3 +33,25 @@
   <% end %>
 </div>
 
+<%# Debt Snowball summary card %>
+<% if @snowball_target %>
+  <div class="<%= ui.card %> mt-6">
+    <div class="<%= ui.card_header %>">
+      <h2 class="<%= ui.label %>">Debt Snowball</h2>
+      <%= link_to "View all", debts_path, class: ui.link(:subtle) %>
+    </div>
+
+    <p class="text-[13px] text-hs-muted mb-1">Current target</p>
+    <p class="text-xl font-bold text-hs-navy"><%= @snowball_target.name %></p>
+    <p class="<%= ui.stat_value %> mt-1"><%= number_to_currency(@snowball_target.current_balance) %></p>
+
+    <div class="h-2 rounded-full bg-hs-border overflow-hidden mt-3 mb-1">
+      <div class="h-full rounded-full bg-hs-primary" style="width: <%= @snowball_target.progress_pct %>%"></div>
+    </div>
+    <p class="text-[12px] text-hs-muted"><%= @snowball_target.progress_pct %>% paid off</p>
+
+    <p class="<%= ui.label(:secondary) %> mt-3">
+      Total non-mortgage debt: <%= number_to_currency(@total_snowball) %>
+    </p>
+  </div>
+<% end %>

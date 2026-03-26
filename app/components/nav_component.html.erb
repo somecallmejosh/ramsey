@@ -15,20 +15,9 @@
       <span>Lunch</span>
     <% end %>
 
-    <% if admin? %>
-      <%= link_to admin_settings_path, class: ui.nav_item(active: active?("/admin")), aria: { label: "Settings" } do %>
-        <%= icon "settings", classes: "w-6 h-6" %>
-        <span>Settings</span>
-      <% end %>
+    <%= link_to debts_path, class: ui.nav_item(active: active?(debts_path)), aria: { label: "Debt Snowball" } do %>
+      <%= icon "debt", classes: "w-6 h-6" %>
+      <span>Debts</span>
     <% end %>
-
-    <%= button_to session_path, method: :delete,
-          class: ui.nav_item,
-          aria: { label: "Sign out" },
-          form: { "data-turbo-confirm": "Sign out?" } do %>
-      <%= icon "lock", classes: "w-6 h-6" %>
-      <span>Sign out</span>
-    <% end %>
-
   </div>
 </nav>

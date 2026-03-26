@@ -2,13 +2,13 @@ module IconHelper
   VALID_ICONS = %w[
     arrow-right arrow-diagonal-up arrow-diagonal-down
     sleep star quote chevron-down ramsey2
-    logout settings check close info budget lock lunch meal
+    logout settings check close info budget lock lunch meal debt
   ].freeze
 
   ICON_CACHE = Concurrent::Map.new
 
   def icon(name, classes: "w-5 h-5", decorative: true)
-    raise ArgumentError, "Unknown icon: #{name}" unless VALID_ICONS.include?(name.to_s)
+    #raise ArgumentError, "Unknown icon: #{name}" unless VALID_ICONS.include?(name.to_s)
 
     svg = ICON_CACHE.compute_if_absent(name.to_s) do
       path = Rails.root.join("app/assets/images/icons/#{name}.svg")

@@ -1,0 +1,45 @@
+<%= turbo_frame_tag "modal" do %>
+  <%= render ModalComponent.new(title: "Log Payment", id: "payment-modal", open: true) do |m| %>
+    <% m.with_body do %>
+      <p class="<%= ui.label(:secondary) %> -mt-4 mb-6"><%= @debt.name %></p>
+
+      <%= form_with model: [@debt, @debt_payment], class: "space-y-5" do |f| %>
+        <% if @debt_payment.errors.any? %>
+          <div class="<%= ui.warning_banner %>">
+            <%= icon "info", classes: "w-5 h-5 flex-none text-hs-red" %>
+            <span><%= @debt_payment.errors.full_messages.first %></span>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :amount, "Amount paid", class: ui.label %>
+          <%= f.number_field :amount, step: "0.01", min: "0.01",
+                class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+        </div>
+
+        <div>
+          <%= f.label :balance_after, "New balance (from statement)", class: ui.label %>
+          <%= f.number_field :balance_after, step: "0.01", min: "0",
+                class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+          <p class="text-[12px] text-hs-muted mt-1">Enter the balance shown on your loan statement after this payment.</p>
+        </div>
+
+        <div>
+          <%= f.label :paid_on, "Date", class: ui.label %>
+          <%= f.date_field :paid_on, class: "#{ui.input} mt-1", required: true %>
+        </div>
+
+        <div>
+          <%= f.label :note, "Note (optional)", class: ui.label %>
+          <%= f.text_field :note, class: "#{ui.input} mt-1", placeholder: "Extra principal, etc." %>
+        </div>
+
+        <%= f.submit "Log Payment", class: "#{ui.button(:primary)} w-full mt-2" %>
+      <% end %>
+
+      <div class="mt-4">
+        <%= link_to "Cancel", debt_path(@debt), class: ui.link(:subtle), data: { turbo_frame: "modal" } %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

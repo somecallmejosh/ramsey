@@ -1,0 +1,55 @@
+<div class="<%= ui.stat_card %>">
+  <div class="<%= ui.card_header %>">
+    <div>
+      <h3 class="<%= ui.label %>"><%= @debt.name %></h3>
+      <p class="<%= ui.label(:secondary) %> text-[13px]"><%= type_label %></p>
+    </div>
+    <% if snowball_target? %>
+      <span class="text-[11px] font-bold uppercase tracking-wide text-hs-primary bg-hs-blue-pale border border-hs-primary/30 px-2 py-1 rounded-full">
+        Target
+      </span>
+    <% end %>
+    <% if paid_off? %>
+      <span class="text-[11px] font-bold uppercase tracking-wide text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-full">
+        Paid off
+      </span>
+    <% end %>
+  </div>
+
+  <p class="<%= ui.stat_value %> mt-2"><%= number_to_currency(@debt.current_balance) %></p>
+  <p class="<%= ui.label(:secondary) %>">
+    remaining
+    <% if @debt.interest_rate.present? %>
+      <span class="ml-2 opacity-60"><%= number_to_percentage(@debt.interest_rate, precision: 3).delete_suffix("0").delete_suffix(".") %>% APR</span>
+    <% end %>
+  </p>
+
+  <%# Progress bar %>
+  <div class="mt-3 mb-1">
+    <div class="h-2 rounded-full bg-hs-border overflow-hidden">
+      <div class="h-full rounded-full bg-hs-primary transition-all" style="width: <%= progress_bar_width %>"></div>
+    </div>
+    <p class="text-[12px] text-hs-muted mt-1"><%= @debt.progress_pct %>% paid off</p>
+  </div>
+
+  <p class="<%= ui.label(:secondary) %> mt-2">
+    Min. payment: <%= number_to_currency(@debt.minimum_payment) %>/mo
+  </p>
+
+  <div class="flex items-center justify-between mt-4">
+    <% unless paid_off? %>
+      <%= link_to "Log payment",
+            new_debt_debt_payment_path(@debt),
+            class: "#{ui.button(:primary, extra: "text-sm px-5 py-2")}",
+            data: { turbo_frame: "modal" } %>
+    <% end %>
+
+    <div class="flex items-center gap-3 ml-auto">
+      <%= link_to "History", debt_path(@debt), class: ui.link(:subtle) %>
+
+      <% if admin? %>
+        <%= link_to "Edit", edit_admin_debt_path(@debt), class: ui.link(:subtle) %>
+      <% end %>
+    </div>
+  </div>
+</div>

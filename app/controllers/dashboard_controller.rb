@@ -19,5 +19,9 @@ class DashboardController < ApplicationController
 
     @year  = year
     @month = month
+
+    @snowball_debts  = Debt.snowball.active.ordered
+    @snowball_target = @snowball_debts.first
+    @total_snowball  = @snowball_debts.sum(:current_balance)
   end
 end

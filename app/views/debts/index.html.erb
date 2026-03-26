@@ -1,0 +1,48 @@
+<% content_for :title, "Debt Snowball" %>
+
+<div class="mb-6 flex items-center justify-between">
+  <h1 class="<%= ui.page_heading %>">Debt Snowball</h1>
+  <% if current_user.admin? %>
+    <%= link_to "Add debt", new_admin_debt_path, class: ui.link %>
+  <% end %>
+</div>
+
+<%# Baby Step 2 — Snowball %>
+<% if @snowball_debts.any? %>
+  <h2 class="<%= ui.section_heading %>">Baby Step 2</h2>
+  <div class="grid grid-cols-1 gap-4 mb-8">
+    <% @snowball_debts.each_with_index do |debt, index| %>
+      <%= render DebtCardComponent.new(
+            debt: debt,
+            current_user: current_user,
+            snowball_target: index == 0) %>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Baby Step 6 — Mortgage %>
+<% if @mortgage %>
+  <h2 class="<%= ui.section_heading %>">Baby Step 6 — Mortgage</h2>
+  <div class="mb-8">
+    <%= render DebtCardComponent.new(debt: @mortgage, current_user: current_user) %>
+  </div>
+<% end %>
+
+<%# Paid off %>
+<% if @paid_off.any? %>
+  <h2 class="<%= ui.section_heading %> text-hs-muted">Paid Off</h2>
+  <div class="grid grid-cols-1 gap-4 opacity-60">
+    <% @paid_off.each do |debt| %>
+      <%= render DebtCardComponent.new(debt: debt, current_user: current_user) %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @snowball_debts.empty? && @mortgage.nil? && @paid_off.empty? %>
+  <div class="<%= ui.card %> text-center py-12">
+    <p class="<%= ui.label(:secondary) %>">No debts added yet.</p>
+    <% if current_user.admin? %>
+      <%= link_to "Add your first debt", new_admin_debt_path, class: "#{ui.button(:primary)} mt-4 inline-block" %>
+    <% end %>
+  </div>
+<% end %>

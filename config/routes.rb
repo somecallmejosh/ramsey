@@ -14,6 +14,11 @@ Rails.application.routes.draw do
     resources :envelope_budgets, only: [ :edit, :update ], shallow: true
   end
 
+  # Debt snowball
+  resources :debts, only: [ :index, :show ] do
+    resources :debt_payments, only: [ :new, :create, :destroy ]
+  end
+
   # Admin settings
   namespace :admin do
     resource :settings, only: [ :show, :update ]
@@ -23,6 +28,7 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
+    resources :debts, only: [ :new, :create, :edit, :update ]
   end
 
   # Dashboard with month selector

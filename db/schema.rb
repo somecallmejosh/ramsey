@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_210835) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_001342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_210835) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "debt_payments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.decimal "balance_after", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.bigint "debt_id", null: false
+    t.string "note"
+    t.date "paid_on", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["debt_id"], name: "index_debt_payments_on_debt_id"
+    t.index ["user_id"], name: "index_debt_payments_on_user_id"
+  end
+
+  create_table "debts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "current_balance", precision: 10, scale: 2, null: false
+    t.integer "debt_type", null: false
+    t.decimal "interest_rate", precision: 5, scale: 3
+    t.decimal "minimum_payment", precision: 10, scale: 2, null: false
+    t.string "name", null: false
+    t.decimal "original_balance", precision: 10, scale: 2, null: false
+    t.date "paid_off_at"
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_debts_on_position"
   end
 
   create_table "envelope_budgets", force: :cascade do |t|
@@ -158,6 +185,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_210835) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "debt_payments", "debts"
+  add_foreign_key "debt_payments", "users"
   add_foreign_key "envelope_budgets", "envelopes"
   add_foreign_key "expenses", "envelopes"
   add_foreign_key "expenses", "users"

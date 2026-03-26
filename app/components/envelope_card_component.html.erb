@@ -2,7 +2,11 @@
 <%= turbo_frame_tag "envelope_card_#{@envelope.id}" do %>
   <div class="<%= ui.stat_card %>" data-envelope-card>
     <div class="<%= ui.card_header %>">
+    <div class="flex gap-2 items-center">
+      <%= icon @envelope.name.parameterize, classes: "w-6 h-6 text-hs-slate" %>
       <h3 class="<%= ui.label %>"><%= @envelope.name %></h3>
+    </div>
+
       <% if budget_score %>
         <%= render EmojiComponent.new(score: budget_score, size: :small) %>
       <% else %>
