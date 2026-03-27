@@ -1,0 +1,48 @@
+<div class="flex items-center gap-3 mb-6">
+  <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
+    New plan
+  <% end %>
+  <h1 class="<%= ui.page_heading %>">Meal History</h1>
+</div>
+
+<% if @meal_plans.any? %>
+  <div class="grid grid-cols-1 gap-4">
+    <% @meal_plans.each do |plan| %>
+      <% this_week = plan.week_start == Date.current.beginning_of_week(:sunday) %>
+      <div class="<%= ui.card %>">
+        <div class="<%= ui.card_header %>">
+          <div>
+            <p class="<%= ui.label %>">Week of <%= plan.week_start.strftime("%B %-d, %Y") %></p>
+            <% if this_week %>
+              <span class="<%= ui.label(:secondary) %>">Current week</span>
+            <% end %>
+          </div>
+          <div class="flex gap-2">
+            <%= link_to "View", meal_plan_path(plan), class: ui.button(:secondary, extra: "text-sm px-4 py-1.5") %>
+            <% unless this_week %>
+              <%= button_to "Use this week", reuse_meal_plan_path(plan), method: :post,
+                    class: ui.button(:primary, extra: "text-sm px-4 py-1.5") %>
+            <% end %>
+          </div>
+        </div>
+
+        <% meals = plan.meals.order(:day_of_week) %>
+        <% if meals.any? %>
+          <div class="mt-3 divide-y divide-hs-border">
+            <% meals.each do |meal| %>
+              <div class="py-2 flex items-baseline gap-2">
+                <span class="<%= ui.label(:secondary) %> w-10 shrink-0"><%= meal.day_name.first(3) %></span>
+                <span class="text-hs-navy text-sm"><%= meal.dinner %></span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="<%= ui.card %> text-center py-10">
+    <p class="<%= ui.label(:secondary) %>">No confirmed meal plans yet.</p>
+    <%= link_to "Create your first plan", new_meal_plan_path, class: "mt-4 inline-block #{ui.link}" %>
+  </div>
+<% end %>

@@ -1,5 +1,10 @@
 class MealPlansController < ApplicationController
-  before_action :set_meal_plan, only: [ :show, :confirm, :destroy ]
+  before_action :set_meal_plan, only: [ :show, :confirm, :reuse, :destroy ]
+
+  # GET /meal_plans
+  def index
+    @meal_plans = MealPlan.confirmed.order(week_start: :desc)
+  end
 
   # GET /meal_plans/new
   def new
@@ -39,10 +44,32 @@ class MealPlansController < ApplicationController
   def show
   end
 
+  # POST /meal_plans/:id/reuse
+  def reuse
+    this_week = Date.current.beginning_of_week(:sunday)
+
+    if MealPlan.confirmed.exists?(week_start: this_week)
+      redirect_to meal_plans_path, alert: "You already have a confirmed plan for this week." and return
+    end
+
+    MealPlan.unconfirmed.where(week_start: this_week).destroy_all
+
+    new_plan = MealPlan.create!(user: current_user, week_start: this_week, confirmed_at: Time.current)
+
+    @meal_plan.meals.each do |m|
+      new_plan.meals.create!(m.slice(:day_of_week, :dinner, :lunch, :prep_note, :estimated_cost))
+    end
+    @meal_plan.shopping_items.each do |i|
+      new_plan.shopping_items.create!(i.slice(:name, :quantity, :estimated_cost, :store))
+    end
+
+    redirect_to meal_plan_path(new_plan), notice: "Meal plan applied for this week!"
+  end
+
   # DELETE /meal_plans/:id
   def destroy
     @meal_plan.destroy
-    redirect_to new_meal_plan_path
+    redirect_to meal_plans_path
   end
 
   # PATCH /meal_plans/:id/confirm

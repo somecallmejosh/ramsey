@@ -26,12 +26,18 @@
     <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
       New plan
     <% end %>
+    <%= link_to "History", meal_plans_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" %>
     <h1 class="<%= ui.page_heading %>">This Week</h1>
   </div>
 
-  <p class="<%= ui.label(:secondary) %> mb-6">
+  <p class="<%= ui.label(:secondary) %> mb-4">
     Week of <%= @meal_plan.week_start.strftime("%B %-d") %>
   </p>
+
+  <% unless @meal_plan.week_start == Date.current.beginning_of_week(:sunday) %>
+    <%= button_to "Use this meal plan this week", reuse_meal_plan_path(@meal_plan), method: :post,
+          class: "#{ui.button(:primary, extra: "text-sm mb-6")}" %>
+  <% end %>
 
   <%# Meal grid %>
   <div class="grid grid-cols-1 gap-3 mb-8">

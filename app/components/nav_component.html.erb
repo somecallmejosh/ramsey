@@ -5,7 +5,7 @@
       <span>Budget</span>
     <% end %>
 
-    <%= link_to new_meal_plan_path, class: ui.nav_item(active: active?(new_meal_plan_path)), aria: { label: "Meal Planner" } do %>
+    <%= link_to meal_plans_path, class: ui.nav_item(active: active?(meal_plans_path)), aria: { label: "Meal Planner" } do %>
       <%= icon "meal", classes: "w-6 h-6" %>
       <span>Meals</span>
     <% end %>

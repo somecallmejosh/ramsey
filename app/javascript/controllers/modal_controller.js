@@ -30,6 +30,10 @@ export default class extends Controller {
     }
   }
 
+  disconnect() {
+    document.body.style.overflow = ""
+  }
+
   // Close on backdrop click (click on overlay, not card)
   clickOutside(event) {
     if (event.target === this.element) this.close()
