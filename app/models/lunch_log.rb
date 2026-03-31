@@ -1,5 +1,5 @@
 class LunchLog < ApplicationRecord
-  SAVINGS_PER_LUNCH = 8
+  SAVINGS_PER_LUNCH = 20
 
   belongs_to :user
 
