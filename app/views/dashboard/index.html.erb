@@ -2,7 +2,7 @@
 
 <%# Month selector %>
 <div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
-  <% 6.downto(0) do |n| %>
+  <% 0.upto(6) do |n| %>
     <% d = Date.current.beginning_of_month - n.months %>
     <% is_current = d.month == @month && d.year == @year %>
     <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
