@@ -13,7 +13,7 @@ module Admin
       month = Date.current.month
       now   = Time.current
 
-      budget_params = params.permit(budgets: {}).fetch(:budgets, {})
+      budget_params = params.permit(budgets: {}).fetch(:budgets, {}).to_h
 
       records = budget_params.filter_map do |envelope_id, amount|
         next unless Envelope.exists?(id: envelope_id, active: true)

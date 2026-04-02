@@ -46,18 +46,13 @@
             <%# Deactivate / reactivate toggle %>
             <div class="shrink-0">
               <% if envelope.active? %>
-                <%= button_to deactivate_admin_envelope_path(envelope),
-                      method: :patch,
-                      class: "text-[13px] text-hs-muted hover:text-hs-red transition-colors font-semibold",
-                      form: { "data-turbo-confirm": "Deactivate #{envelope.name}? It will hide from the dashboard." } do %>
-                  Deactivate
-                <% end %>
+                <%= link_to "Deactivate", deactivate_admin_envelope_path(envelope),
+                      data: { turbo_method: :patch, turbo_confirm: "Deactivate #{envelope.name}? It will hide from the dashboard." },
+                      class: "text-[13px] text-hs-muted hover:text-hs-red transition-colors font-semibold" %>
               <% else %>
-                <%= button_to reactivate_admin_envelope_path(envelope),
-                      method: :patch,
-                      class: "text-[13px] text-hs-primary hover:underline font-semibold" do %>
-                  Reactivate
-                <% end %>
+                <%= link_to "Reactivate", reactivate_admin_envelope_path(envelope),
+                      data: { turbo_method: :patch },
+                      class: "text-[13px] text-hs-primary hover:underline font-semibold" %>
               <% end %>
             </div>
           </div>
