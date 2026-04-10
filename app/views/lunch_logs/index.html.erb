@@ -10,7 +10,7 @@
 
 <%# Month selector %>
 <div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
-  <% 6.downto(0) do |n| %>
+  <% 0.upto(6) do |n| %>
     <% d = Date.current.beginning_of_month - n.months %>
     <% is_current = d.month == @month && d.year == @year %>
     <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
@@ -22,13 +22,18 @@
 <%# Weekly Mon–Fri grid %>
 <div class="<%= ui.card %> mb-6">
   <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B %Y") %></h2>
-  <% weeks_for_month(@year, @month).each do |week| %>
-    <div class="grid grid-cols-5 gap-2 mb-3">
-      <% week.each do |date| %>
-        <%= render "day_cell", date: date, log: @logs.find { |l| l.logged_on == date } %>
+  <p class="md:hidden">Scroll horizontally to view all days.</p>
+  <div class="overflow-x-scroll border border-b-0 border-hs-border">
+    <div class="">
+      <% weeks_for_month(@year, @month).each do |week| %>
+        <div class="grid grid-cols-5 border-b border-hs-border divide-x divide-hs-border min-w-[720px]">
+          <% week.each do |date| %>
+            <%= render "day_cell", date: date, log: @logs.find { |l| l.logged_on == date } %>
+          <% end %>
+        </div>
       <% end %>
     </div>
-  <% end %>
+  </div>
 </div>
 
 <%# Stats %>

@@ -73,7 +73,7 @@
             <%= icon "lock", classes: "w-6 h-6" %>
             <span class="sr-only">Sign out</span>
           <% end %>
-          <% if current_user&.admin? %>
+          <% if current_user&.owner? %>
             <%= link_to admin_settings_path, class: ui.nav_item, aria: { label: "Settings" } do %>
               <%= icon "settings", classes: "w-6 h-6" %>
               <span class="sr-only">Settings</span>

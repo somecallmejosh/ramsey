@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include AccountScoped
   stale_when_importmap_changes
 
   before_action :check_session_expiry, if: :authenticated?

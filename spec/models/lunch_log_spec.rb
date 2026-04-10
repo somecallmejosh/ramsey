@@ -37,8 +37,8 @@ RSpec.describe LunchLog, type: :model do
   end
 
   describe "SAVINGS_PER_LUNCH" do
-    it "is $8" do
-      expect(LunchLog::SAVINGS_PER_LUNCH).to eq(8)
+    it "is $20" do
+      expect(LunchLog::SAVINGS_PER_LUNCH).to eq(20)
     end
   end
 
@@ -47,7 +47,7 @@ RSpec.describe LunchLog, type: :model do
       create(:lunch_log, user: user, logged_on: Date.new(2026, 3, 3))
       create(:lunch_log, user: user, logged_on: Date.new(2026, 3, 4))
       days = LunchLog.where(user: user).for_month(2026, 3).count
-      expect(days * LunchLog::SAVINGS_PER_LUNCH).to eq(16)
+      expect(days * LunchLog::SAVINGS_PER_LUNCH).to eq(40)
     end
 
     it "ignores other users' logs" do

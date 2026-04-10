@@ -1,11 +1,12 @@
 module Admin
   class SettingsController < ApplicationController
-    include RequireAdmin
+    include RequireOwner
 
-    before_action :require_admin_role
+    before_action :require_owner_role
 
     def show
       load_envelopes_and_budgets
+      @users = current_account.users.order(:email_address)
     end
 
     def update
@@ -16,7 +17,7 @@ module Admin
       budget_params = params.permit(budgets: {}).fetch(:budgets, {}).to_h
 
       records = budget_params.filter_map do |envelope_id, amount|
-        next unless Envelope.exists?(id: envelope_id, active: true)
+        next unless current_account.envelopes.exists?(id: envelope_id, active: true)
 
         { envelope_id: envelope_id.to_i,
           year:        year,
@@ -36,7 +37,7 @@ module Admin
     private
 
     def load_envelopes_and_budgets
-      @envelopes = Envelope.ordered
+      @envelopes = current_account.envelopes.ordered
       @budgets   = EnvelopeBudget
         .where(envelope_id: @envelopes.select(:id), year: Date.current.year, month: Date.current.month)
         .index_by(&:envelope_id)

@@ -2,16 +2,15 @@
 <%= turbo_frame_tag "envelope_card_#{@envelope.id}" do %>
   <div class="<%= ui.stat_card %>" data-envelope-card>
     <div class="<%= ui.card_header %>">
-    <div class="flex gap-2 items-center">
-      <%= icon @envelope.name.parameterize, classes: "w-6 h-6 text-hs-slate" %>
-      <h3 class="<%= ui.label %>"><%= @envelope.name %></h3>
-    </div>
-
-      <% if budget_score %>
-        <%= render EmojiComponent.new(score: budget_score, size: :small) %>
-      <% else %>
-        <span class="<%= ui.label(:secondary) %>" aria-label="No budget set">–</span>
-      <% end %>
+      <div class="flex items-center justify-between gap-2 w-full">
+        <h3 class="<%= ui.label %>"><%= @envelope.name %></h3>
+        <% if budget_score %>
+          <span class="flex-1"></span>
+          <%= render EmojiComponent.new(score: budget_score, size: :large) %>
+        <% else %>
+          <span class="<%= ui.label(:secondary) %>" aria-label="No budget set">–</span>
+        <% end %>
+      </div>
     </div>
 
     <%# aria-live announces balance updates to screen readers without moving focus %>
@@ -39,7 +38,7 @@
               class: ui.link(:subtle),
               data: { turbo_frame: "_top" } %>
 
-        <% if admin? && (eb = envelope_budget_for_edit) %>
+        <% if owner? && (eb = envelope_budget_for_edit) %>
           <%= link_to "Edit budget",
                 edit_envelope_budget_path(eb),
                 class: ui.link(:subtle) %>

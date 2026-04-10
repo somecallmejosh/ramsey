@@ -73,7 +73,7 @@
               <p class="text-[13px] text-hs-muted italic"><%= payment.note %></p>
             <% end %>
           </div>
-          <% if current_user.admin? %>
+          <% if current_user.owner? %>
             <%= button_to debt_debt_payment_path(@debt, payment),
                   method: :delete,
                   class: ui.link(:subtle),

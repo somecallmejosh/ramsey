@@ -1,8 +1,9 @@
-<div class="flex items-center gap-3 mb-6">
-  <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
+<div class="flex items-center gap-3 mb-6 justify-between">
+
+  <h1 class="<%= ui.page_heading %>">Meal History</h1>
+  <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2 shrink-0")}" do %>
     New plan
   <% end %>
-  <h1 class="<%= ui.page_heading %>">Meal History</h1>
 </div>
 
 <% if @meal_plans.any? %>

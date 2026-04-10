@@ -1,18 +1,19 @@
-class NotifyPartnerJob < ApplicationJob
+class NotifyAccountMembersJob < ApplicationJob
   queue_as :default
 
   def perform(resource_type, resource_id)
     resource = resource_type.constantize.find_by(id: resource_id)
     return unless resource
 
-    partner = User.where.not(id: resource.user_id).first
-    return unless partner
-
-    subscriptions = partner.push_subscriptions.to_a
-    return if subscriptions.empty?
+    actor = resource.user
+    members = actor.account.users.where.not(id: actor.id)
 
     payload = build_payload(resource)
-    subscriptions.each { |sub| deliver(sub, payload) }
+
+    members.find_each do |member|
+      subscriptions = member.push_subscriptions.to_a
+      subscriptions.each { |sub| deliver(sub, payload) }
+    end
   end
 
   private

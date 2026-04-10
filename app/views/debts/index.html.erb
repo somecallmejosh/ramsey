@@ -2,7 +2,7 @@
 
 <div class="mb-6 flex items-center justify-between">
   <h1 class="<%= ui.page_heading %>">Debt Snowball</h1>
-  <% if current_user.admin? %>
+  <% if current_user.owner? %>
     <%= link_to "Add debt", new_admin_debt_path, class: ui.link %>
   <% end %>
 </div>
@@ -41,7 +41,7 @@
 <% if @snowball_debts.empty? && @mortgage.nil? && @paid_off.empty? %>
   <div class="<%= ui.card %> text-center py-12">
     <p class="<%= ui.label(:secondary) %>">No debts added yet.</p>
-    <% if current_user.admin? %>
+    <% if current_user.owner? %>
       <%= link_to "Add your first debt", new_admin_debt_path, class: "#{ui.button(:primary)} mt-4 inline-block" %>
     <% end %>
   </div>

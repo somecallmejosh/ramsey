@@ -1,12 +1,13 @@
 require "rails_helper"
 
 RSpec.describe "Admin::Debts", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
 
   describe "GET /admin/debts/new" do
-    context "standard user" do
-      before { sign_in(standard) }
+    context "member" do
+      before { sign_in(member) }
 
       it "redirects to root" do
         get new_admin_debt_path
@@ -14,8 +15,8 @@ RSpec.describe "Admin::Debts", type: :request do
       end
     end
 
-    context "admin user" do
-      before { sign_in(admin) }
+    context "owner" do
+      before { sign_in(owner) }
 
       it "returns 200" do
         get new_admin_debt_path
@@ -25,8 +26,8 @@ RSpec.describe "Admin::Debts", type: :request do
   end
 
   describe "POST /admin/debts" do
-    context "admin user" do
-      before { sign_in(admin) }
+    context "owner" do
+      before { sign_in(owner) }
 
       it "creates a debt and redirects to debts path" do
         post admin_debts_path, params: {
@@ -41,8 +42,8 @@ RSpec.describe "Admin::Debts", type: :request do
       end
     end
 
-    context "standard user" do
-      before { sign_in(standard) }
+    context "member" do
+      before { sign_in(member) }
 
       it "redirects to root" do
         post admin_debts_path, params: {
@@ -54,10 +55,10 @@ RSpec.describe "Admin::Debts", type: :request do
   end
 
   describe "GET /admin/debts/:id/edit" do
-    let(:debt) { create(:debt) }
+    let(:debt) { create(:debt, account: account) }
 
-    context "admin user" do
-      before { sign_in(admin) }
+    context "owner" do
+      before { sign_in(owner) }
 
       it "returns 200" do
         get edit_admin_debt_path(debt)
@@ -67,10 +68,10 @@ RSpec.describe "Admin::Debts", type: :request do
   end
 
   describe "PATCH /admin/debts/:id" do
-    let(:debt) { create(:debt, name: "Old Name") }
+    let(:debt) { create(:debt, account: account, name: "Old Name") }
 
-    context "admin user" do
-      before { sign_in(admin) }
+    context "owner" do
+      before { sign_in(owner) }
 
       it "updates the debt" do
         patch admin_debt_path(debt), params: {

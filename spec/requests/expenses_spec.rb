@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Expenses", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
-  let(:envelope) { create(:envelope) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
+  let(:envelope) { create(:envelope, account: account) }
 
   describe "GET /envelopes/:envelope_id/expenses" do
-    context "authenticated standard user" do
-      before { sign_in(standard) }
+    context "authenticated member" do
+      before { sign_in(member) }
 
       it "returns 200 for current month" do
         get envelope_expenses_path(envelope)
@@ -30,10 +31,10 @@ RSpec.describe "Expenses", type: :request do
   end
 
   describe "DELETE /envelopes/:envelope_id/expenses/:id" do
-    context "prior month expense, standard user" do
-      let(:expense) { create(:expense, :prior_month, envelope: envelope, user: standard) }
+    context "prior month expense, member" do
+      let(:expense) { create(:expense, :prior_month, envelope: envelope, user: member) }
 
-      before { sign_in(standard) }
+      before { sign_in(member) }
 
       it "redirects with not authorized" do
         delete envelope_expense_path(envelope, expense)
@@ -42,10 +43,10 @@ RSpec.describe "Expenses", type: :request do
       end
     end
 
-    context "prior month expense, admin user" do
-      let(:expense) { create(:expense, :prior_month, envelope: envelope, user: standard) }
+    context "prior month expense, owner" do
+      let(:expense) { create(:expense, :prior_month, envelope: envelope, user: member) }
 
-      before { sign_in(admin) }
+      before { sign_in(owner) }
 
       it "allows deletion" do
         delete envelope_expense_path(envelope, expense)
@@ -53,10 +54,10 @@ RSpec.describe "Expenses", type: :request do
       end
     end
 
-    context "current month expense, standard user" do
-      let(:expense) { create(:expense, envelope: envelope, user: standard) }
+    context "current month expense, member" do
+      let(:expense) { create(:expense, envelope: envelope, user: member) }
 
-      before { sign_in(standard) }
+      before { sign_in(member) }
 
       it "allows deletion" do
         delete envelope_expense_path(envelope, expense)

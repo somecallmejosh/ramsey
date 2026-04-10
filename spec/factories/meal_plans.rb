@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :meal_plan do
     association :user
+    account { user.account }
     week_start { Date.current.beginning_of_week(:sunday) }
     confirmed_at { nil }
 

@@ -11,8 +11,13 @@ class ExpensesController < ApplicationController
       .includes(:user)
       .order(transacted_on: :desc, created_at: :desc)
     @budget = EnvelopeBudget.find_by(envelope: @envelope, year: @year, month: @month)
-    @weekly_spend = WeeklySpendQuery.new(@envelope).past_eight_weeks
-    @weekly_target = 175.0
+    @weekly_spend = WeeklySpendQuery.new(@envelope).for_month(@year, @month)
+    @weekly_target = if @budget
+      weeks_in_month = ((@selected_date.end_of_month - @selected_date.beginning_of_month).to_f / 7).ceil
+      (@budget.amount / weeks_in_month).round(2)
+    else
+      0
+    end
   end
 
   def new
@@ -48,7 +53,7 @@ class ExpensesController < ApplicationController
   private
 
   def set_envelope
-    @envelope = Envelope.find(params[:envelope_id])
+    @envelope = current_account.envelopes.find(params[:envelope_id])
   end
 
   def set_expense
@@ -60,7 +65,7 @@ class ExpensesController < ApplicationController
   end
 
   def can_delete?
-    return true if current_user.admin?
+    return true if current_user.owner?
     !@expense.prior_month?
   end
 end

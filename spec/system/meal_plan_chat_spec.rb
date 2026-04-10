@@ -1,7 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Meal plan chat journey", type: :system do
-  let(:sally) { create(:user, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
+  let(:account) { create(:account) }
+  let(:sally) { create(:user, account: account, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
 
   let(:ai_response) do
     {

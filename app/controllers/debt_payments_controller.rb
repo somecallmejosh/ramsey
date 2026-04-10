@@ -21,7 +21,7 @@ class DebtPaymentsController < ApplicationController
   end
 
   def destroy
-    unless current_user.admin?
+    unless current_user.owner?
       redirect_to debt_path(@debt), alert: "Not authorized."
       return
     end
@@ -33,7 +33,7 @@ class DebtPaymentsController < ApplicationController
   private
 
   def set_debt
-    @debt = Debt.find(params[:debt_id])
+    @debt = current_account.debts.find(params[:debt_id])
   end
 
   def set_debt_payment

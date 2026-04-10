@@ -46,7 +46,7 @@ class LunchLogsController < ApplicationController
   def load_stats(year, month)
     @days_packed         = current_user.lunch_logs.for_month(year, month).count
     @estimated_savings   = @days_packed * LunchLog::SAVINGS_PER_LUNCH
-    @work_meals_envelope = Envelope.find_by(name: "Work Meals")
+    @work_meals_envelope = current_account.envelopes.find_by(name: "Work Meals")
     return unless @work_meals_envelope
 
     budget                = EnvelopeBudget.find_by(envelope: @work_meals_envelope, year: year, month: month)

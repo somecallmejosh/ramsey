@@ -4,7 +4,7 @@ class UiPresenter
   end
 
   def card_header
-    "flex items-center justify-between mb-3"
+    "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3"
   end
 
   def stat_card
@@ -18,7 +18,8 @@ class UiPresenter
       primary:   "bg-hs-primary text-white hover:bg-hs-primary-dark " \
                  "focus-visible:ring-hs-primary disabled:bg-hs-muted disabled:text-white",
       secondary: "bg-transparent text-hs-primary border border-hs-primary " \
-                 "hover:bg-hs-blue-pale focus-visible:ring-hs-primary disabled:opacity-40"
+                 "hover:bg-hs-blue-pale focus-visible:ring-hs-primary disabled:opacity-40",
+      error:     "bg-hs-red text-white hover:bg-hs-red-dark focus-visible:ring-hs-red disabled:bg-hs-muted disabled:text-white"
     }
     [ base, variants[variant], extra ].compact.join(" ")
   end

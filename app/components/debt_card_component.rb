@@ -6,7 +6,7 @@ class DebtCardComponent < ApplicationComponent
   end
 
   def snowball_target? = @snowball_target
-  def admin? = @current_user.admin?
+  def owner? = @current_user.owner?
   def paid_off? = @debt.paid_off?
 
   def type_label

@@ -1,0 +1,47 @@
+<% content_for :title, "Invitations" %>
+
+<div class="mb-6">
+  <h1 class="<%= ui.page_heading %>">Invite a Member</h1>
+  <p class="<%= ui.label(:secondary) %> mt-1">Invite someone to join <%= current_account.name %>.</p>
+</div>
+
+<% if flash[:alert].present? %>
+  <div class="<%= ui.warning_banner %> mb-4" role="alert">
+    <%= flash[:alert] %>
+  </div>
+<% end %>
+
+<div class="<%= ui.card %> mb-6">
+  <%= form_with url: invitations_path do |f| %>
+    <div class="mb-4">
+      <label for="email" class="<%= ui.label %> block mb-1">Email (optional, for your reference)</label>
+      <%= f.email_field :email,
+            id: "email",
+            placeholder: "partner@example.com",
+            class: ui.input %>
+    </div>
+
+    <%= f.submit "Create invitation link", class: "#{ui.button(:primary)} w-full" %>
+  <% end %>
+</div>
+
+<% if @invitations.any? %>
+  <h2 class="<%= ui.section_heading %> mb-4">Pending Invitations</h2>
+
+  <div class="space-y-3">
+    <% @invitations.each do |invitation| %>
+      <div class="<%= ui.card %> flex items-center justify-between">
+        <div>
+          <p class="<%= ui.label %>"><%= invitation.email.presence || "No email" %></p>
+          <p class="<%= ui.label(:secondary) %> text-sm">
+            Link: <%= accept_invitation_url(token: invitation.token) %>
+          </p>
+          <p class="<%= ui.label(:secondary) %> text-sm">
+            Expires <%= time_ago_in_words(invitation.expires_at) %> from now
+          </p>
+        </div>
+        <%= button_to "Revoke", invitation_path(invitation), method: :delete, class: ui.button(:secondary, extra: "text-sm px-4 py-1") %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

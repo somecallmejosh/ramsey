@@ -1,10 +1,13 @@
 <div id="lunch-stats">
-  <div class="<%= ui.stat_card %> mb-4">
-    <p class="<%= ui.label %> mb-1">Packed lunches</p>
-    <p class="<%= ui.stat_value %>"><%= @days_packed %> days</p>
-    <p class="<%= ui.label(:secondary) %>">
-      Estimated savings: <%= number_to_currency(@estimated_savings) %>
-    </p>
+  <div class="<%= ui.stat_card %> mb-4 flex justify-between">
+    <div>
+      <p class="<%= ui.label %> mb-1">Packed lunches</p>
+      <p class="<%= ui.stat_value %>"><%= @days_packed %> <%= "day".pluralize(@days_packed) %></p>
+    </div>
+    <div>
+      <p class="<%= ui.label %> mb-1">Estimated savings</p>
+       <p class="<%= ui.stat_value %>"><%= number_to_currency(@estimated_savings) %></p>
+    </div>
   </div>
 
   <% if @work_meals_envelope %>

@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "DebtPayments", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
-  let(:debt)     { create(:debt, original_balance: 10_000, current_balance: 10_000) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
+  let(:debt)     { create(:debt, account: account, original_balance: 10_000, current_balance: 10_000) }
 
   describe "POST /debts/:debt_id/debt_payments" do
-    context "standard user" do
-      before { sign_in(standard) }
+    context "member" do
+      before { sign_in(member) }
 
       it "creates a payment and updates debt balance" do
         post debt_debt_payments_path(debt), params: {
@@ -36,10 +37,10 @@ RSpec.describe "DebtPayments", type: :request do
   end
 
   describe "DELETE /debts/:debt_id/debt_payments/:id" do
-    let!(:payment) { create(:debt_payment, debt: debt, user: standard) }
+    let!(:payment) { create(:debt_payment, debt: debt, user: member) }
 
-    context "standard user" do
-      before { sign_in(standard) }
+    context "member" do
+      before { sign_in(member) }
 
       it "redirects with not authorized" do
         delete debt_debt_payment_path(debt, payment)
@@ -48,8 +49,8 @@ RSpec.describe "DebtPayments", type: :request do
       end
     end
 
-    context "admin user" do
-      before { sign_in(admin) }
+    context "owner" do
+      before { sign_in(owner) }
 
       it "deletes the payment" do
         delete debt_debt_payment_path(debt, payment)

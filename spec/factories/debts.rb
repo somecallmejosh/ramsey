@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :debt do
+    association :account
     sequence(:name) { |n| "Debt #{n}" }
     debt_type { :personal_loan }
     original_balance { 10_000 }

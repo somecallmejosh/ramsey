@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Envelopes", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
-  let(:envelope) { create(:envelope) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
+  let(:envelope) { create(:envelope, account: account) }
 
   describe "admin-only write actions" do
-    context "as a standard user" do
-      before { sign_in(standard) }
+    context "as a member" do
+      before { sign_in(member) }
 
       it "GET /envelopes/new redirects to root" do
         get new_envelope_path
@@ -30,8 +31,8 @@ RSpec.describe "Envelopes", type: :request do
       end
     end
 
-    context "as an admin user" do
-      before { sign_in(admin) }
+    context "as an owner" do
+      before { sign_in(owner) }
 
       it "GET /envelopes/new is accessible" do
         get new_envelope_path

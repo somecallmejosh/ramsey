@@ -1,0 +1,70 @@
+<div class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+
+    <div class="text-center mb-8">
+      <h1 class="<%= ui.page_heading %>">Ramsey</h1>
+      <p class="<%= ui.label(:secondary) %> mt-2">Create your account</p>
+    </div>
+
+    <% if flash[:alert].present? %>
+      <div class="<%= ui.warning_banner %> mb-4" role="alert">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="<%= ui.card %>">
+      <%= form_with url: registration_path, data: { turbo: false } do |f| %>
+
+        <div class="mb-4">
+          <label for="account_name" class="<%= ui.label %> block mb-1">Household name</label>
+          <%= f.text_field :account_name,
+                id: "account_name",
+                required: true,
+                autofocus: true,
+                placeholder: "e.g. Smith Household",
+                value: params[:account_name],
+                class: ui.input %>
+        </div>
+
+        <div class="mb-4">
+          <label for="email_address" class="<%= ui.label %> block mb-1">Email address</label>
+          <%= f.email_field :email_address,
+                id: "email_address",
+                required: true,
+                autocomplete: "email",
+                placeholder: "you@example.com",
+                value: params[:email_address],
+                class: ui.input %>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="<%= ui.label %> block mb-1">Password</label>
+          <%= f.password_field :password,
+                id: "password",
+                required: true,
+                autocomplete: "new-password",
+                maxlength: 72,
+                class: ui.input %>
+        </div>
+
+        <div class="mb-6">
+          <label for="password_confirmation" class="<%= ui.label %> block mb-1">Confirm password</label>
+          <%= f.password_field :password_confirmation,
+                id: "password_confirmation",
+                required: true,
+                autocomplete: "new-password",
+                maxlength: 72,
+                class: ui.input %>
+        </div>
+
+        <%= f.submit "Create account", class: "#{ui.button(:primary)} w-full" %>
+
+      <% end %>
+
+      <div class="mt-4 text-center">
+        <%= link_to "Already have an account? Sign in", new_session_path, class: ui.link(:subtle) %>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -47,7 +47,7 @@
     <div class="flex items-center gap-3 ml-auto">
       <%= link_to "History", debt_path(@debt), class: ui.link(:subtle) %>
 
-      <% if admin? %>
+      <% if owner? %>
         <%= link_to "Edit", edit_admin_debt_path(@debt), class: ui.link(:subtle) %>
       <% end %>
     </div>

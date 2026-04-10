@@ -5,7 +5,7 @@ class ExpenseRowComponent < ApplicationComponent
   end
 
   def can_delete?
-    return true if @current_user&.admin?
+    return true if @current_user&.owner?
     !@expense.prior_month?
   end
 

@@ -6,37 +6,43 @@ RSpec.describe WeeklySpendQuery do
   let(:user)      { create(:user) }
   subject(:query) { WeeklySpendQuery.new(envelope) }
 
-  it "returns 8 entries" do
-    expect(query.past_eight_weeks.size).to eq(8)
-  end
+  let(:year)  { Date.current.year }
+  let(:month) { Date.current.month }
 
   it "keys are ordered oldest to newest" do
-    weeks = query.past_eight_weeks.keys
+    weeks = query.for_month(year, month).keys
     expect(weeks).to eq(weeks.sort)
   end
 
   it "sums expenses in each week" do
-    this_week_start = Date.current.beginning_of_week(:sunday)
+    day = Date.new(year, month, 1)
+    week_start = day.beginning_of_week(:sunday)
+    week_end = week_start + 6.days
+    label = "#{week_start.strftime("%-m/%d")}-#{week_end.strftime("%-m/%d")}"
     create(:expense, envelope: envelope, user: user,
-           transacted_on: this_week_start, amount: 50.00)
+           transacted_on: day, amount: 50.00)
     create(:expense, envelope: envelope, user: user,
-           transacted_on: this_week_start + 2.days, amount: 30.00)
+           transacted_on: day + 1.day, amount: 30.00)
 
-    result = query.past_eight_weeks
-    expect(result[this_week_start]).to eq(80.00)
+    result = query.for_month(year, month)
+    expect(result[label]).to eq(80.00)
   end
 
-  it "returns 0 for weeks with no expenses" do
-    result = query.past_eight_weeks
-    expect(result.values).to all(eq(0))
+  it "excludes expenses from other months" do
+    last_month = Date.current.beginning_of_month - 1.day
+    create(:expense, envelope: envelope, user: user,
+           transacted_on: last_month, amount: 100.00)
+
+    result = query.for_month(year, month)
+    expect(result.values.sum).to eq(0)
   end
 
   it "ignores expenses from other envelopes" do
-    this_week_start = Date.current.beginning_of_week(:sunday)
+    day = Date.new(year, month, 1)
     create(:expense, envelope: other_env, user: user,
-           transacted_on: this_week_start, amount: 200.00)
+           transacted_on: day, amount: 200.00)
 
-    result = query.past_eight_weeks
-    expect(result[this_week_start]).to eq(0)
+    result = query.for_month(year, month)
+    expect(result.values.sum).to eq(0)
   end
 end

@@ -16,8 +16,8 @@ class EnvelopeCardComponent < ApplicationComponent
     remaining.negative?
   end
 
-  def admin?
-    @current_user&.admin?
+  def owner?
+    @current_user&.owner?
   end
 
   def budget_score

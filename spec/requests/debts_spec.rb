@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Debts", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
-  let!(:debt)    { create(:debt) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
+  let!(:debt)    { create(:debt, account: account) }
 
   describe "GET /debts" do
     context "authenticated user" do
-      before { sign_in(standard) }
+      before { sign_in(member) }
 
       it "returns 200" do
         get debts_path
@@ -25,7 +26,7 @@ RSpec.describe "Debts", type: :request do
 
   describe "GET /debts/:id" do
     context "authenticated user" do
-      before { sign_in(standard) }
+      before { sign_in(member) }
 
       it "returns 200" do
         get debt_path(debt)

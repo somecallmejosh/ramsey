@@ -1,8 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "Log expense journey", type: :system do
-  let(:sally) { create(:user, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
-  let(:envelope) { create(:envelope, name: "Groceries", position: 1) }
+  let(:account)  { create(:account) }
+  let(:sally)    { create(:user, account: account, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
+  let(:envelope) { create(:envelope, account: account, name: "Groceries", position: 1) }
 
   before do
     create(:envelope_budget, envelope: envelope, year: Date.current.year, month: Date.current.month, amount: 700)

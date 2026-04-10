@@ -5,7 +5,7 @@ class DashboardController < ApplicationController
 
     @selected_date  = Date.new(year, month)
     @current_month  = @selected_date == Date.current.beginning_of_month.change(day: 1)
-    @envelopes      = Envelope.active.ordered
+    @envelopes      = current_account.envelopes.active.ordered
 
     @budgets = EnvelopeBudget
       .where(envelope_id: @envelopes.select(:id), year: year, month: month)
@@ -20,7 +20,7 @@ class DashboardController < ApplicationController
     @year  = year
     @month = month
 
-    @snowball_debts  = Debt.snowball.active.ordered
+    @snowball_debts  = current_account.debts.snowball.active.ordered
     @snowball_target = @snowball_debts.first
     @total_snowball  = @snowball_debts.sum(:current_balance)
   end

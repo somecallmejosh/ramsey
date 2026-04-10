@@ -1,7 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Shopping list management", type: :system do
-  let(:sally) { create(:user, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
+  let(:account) { create(:account) }
+  let(:sally) { create(:user, account: account, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
   let!(:meal_plan) { create(:meal_plan, :confirmed, user: sally) }
   let!(:ground_beef) { create(:shopping_item, meal_plan: meal_plan, name: "Ground beef", quantity: "2 lbs", store: "Aldi", estimated_cost: 8.00) }
   let!(:pasta) { create(:shopping_item, meal_plan: meal_plan, name: "Pasta", quantity: "1 box", store: "Walmart", estimated_cost: 2.50) }

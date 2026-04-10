@@ -1,4 +1,5 @@
 class Envelope < ApplicationRecord
+  belongs_to :account
   has_many :envelope_budgets, dependent: :destroy
   has_many :expenses, dependent: :destroy
 

@@ -1,17 +1,17 @@
 module Admin
   class DebtsController < ApplicationController
-    include RequireAdmin
+    include RequireOwner
 
-    before_action :require_admin_role
+    before_action :require_owner_role
     before_action :set_debt, only: [ :edit, :update ]
 
     def new
-      @debt = Debt.new
+      @debt = current_account.debts.build
     end
 
     def create
-      @debt = Debt.new(debt_params)
-      @debt.position = Debt.maximum(:position).to_i + 1
+      @debt = current_account.debts.build(debt_params)
+      @debt.position = current_account.debts.maximum(:position).to_i + 1
 
       if @debt.save
         redirect_to debts_path, notice: "Debt added."
@@ -33,7 +33,7 @@ module Admin
     private
 
     def set_debt
-      @debt = Debt.find(params[:id])
+      @debt = current_account.debts.find(params[:id])
     end
 
     def debt_params

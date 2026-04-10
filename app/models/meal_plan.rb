@@ -1,10 +1,11 @@
 class MealPlan < ApplicationRecord
   belongs_to :user
+  belongs_to :account
   has_many :meals, dependent: :destroy
   has_many :shopping_items, dependent: :destroy
   has_many_attached :pantry_images, dependent: :purge_later
 
-  validates :week_start, presence: true, uniqueness: true
+  validates :week_start, presence: true, uniqueness: { scope: :account_id }
   validate  :week_start_must_be_sunday
   validate  :confirmed_at_not_cleared_after_set
 

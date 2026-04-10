@@ -22,12 +22,13 @@
 <% elsif @meal_plan.confirmed? %>
   <%# ── Confirmed plan view ──────────────────────────────────────────────── %>
 
-  <div class="flex items-center gap-3 mb-6">
+  <div class="flex items-center gap-2 mb-6">
+  <h1 class="<%= ui.page_heading %> flex-1">This Week</h1>
     <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
       New plan
     <% end %>
     <%= link_to "History", meal_plans_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" %>
-    <h1 class="<%= ui.page_heading %>">This Week</h1>
+
   </div>
 
   <p class="<%= ui.label(:secondary) %> mb-4">

@@ -1,15 +1,16 @@
 require "rails_helper"
 
 RSpec.describe "EnvelopeBudgets", type: :request do
-  let(:admin)    { create(:user, :admin) }
-  let(:standard) { create(:user) }
-  let(:envelope) { create(:envelope) }
+  let(:account)  { create(:account) }
+  let(:owner)    { create(:user, :owner, account: account) }
+  let(:member)   { create(:user, account: account) }
+  let(:envelope) { create(:envelope, account: account) }
 
   describe "PATCH /envelope_budgets/:id" do
-    context "prior month budget, admin user" do
+    context "prior month budget, owner" do
       let(:budget) { create(:envelope_budget, :prior_month, envelope: envelope, amount: 500) }
 
-      before { sign_in(admin) }
+      before { sign_in(owner) }
 
       it "does not update the amount (model-level guard)" do
         patch envelope_budget_path(budget), params: { envelope_budget: { amount: 999 } }
@@ -22,10 +23,10 @@ RSpec.describe "EnvelopeBudgets", type: :request do
       end
     end
 
-    context "current month budget, admin user" do
+    context "current month budget, owner" do
       let(:budget) { create(:envelope_budget, envelope: envelope, amount: 500) }
 
-      before { sign_in(admin) }
+      before { sign_in(owner) }
 
       it "updates the amount and redirects to settings" do
         patch envelope_budget_path(budget), params: { envelope_budget: { amount: 750 } }
@@ -34,12 +35,12 @@ RSpec.describe "EnvelopeBudgets", type: :request do
       end
     end
 
-    context "any request from a standard user" do
+    context "any request from a member" do
       let(:budget) { create(:envelope_budget, envelope: envelope, amount: 500) }
 
-      before { sign_in(standard) }
+      before { sign_in(member) }
 
-      it "redirects to root (admin required)" do
+      it "redirects to root (owner required)" do
         patch envelope_budget_path(budget), params: { envelope_budget: { amount: 750 } }
         expect(response).to redirect_to(root_path)
         expect(budget.reload.amount).to eq(500)

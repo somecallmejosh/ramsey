@@ -1,13 +1,13 @@
 class DebtsController < ApplicationController
   def index
-    @snowball_debts = Debt.snowball.active.ordered
+    @snowball_debts = current_account.debts.snowball.active.ordered
     @snowball_target = @snowball_debts.first
-    @mortgage = Debt.mortgage.active.first
-    @paid_off = Debt.paid_off.ordered
+    @mortgage = current_account.debts.mortgage.active.first
+    @paid_off = current_account.debts.paid_off.ordered
   end
 
   def show
-    @debt = Debt.find(params[:id])
+    @debt = current_account.debts.find(params[:id])
     @payments = @debt.debt_payments.includes(:user).order(paid_on: :desc, created_at: :desc)
     @chart_data = build_chart_data
   end

@@ -11,7 +11,7 @@ RSpec.describe MealPlan, type: :model do
     subject { build(:meal_plan) }
 
     it { should validate_presence_of(:week_start) }
-    it { should validate_uniqueness_of(:week_start) }
+    it { should validate_uniqueness_of(:week_start).scoped_to(:account_id) }
   end
 
   describe "week_start must be a Sunday" do

@@ -1,9 +1,10 @@
 require "rails_helper"
 
-RSpec.describe NotifyPartnerJob, type: :job do
-  let(:josh)     { create(:user) }
-  let(:sally)    { create(:user) }
-  let(:envelope) { create(:envelope, name: "Groceries") }
+RSpec.describe NotifyAccountMembersJob, type: :job do
+  let(:account)  { create(:account) }
+  let(:josh)     { create(:user, account: account) }
+  let(:sally)    { create(:user, account: account) }
+  let(:envelope) { create(:envelope, account: account, name: "Groceries") }
   let!(:budget)  { create(:envelope_budget, envelope: envelope,
                           year: Date.current.year, month: Date.current.month, amount: 700) }
   let(:expense)  { create(:expense, user: josh, envelope: envelope,
@@ -15,7 +16,7 @@ RSpec.describe NotifyPartnerJob, type: :job do
   end
 
   describe "expense notification" do
-    it "sends a push to the partner's subscription" do
+    it "sends a push to account members' subscriptions" do
       described_class.perform_now("Expense", expense.id)
       expect(WebPush).to have_received(:payload_send)
         .with(hash_including(endpoint: sally_sub.endpoint))
@@ -35,13 +36,13 @@ RSpec.describe NotifyPartnerJob, type: :job do
       expect(WebPush).not_to have_received(:payload_send)
     end
 
-    it "no-ops when no partner user exists" do
+    it "no-ops when no other account members exist" do
       sally.destroy
       described_class.perform_now("Expense", expense.id)
       expect(WebPush).not_to have_received(:payload_send)
     end
 
-    it "no-ops when the partner has no subscriptions" do
+    it "no-ops when account members have no subscriptions" do
       sally_sub.destroy
       described_class.perform_now("Expense", expense.id)
       expect(WebPush).not_to have_received(:payload_send)
@@ -51,7 +52,7 @@ RSpec.describe NotifyPartnerJob, type: :job do
   describe "lunch log notification" do
     let!(:log) { create(:lunch_log, user: josh, logged_on: Date.current) }
 
-    it "sends a push to the partner's subscription" do
+    it "sends a push to account members' subscriptions" do
       described_class.perform_now("LunchLog", log.id)
       expect(WebPush).to have_received(:payload_send)
         .with(hash_including(endpoint: sally_sub.endpoint))

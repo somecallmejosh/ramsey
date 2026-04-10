@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   resource :session
+  resource :registration, only: [ :new, :create ]
   resources :passwords, param: :token
+  resources :invitations, only: [ :index, :create, :destroy ]
+  get  "join/:token", to: "invitation_acceptances#new", as: :accept_invitation
+  post "join/:token", to: "invitation_acceptances#create"
 
   get "up" => "rails/health#show", as: :rails_health_check
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
@@ -22,6 +26,9 @@ Rails.application.routes.draw do
   # Admin settings
   namespace :admin do
     resource :settings, only: [ :show, :update ]
+    resource :account, only: [ :destroy ] do
+      get :export, on: :member
+    end
     resources :envelopes, only: [ :index, :new, :create, :edit, :update ] do
       member do
         patch :deactivate

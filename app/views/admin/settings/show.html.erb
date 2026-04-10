@@ -1,4 +1,21 @@
-<h1 class="<%= ui.page_heading %> mb-6">Settings</h1>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="<%= ui.page_heading %> mb-0">Settings</h1>
+  <%= link_to "Invite member", invitations_path, class: ui.button(:secondary, extra: "text-sm px-5 py-2") %>
+</div>
+
+<div class="mb-8">
+  <h2 class="<%= ui.section_heading %> mb-4">Members</h2>
+  <div class="<%= ui.card %>">
+    <% @users.each do |user| %>
+      <div class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+        <p class="text-lg text-hs-navy"><%= user.email_address %></p>
+        <span class="text-[13px] font-semibold <%= user.owner? ? "text-hs-primary" : "text-hs-muted" %>">
+          <%= user.role.capitalize %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>
 
 <div class="flex items-center justify-between mb-4">
   <h2 class="<%= ui.section_heading %> mb-0">Envelopes</h2>
@@ -15,7 +32,7 @@
     <div class="<%= ui.card %> mb-4">
       <% @envelopes.each_with_index do |envelope, i| %>
         <div class="py-4 border-b border-hs-border last:border-0">
-          <div class="flex items-center justify-between gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <%# Name + status %>
             <div class="flex-1 min-w-0">
               <p class="text-lg font-semibold text-hs-navy <%= "opacity-40" unless envelope.active? %> truncate">
@@ -73,3 +90,30 @@
     </div>
   <% end %>
 <% end %>
+
+<div class="mt-12">
+  <h2 class="<%= ui.section_heading %> mb-4">Account</h2>
+  <div class="<%= ui.card %> space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="space-y-1.5">
+        <p class="text-lg font-semibold text-hs-navy">Download your data</p>
+        <p class="text-sm text-hs-muted">Export all account data as a CSV file.</p>
+      </div>
+      <div><%= link_to "Download CSV", export_admin_account_path, class: ui.button(:secondary, extra: "text-sm px-8 py-3") %></div>
+    </div>
+
+    <hr class="<%= ui.divider %>">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="space-y-1.5">
+        <p class="text-lg font-semibold text-hs-red">Cancel account</p>
+        <p class="text-sm text-hs-muted">Permanently delete your account and all data. This cannot be undone.</p>
+      </div>
+      <div class="shrink-0">
+        <%= button_to "Cancel account", admin_account_path, method: :delete,
+              class: ui.button(:error, extra: "text-sm px-8 py-3"),
+              data: { turbo_confirm: "Are you sure you want to cancel your account? All data will be permanently deleted." } %>
+      </div>
+    </div>
+  </div>
+</div>

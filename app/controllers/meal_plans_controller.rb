@@ -3,7 +3,7 @@ class MealPlansController < ApplicationController
 
   # GET /meal_plans
   def index
-    @meal_plans = MealPlan.confirmed.order(week_start: :desc)
+    @meal_plans = current_account.meal_plans.confirmed.order(week_start: :desc)
   end
 
   # GET /meal_plans/new
@@ -11,7 +11,7 @@ class MealPlansController < ApplicationController
     this_week = Date.current.beginning_of_week(:sunday)
 
     # Redirect to any in-progress plan for this week (don't block if already confirmed)
-    if (plan = MealPlan.where(week_start: this_week).first)
+    if (plan = current_account.meal_plans.where(week_start: this_week).first)
       redirect_to meal_plan_path(plan) and return if plan.pending? || plan.processing?
     end
   end
@@ -21,9 +21,9 @@ class MealPlansController < ApplicationController
     week_start = Date.current.beginning_of_week(:sunday)
 
     # Destroy any existing unconfirmed plan for this week so the user can retry
-    MealPlan.unconfirmed.where(week_start: week_start).destroy_all
+    current_account.meal_plans.unconfirmed.where(week_start: week_start).destroy_all
 
-    @meal_plan = MealPlan.new(user: current_user, week_start: week_start)
+    @meal_plan = current_account.meal_plans.build(user: current_user, week_start: week_start)
 
     if params[:pantry_images].present?
       @meal_plan.pantry_images.attach(params[:pantry_images])
@@ -48,13 +48,13 @@ class MealPlansController < ApplicationController
   def reuse
     this_week = Date.current.beginning_of_week(:sunday)
 
-    if MealPlan.confirmed.exists?(week_start: this_week)
+    if current_account.meal_plans.confirmed.exists?(week_start: this_week)
       redirect_to meal_plans_path, alert: "You already have a confirmed plan for this week." and return
     end
 
-    MealPlan.unconfirmed.where(week_start: this_week).destroy_all
+    current_account.meal_plans.unconfirmed.where(week_start: this_week).destroy_all
 
-    new_plan = MealPlan.create!(user: current_user, week_start: this_week, confirmed_at: Time.current)
+    new_plan = current_account.meal_plans.create!(user: current_user, week_start: this_week, confirmed_at: Time.current)
 
     @meal_plan.meals.each do |m|
       new_plan.meals.create!(m.slice(:day_of_week, :dinner, :lunch, :prep_note, :estimated_cost))
@@ -119,7 +119,7 @@ class MealPlansController < ApplicationController
   private
 
   def set_meal_plan
-    @meal_plan = MealPlan.find_by(id: params[:id])
+    @meal_plan = current_account.meal_plans.find_by(id: params[:id])
     redirect_to new_meal_plan_path unless @meal_plan
   end
 end

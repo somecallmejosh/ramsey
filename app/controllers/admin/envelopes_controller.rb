@@ -1,8 +1,8 @@
 module Admin
   class EnvelopesController < ApplicationController
-    include RequireAdmin
+    include RequireOwner
 
-    before_action :require_admin_role
+    before_action :require_owner_role
     before_action :set_envelope, only: [ :deactivate, :reactivate ]
 
     def deactivate
@@ -18,7 +18,7 @@ module Admin
     private
 
     def set_envelope
-      @envelope = Envelope.find(params[:id])
+      @envelope = current_account.envelopes.find(params[:id])
     end
   end
 end

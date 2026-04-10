@@ -10,7 +10,7 @@
 
 <%# Month selector %>
 <div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
-  <% 6.downto(0) do |n| %>
+  <% 0.upto(6) do |n| %>
     <% d = Date.current.beginning_of_month - n.months %>
     <% is_current = d.month == @month && d.year == @year %>
     <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
@@ -39,20 +39,23 @@
 
 <%# Weekly spend chart %>
 <div class="<%= ui.card %> mb-6">
-  <h2 class="<%= ui.section_heading %> mb-4">8-Week Spend</h2>
-  <%= bar_chart(
+  <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B") %> Weekly Spend</h2>
+  <%= column_chart(
     [
       { name: "Weekly spend", data: @weekly_spend },
-      { name: "Target ($175)", data: @weekly_spend.transform_values { @weekly_target } }
+      { name: "Weekly target (#{number_to_currency(@weekly_target)})", data: @weekly_spend.transform_values { @weekly_target } }
     ],
     colors:  ["#4F7FFF", "#E5E7EB"],
     prefix:  "$",
     round:   2,
-    height:  "200px",
+    height:  "300px",
     library: {
-      scales: { y: { beginAtZero: true } },
+      scales: {
+        x: { grid: { offset: false } },
+        y: { beginAtZero: true }
+      },
       datasets: [
-        { type: "bar",  order: 2 },
+        { type: "bar",  order: 2, barPercentage: 1.0, categoryPercentage: 1.0 },
         { type: "line", order: 1, pointRadius: 0, borderDash: [6, 4],
           borderColor: "#94A3B8", backgroundColor: "transparent", borderWidth: 2 }
       ]

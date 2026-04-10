@@ -4,8 +4,8 @@ class NavComponent < ApplicationComponent
     @current_path = current_path
   end
 
-  def admin?
-    @current_user&.admin?
+  def owner?
+    @current_user&.owner?
   end
 
   def active?(path)

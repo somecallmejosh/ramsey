@@ -1,7 +1,7 @@
 class EnvelopeBudgetsController < ApplicationController
-  include RequireAdmin
+  include RequireOwner
 
-  before_action :require_admin_role, only: [ :update ]
+  before_action :require_owner_role, only: [ :update ]
   before_action :set_envelope_budget
 
   def edit
@@ -18,7 +18,7 @@ class EnvelopeBudgetsController < ApplicationController
   private
 
   def set_envelope_budget
-    @envelope_budget = EnvelopeBudget.find(params[:id])
+    @envelope_budget = current_account.envelope_budgets.find(params[:id])
   end
 
   def envelope_budget_params

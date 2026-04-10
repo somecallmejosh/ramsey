@@ -1,4 +1,5 @@
 class Debt < ApplicationRecord
+  belongs_to :account
   enum :debt_type, { personal_loan: 0, vehicle_loan: 1, mortgage: 2,
                      student_loan: 3, medical: 4, other: 5 }
 

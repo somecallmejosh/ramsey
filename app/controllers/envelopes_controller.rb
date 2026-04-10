@@ -1,19 +1,19 @@
 class EnvelopesController < ApplicationController
-  include RequireAdmin
+  include RequireOwner
 
-  before_action :require_admin_role, only: [ :new, :create, :edit, :update ]
+  before_action :require_owner_role, only: [ :new, :create, :edit, :update ]
   before_action :set_envelope, only: [ :edit, :update ]
 
   def new
-    @envelope        = Envelope.new
+    @envelope        = current_account.envelopes.build
     @envelope_budget = @envelope.envelope_budgets.build(
       year: Date.current.year, month: Date.current.month
     )
   end
 
   def create
-    @envelope = Envelope.new(envelope_params)
-    @envelope.position = Envelope.maximum(:position).to_i + 1
+    @envelope = current_account.envelopes.build(envelope_params)
+    @envelope.position = current_account.envelopes.maximum(:position).to_i + 1
 
     Envelope.transaction do
       @envelope.save!
@@ -47,7 +47,7 @@ class EnvelopesController < ApplicationController
   private
 
   def set_envelope
-    @envelope = Envelope.find(params[:id])
+    @envelope = current_account.envelopes.find(params[:id])
   end
 
   def envelope_params
