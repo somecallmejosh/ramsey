@@ -1,19 +1,19 @@
-<div id="day_<%= date.to_s %>" class="p-2 min-w-36 <% if Date.current == date %> bg-hs-primary/10<% end %>">
+<div id="day_<%= date.to_s %>" class="p-2 <% if Date.current == date %> bg-hs-primary/10<% elsif date.month != @month %> bg-neutral-100<% end %>">
   <div class="text-center">
-    <p class="<%= ui.label(:secondary) %> text-xs mb-1"><%= date.strftime("%a") %></p>
-    <p class="font-serif text-2xl mb-2"><%= date.day %></p>
+    <p class="text-xs lg:mb-1"><%= date.strftime("%a") %></p>
+    <p class="font-serif lg:text-2xl lg:mb-1"><%= date.day %></p>
     <% if date > Date.current %>
       <div class="h-7"></div>
     <% elsif log %>
       <%= button_to lunch_log_path(log), method: :delete,
-            class: "inline-flex py-1 px-4 rounded-lg bg-hs-primary text-white text-xs font-semibold transition-colors",
+            class: "inline-flex py-px px-1 lg:px-1.5 rounded-lg bg-hs-primary text-white text-xs font-semibold transition-colors",
             aria: { label: "Unlog #{date.strftime("%b %-d")}" } do %>
         Packed
       <% end %>
     <% else %>
       <div>
         <%= button_to lunch_logs_path(logged_on: date.to_s), method: :post,
-              class: "inline-flex py-1 px-4 rounded-lg border border-hs-border text-hs-muted text-xs transition-colors hover:border-hs-primary",
+              class: "inline-flex py-px px-1 lg:px-1.5 rounded-lg border border-hs-border text-hs-muted text-xs transition-colors hover:border-hs-primary",
               aria: { label: "Log packed lunch for #{date.strftime("%b %-d")}" } do %>
           Log
         <% end %>

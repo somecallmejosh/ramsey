@@ -23,10 +23,10 @@
 <div class="<%= ui.card %> mb-6">
   <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B %Y") %></h2>
   <p class="md:hidden">Scroll horizontally to view all days.</p>
-  <div class="overflow-x-scroll border border-b-0 border-hs-border">
-    <div class="">
+  <div class="overflow-x-scroll border border-hs-border rounded-lg">
+    <div class="divide-y divide-hs-border">
       <% weeks_for_month(@year, @month).each do |week| %>
-        <div class="grid grid-cols-5 border-b border-hs-border divide-x divide-hs-border min-w-[720px]">
+        <div class="grid grid-cols-5  divide-x divide-hs-border">
           <% week.each do |date| %>
             <%= render "day_cell", date: date, log: @logs.find { |l| l.logged_on == date } %>
           <% end %>
