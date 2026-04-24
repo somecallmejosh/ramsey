@@ -1,6 +1,6 @@
 <%# Back link + heading %>
 <div class="flex items-center gap-3 mb-6">
-  <%= link_to root_path, class: "text-hs-muted hover:text-hs-navy transition-colors", aria: { label: "Back to dashboard" } do %>
+  <%= link_to root_path, class: "text-mute hover:text-ink transition-colors", aria: { label: "Back to dashboard" } do %>
     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
     </svg>
@@ -15,7 +15,7 @@
     <% is_current = d.month == @month && d.year == @year %>
     <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
           envelope_expenses_path(@envelope, year: d.year, month: d.month),
-          class: "flex-none px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors #{is_current ? "bg-hs-primary text-white" : "bg-white text-hs-slate border border-hs-border hover:border-hs-primary"}" %>
+          class: "flex-none px-4 py-2 rounded-full font-sans font-medium text-[13px] whitespace-nowrap transition-colors #{is_current ? "bg-accent text-porcelain" : "bg-porcelain text-graphite border border-border hover:border-accent"}" %>
   <% end %>
 </div>
 
@@ -39,7 +39,7 @@
 
 <%# Weekly spend chart %>
 <div class="<%= ui.card %> mb-6">
-  <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B") %> Weekly Spend</h2>
+  <h2 class="<%= ui.section_heading %> mb-4"><%= @selected_date.strftime("%B") %> weekly spend</h2>
   <%= column_chart(
     [
       { name: "Weekly spend", data: @weekly_spend },

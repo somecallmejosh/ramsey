@@ -1,0 +1,202 @@
+/* ==============================================================*=
+Clempo Design System — Tokens
+A sophisticated, editorial system for a family budgeting app.
+================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css');
+
+:root {
+  /* ---- Color: neutrals (cool hue family, h=260) ---- */
+  --porcelain: oklch(0.985 0.004 260); /* page bg */
+  --porcelain-2: oklch(0.965 0.005 260); /* elevated bg */
+  --porcelain-3: oklch(0.94 0.006 260); /* inset / rail */
+  --silver: oklch(0.88 0.008 260); /* dividers emphasis */
+  --line: oklch(0.92 0.006 260); /* hairline */
+  --mute: oklch(0.62 0.015 260); /* secondary text */
+  --graphite: oklch(0.38 0.018 260); /* tertiary surface text */
+  --ink-2: oklch(0.28 0.02 260); /* strong text */
+  --ink: oklch(0.18 0.02 260); /* primary fg / dark surface */
+  --ink-deep: oklch(0.12 0.022 260); /* deepest — reserved */
+
+  /* ---- Color: accent (single jewel) ---- */
+  --amethyst: oklch(0.52 0.14 310);
+  --amethyst-soft: oklch(0.52 0.14 310 / 0.12);
+  --amethyst-ring: oklch(0.52 0.14 310 / 0.35);
+
+  /* ---- Color: semantic (all muted, shared chroma ~0.08) ---- */
+  --sage: oklch(0.62 0.08 160); /* positive */
+  --sage-soft: oklch(0.62 0.08 160 / 0.12);
+  --claret: oklch(0.52 0.12 15); /* negative */
+  --claret-soft: oklch(0.52 0.12 15 / 0.12);
+  --gilt: oklch(0.7 0.1 75); /* warning */
+  --gilt-soft: oklch(0.7 0.1 75 / 0.14);
+
+  /* ---- Typography families ---- */
+  --font-display: 'Newsreader', 'Times New Roman', Georgia, serif;
+  --font-ui:
+    'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-italic: 'Instrument Serif', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- Type scale (semantic) ---- */
+  --t-hero: 600 72px/1.02 var(--font-display); /* balance hero */
+  --t-display: 500 48px/1.08 var(--font-display); /* screen title */
+  --t-h1: 500 32px/1.15 var(--font-display);
+  --t-h2: 500 24px/1.2 var(--font-display);
+  --t-h3: 600 18px/1.3 var(--font-ui);
+  --t-body: 400 15px/1.55 var(--font-ui);
+  --t-body-strong: 500 15px/1.55 var(--font-ui);
+  --t-small: 400 13px/1.5 var(--font-ui);
+  --t-meta: 500 11px/1.2 var(--font-ui); /* small-caps label */
+  --t-num-hero: 500 56px/1 var(--font-display);
+  --t-num: 500 20px/1.2 var(--font-ui);
+
+  --ls-tight: -0.02em;
+  --ls-caps: 0.12em;
+
+  /* ---- Spacing (4px base, musical) ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+
+  /* ---- Radii ---- */
+  --r-0: 0;
+  --r-1: 4px;
+  --r-2: 10px;
+  --r-3: 20px;
+  --r-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-0: none;
+  --shadow-1:
+    0 1px 2px oklch(0.18 0.02 260 / 0.04),
+    0 8px 24px oklch(0.18 0.02 260 / 0.06);
+  --shadow-2:
+    0 2px 4px oklch(0.18 0.02 260 / 0.05),
+    0 18px 40px oklch(0.18 0.02 260 / 0.1);
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --d-fast: 180ms;
+  --d-med: 240ms;
+  --d-slow: 400ms;
+
+  /* ---- Semantic surface/text pairings ---- */
+  --bg: var(--porcelain);
+  --bg-elev: var(--porcelain-2);
+  --bg-inset: var(--porcelain-3);
+  --fg: var(--ink);
+  --fg-2: var(--ink-2);
+  --fg-mute: var(--mute);
+  --border: var(--line);
+  --accent: var(--amethyst);
+}
+
+/* ---- Dark mode (ink-forward) ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--ink);
+    --bg-elev: oklch(0.22 0.02 260);
+    --bg-inset: oklch(0.16 0.02 260);
+    --fg: var(--porcelain);
+    --fg-2: oklch(0.92 0.008 260);
+    --fg-mute: oklch(0.68 0.014 260);
+    --border: oklch(0.3 0.018 260);
+  }
+}
+
+/* ==============================================================*=
+   Semantic element defaults
+   ============================================================== */
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: var(--t-body);
+  font-feature-settings: 'ss01', 'cv11', 'tnum';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1 {
+  font: var(--t-display);
+  letter-spacing: var(--ls-tight);
+  margin: 0;
+}
+h2 {
+  font: var(--t-h1);
+  letter-spacing: var(--ls-tight);
+  margin: 0;
+}
+h3 {
+  font: var(--t-h2);
+  letter-spacing: var(--ls-tight);
+  margin: 0;
+}
+h4 {
+  font: var(--t-h3);
+  margin: 0;
+}
+p {
+  font: var(--t-body);
+  margin: 0;
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+
+small {
+  font: var(--t-small);
+  color: var(--fg-mute);
+}
+
+.meta {
+  font: var(--t-meta);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+
+.num,
+.num \* {
+  font-variant-numeric: tabular-nums;
+}
+
+.num-hero {
+  font: var(--t-num-hero);
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.italic-accent {
+  font-family: var(--font-italic);
+  font-style: italic;
+  font-weight: 400;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--s-5) 0;
+}
+
+/* Focus ring — always visible */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--amethyst);
+  outline-offset: 2px;
+  border-radius: var(--r-1);
+}

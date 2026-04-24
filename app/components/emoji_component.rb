@@ -8,7 +8,7 @@ class EmojiComponent < ApplicationComponent
   }.freeze
 
   def initialize(score:, size: :small)
-    @score = score
+    @score = score.to_i.clamp(0, 5)
     @size  = size
   end
 
@@ -16,28 +16,20 @@ class EmojiComponent < ApplicationComponent
     LABELS[@score] || "Unknown"
   end
 
-  def svg_path
-    Rails.root.join("app/assets/images/emoji/#{@size}-#{@score}.svg")
+  def pip_size
+    @size == :large ? "w-1.5 h-1.5" : "w-1 h-1"
   end
 
-  def svg_content
-    return placeholder_svg unless svg_path.exist?
-    File.read(svg_path).html_safe
+  def gap
+    @size == :large ? "gap-1.5" : "gap-1"
   end
 
-  def dimension
-    @size == :large ? "w-12 h-12" : "w-8 h-8"
-  end
-
-  private
-
-  def placeholder_svg
-    <<~SVG.html_safe
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-        <title>#{ERB::Util.html_escape(label)}</title>
-        <circle cx="16" cy="16" r="14" fill="currentColor" opacity="0.3"/>
-        <text x="16" y="21" text-anchor="middle" font-size="14">#{@score}</text>
-      </svg>
-    SVG
+  def pip_class(index)
+    base = "#{pip_size} rounded-full"
+    if index <= @score
+      "#{base} bg-ink"
+    else
+      "#{base} bg-line"
+    end
   end
 end

@@ -6,7 +6,7 @@
       <%= form_with model: [@debt, @debt_payment], class: "space-y-5" do |f| %>
         <% if @debt_payment.errors.any? %>
           <div class="<%= ui.warning_banner %>">
-            <%= icon "info", classes: "w-5 h-5 flex-none text-hs-red" %>
+            <%= icon "info", classes: "w-5 h-5 flex-none text-claret" %>
             <span><%= @debt_payment.errors.full_messages.first %></span>
           </div>
         <% end %>
@@ -21,7 +21,7 @@
           <%= f.label :balance_after, "New balance (from statement)", class: ui.label %>
           <%= f.number_field :balance_after, step: "0.01", min: "0",
                 class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
-          <p class="text-[12px] text-hs-muted mt-1">Enter the balance shown on your loan statement after this payment.</p>
+          <p class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Enter the balance shown on your loan statement after this payment.</p>
         </div>
 
         <div>

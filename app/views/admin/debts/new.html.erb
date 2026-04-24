@@ -1,5 +1,5 @@
 <% content_for :title, "Add Debt" %>
-
+<div class="max-w-2xl mx-auto">
 <div class="mb-6 flex items-center gap-3">
   <%= link_to debts_path, class: ui.link(:subtle) do %>
     <%= icon "arrow-right", classes: "w-4 h-4 rotate-180" %>
@@ -9,4 +9,5 @@
 
 <div class="<%= ui.card %>">
   <%= render "form", debt: @debt %>
+</div>
 </div>

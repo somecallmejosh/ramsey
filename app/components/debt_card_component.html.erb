@@ -1,18 +1,14 @@
 <div class="<%= ui.stat_card %>">
   <div class="<%= ui.card_header %>">
     <div>
-      <h3 class="<%= ui.label %>"><%= @debt.name %></h3>
-      <p class="<%= ui.label(:secondary) %> text-[13px]"><%= type_label %></p>
+      <h3 class="<%= ui.subsection_heading %>"><%= @debt.name %></h3>
+      <p class="<%= ui.type(:small) %>"><%= type_label %></p>
     </div>
     <% if snowball_target? %>
-      <span class="text-[11px] font-bold uppercase tracking-wide text-hs-primary bg-hs-blue-pale border border-hs-primary/30 px-2 py-1 rounded-full">
-        Target
-      </span>
+      <span class="<%= ui.badge(:accent) %>">Target</span>
     <% end %>
     <% if paid_off? %>
-      <span class="text-[11px] font-bold uppercase tracking-wide text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-full">
-        Paid off
-      </span>
+      <span class="<%= ui.badge(:success) %>">Paid off</span>
     <% end %>
   </div>
 
@@ -26,10 +22,10 @@
 
   <%# Progress bar %>
   <div class="mt-3 mb-1">
-    <div class="h-2 rounded-full bg-hs-border overflow-hidden">
-      <div class="h-full rounded-full bg-hs-primary transition-all" style="width: <%= progress_bar_width %>"></div>
+    <div class="h-2 rounded-full bg-border overflow-hidden">
+      <div class="h-full rounded-full bg-accent transition-all" style="width: <%= progress_bar_width %>"></div>
     </div>
-    <p class="text-[12px] text-hs-muted mt-1"><%= @debt.progress_pct %>% paid off</p>
+    <p class="<%= ui.label(:meta) %> mt-1"><%= @debt.progress_pct %>% paid off</p>
   </div>
 
   <p class="<%= ui.label(:secondary) %> mt-2">

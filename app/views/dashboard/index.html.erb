@@ -7,7 +7,7 @@
     <% is_current = d.month == @month && d.year == @year %>
     <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
           dashboard_path(year: d.year, month: d.month),
-          class: "flex-none px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors #{is_current ? "bg-hs-primary text-white" : "bg-white text-hs-slate border border-hs-border hover:border-hs-primary"}" %>
+          class: "flex-none px-4 py-2 rounded-full font-sans font-medium text-[13px] whitespace-nowrap transition-colors #{is_current ? "bg-accent text-porcelain" : "bg-porcelain text-graphite border border-border hover:border-accent"}" %>
   <% end %>
 </div>
 
@@ -37,18 +37,18 @@
 <% if @snowball_target %>
   <div class="<%= ui.card %> mt-6">
     <div class="<%= ui.card_header %>">
-      <h2 class="<%= ui.label %>">Debt Snowball</h2>
+      <h2 class="<%= ui.subsection_heading %>">Debt Snowball</h2>
       <%= link_to "View all", debts_path, class: ui.link(:subtle) %>
     </div>
 
-    <p class="text-[13px] text-hs-muted mb-1">Current target</p>
-    <p class="text-xl font-bold text-hs-navy"><%= @snowball_target.name %></p>
+    <p class="<%= ui.label(:meta) %> mb-1">Current target</p>
+    <p class="<%= ui.type(:body_strong) %>"><%= @snowball_target.name %></p>
     <p class="<%= ui.stat_value %> mt-1"><%= number_to_currency(@snowball_target.current_balance) %></p>
 
-    <div class="h-2 rounded-full bg-hs-border overflow-hidden mt-3 mb-1">
-      <div class="h-full rounded-full bg-hs-primary" style="width: <%= @snowball_target.progress_pct %>%"></div>
+    <div class="h-2 rounded-full bg-border overflow-hidden mt-3 mb-1">
+      <div class="h-full rounded-full bg-accent" style="width: <%= @snowball_target.progress_pct %>%"></div>
     </div>
-    <p class="text-[12px] text-hs-muted"><%= @snowball_target.progress_pct %>% paid off</p>
+    <p class="<%= ui.label(:meta) %>"><%= @snowball_target.progress_pct %>% paid off</p>
 
     <p class="<%= ui.label(:secondary) %> mt-3">
       Total non-mortgage debt: <%= number_to_currency(@total_snowball) %>

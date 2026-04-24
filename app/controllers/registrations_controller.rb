@@ -17,7 +17,7 @@ class RegistrationsController < ApplicationController
     end
 
     start_new_session_for(@user)
-    redirect_to root_path, notice: "Welcome to Ramsey!"
+    redirect_to root_path, notice: "Welcome to Clempo!"
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:alert] = e.record.errors.full_messages.to_sentence
     render :new, status: :unprocessable_entity

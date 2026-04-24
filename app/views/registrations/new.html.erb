@@ -1,9 +1,11 @@
-<div class="min-h-screen flex items-center justify-center px-4">
+<div class="flex items-center justify-center px-4">
   <div class="w-full max-w-sm">
 
-    <div class="text-center mb-8">
-      <h1 class="<%= ui.page_heading %>">Ramsey</h1>
-      <p class="<%= ui.label(:secondary) %> mt-2">Create your account</p>
+
+    <div class="mt-8 mb-4">
+      <%= image_tag "logos/logo.svg", class: "h-16 w-auto", alt: "Clempo" %>
+      <h1 class="sr-only">Create your Clempo account</h1>
+      <p class="<%= ui.label(:secondary) %> mt-2">Create a new account</p>
     </div>
 
     <% if flash[:alert].present? %>
@@ -61,7 +63,7 @@
 
       <% end %>
 
-      <div class="mt-4 text-center">
+      <div class="mt-4">
         <%= link_to "Already have an account? Sign in", new_session_path, class: ui.link(:subtle) %>
       </div>
     </div>

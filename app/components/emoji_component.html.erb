@@ -1,3 +1,5 @@
-<span class="<%= dimension %>" role="img" aria-label="<%= label %>">
-  <%= svg_content %>
+<span class="inline-flex items-center <%= gap %>" role="img" aria-label="<%= label %>">
+  <% (1..5).each do |i| %>
+    <span class="<%= pip_class(i) %>" aria-hidden="true"></span>
+  <% end %>
 </span>

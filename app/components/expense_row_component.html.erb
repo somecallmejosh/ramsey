@@ -1,6 +1,6 @@
-<div id="<%= dom_id(@expense) %>" class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+<div id="<%= dom_id(@expense) %>" class="flex items-center justify-between py-3 border-b border-border last:border-0">
   <div class="flex-1 min-w-0">
-    <p class="text-lg font-semibold text-hs-navy">
+    <p class="text-lg font-semibold text-ink">
       <%= number_to_currency(@expense.amount) %>
     </p>
     <p class="<%= ui.label(:secondary) %> truncate">
@@ -15,7 +15,7 @@
   <% if can_delete? %>
     <%= button_to envelope_expense_path(envelope, @expense),
           method: :delete,
-          class: "ml-3 p-2 text-hs-muted hover:text-hs-red transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
+          class: "ml-3 p-2 text-mute hover:text-claret transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
           aria: { label: "Delete expense of #{number_to_currency(@expense.amount)}" },
           form: { "data-turbo-confirm": "Delete this expense?" } do %>
       <%= icon "close", classes: "w-4 h-4" %>

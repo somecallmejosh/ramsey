@@ -1,3 +1,4 @@
+<div class="max-w-3xl mx-auto">
 <div class="flex items-center gap-3 mb-6 justify-between">
 
   <h1 class="<%= ui.page_heading %>">Meal History</h1>
@@ -29,11 +30,11 @@
 
         <% meals = plan.meals.order(:day_of_week) %>
         <% if meals.any? %>
-          <div class="mt-3 divide-y divide-hs-border">
+          <div class="mt-3 divide-y divide-border">
             <% meals.each do |meal| %>
               <div class="py-2 flex items-baseline gap-2">
                 <span class="<%= ui.label(:secondary) %> w-10 shrink-0"><%= meal.day_name.first(3) %></span>
-                <span class="text-hs-navy text-sm"><%= meal.dinner %></span>
+                <span class="text-ink text-sm"><%= meal.dinner %></span>
               </div>
             <% end %>
           </div>
@@ -47,3 +48,4 @@
     <%= link_to "Create your first plan", new_meal_plan_path, class: "mt-4 inline-block #{ui.link}" %>
   </div>
 <% end %>
+</div>

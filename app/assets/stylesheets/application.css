@@ -6,70 +6,118 @@
 @source "../../../app/presenters/**/*.rb";
 @source "../../../app/helpers/**/*.rb";
 
+/* =============================================================
+   Clempo design tokens
+   Editorial, quiet-confident palette — porcelain/ink with amethyst
+   as the single jewel accent. Semantic pairs (sage / claret / gilt)
+   sit on a shared muted chroma so they read as annotations, not alerts.
+   ============================================================= */
+
 @theme {
-  /* Font */
-  --font-sans: 'Reddit Sans', ui-sans-serif, system-ui, sans-serif;
+  /* ---- Fonts ---- */
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Newsreader', 'Times New Roman', Georgia, serif;
+  --font-italic: 'Instrument Serif', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Colors — neutral scale */
-  --color-hs-navy: #21214d;
-  --color-hs-slate: #57577b;
-  --color-hs-muted: #9393b7;
-  --color-hs-border: #cbcdd0;
-  --color-hs-white: #ffffff;
+  /* ---- Colors — Clempo neutrals (hue 260) ---- */
+  --color-porcelain: oklch(0.985 0.004 260);
+  --color-porcelain-2: oklch(0.965 0.005 260);
+  --color-porcelain-3: oklch(0.94 0.006 260);
+  --color-silver: oklch(0.88 0.008 260);
+  --color-line: oklch(0.92 0.006 260);
+  --color-mute: oklch(0.48 0.018 260);
+  --color-graphite: oklch(0.38 0.018 260);
+  --color-ink-2: oklch(0.28 0.02 260);
+  --color-ink: oklch(0.18 0.02 260);
+  --color-ink-deep: oklch(0.12 0.022 260);
 
-  /* Colors — blue / brand */
-  --color-hs-primary: #4865db;
-  --color-hs-primary-dark: #2a4cd5;
-  --color-hs-blue-light: #c7d3f7;
-  --color-hs-blue-pale: #e0e6fa;
+  /* ---- Colors — Clempo accent (amethyst) ---- */
+  --color-accent: oklch(0.52 0.14 310);
+  --color-accent-soft: oklch(0.52 0.14 310 / 0.12);
+  --color-accent-ring: oklch(0.52 0.14 310 / 0.35);
 
-  /* Colors — semantic */
-  --color-hs-red: #e60013;
-  --color-hs-red-soft: #ff9b99;
-  --color-hs-indigo: #b8b1ff;
-  --color-hs-sky: #89caff;
-  --color-hs-green: #89e780;
-  --color-hs-amber: #ffc97c;
+  /* ---- Colors — Clempo semantic (shared chroma ~0.08) ---- */
+  --color-sage: oklch(0.62 0.08 160);
+  --color-sage-soft: oklch(0.62 0.08 160 / 0.12);
+  --color-claret: oklch(0.52 0.12 15);
+  --color-claret-soft: oklch(0.52 0.12 15 / 0.12);
+  --color-gilt: oklch(0.7 0.1 75);
+  --color-gilt-soft: oklch(0.7 0.1 75 / 0.14);
 
-  /* Border radius */
-  --radius-sm: 4px;
-  --radius-md: 10px;
+  /* ---- Semantic surface/text pairings ---- */
+  --color-bg: var(--color-porcelain);
+  --color-bg-elev: var(--color-porcelain-2);
+  --color-bg-inset: var(--color-porcelain-3);
+  --color-fg: var(--color-ink);
+  --color-fg-2: var(--color-ink-2);
+  --color-fg-mute: var(--color-mute);
+  --color-border: var(--color-line);
+
+  /* ---- Radii ---- */
+  --radius-sm: 4px;   /* chips, inputs */
+  --radius-md: 10px;  /* cards, buttons, sheets */
   --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-full: 999px;
+  --radius-xl: 20px;  /* modals, bottom sheets */
+  --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-card: 0 2px 16px rgba(33, 33, 77, 0.08);
+  /* ---- Shadows (stacked pair, cool undertone) ---- */
+  --shadow-1:
+    0 1px 2px oklch(0.18 0.02 260 / 0.04),
+    0 8px 24px oklch(0.18 0.02 260 / 0.06);
+  --shadow-2:
+    0 2px 4px oklch(0.18 0.02 260 / 0.05),
+    0 18px 40px oklch(0.18 0.02 260 / 0.1);
+  --shadow-card: var(--shadow-1);
 
-  /* Type scale */
-  --text-preset-1: 52px;
-  --text-preset-3: 32px;
-  --text-preset-7: 15px;
-  --text-preset-8: 13px;
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 180ms;
+  --duration-med: 240ms;
+  --duration-slow: 400ms;
+
+  /* ---- Type scale markers (used via arbitrary values) ---- */
+  --text-preset-1: 56px;  /* num-hero */
+  --text-preset-3: 32px;  /* h1 */
+  --text-preset-7: 15px;  /* body */
+  --text-preset-8: 13px;  /* small */
+
+  /* ---- Tracking ---- */
+  --tracking-tight: -0.02em;
+  --tracking-caps: 0.12em;
 }
 
-/* Page background */
+/* Page background — flat porcelain */
 body {
-  background: linear-gradient(180deg, #f5f5ff 72.99%, #e0e0ff 100%);
+  background: var(--color-bg);
   min-height: 100dvh;
   font-family: var(--font-sans);
-  color: var(--color-hs-navy);
+  color: var(--color-fg);
+  font-feature-settings: 'ss01', 'cv11', 'tnum';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Modal entrance animation */
+/* Tabular numerics on monetary values */
+.num,
+.num * {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Modal entrance — fade + gentle drift, never scale. */
 @keyframes modal-in {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(-6px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
 }
 
 @utility animate-modal-in {
-  animation: modal-in 200ms ease-out both;
+  animation: modal-in var(--duration-med, 240ms) var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) both;
 }
 
 /* Respect reduced motion */

@@ -1,7 +1,7 @@
 <% if authenticated? && !current_user.push_subscriptions.exists? %>
   <div data-controller="push-notifications"
        class="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none">
-    <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full pointer-events-auto">
+    <div class="bg-porcelain-2 border border-line rounded-[20px] shadow-[var(--shadow-2)] p-6 max-w-sm w-full pointer-events-auto">
       <h2 class="<%= ui.section_heading %> mb-2">Stay in the loop</h2>
       <p class="<%= ui.label(:secondary) %> mb-6">
         Get notified when Josh or Sally logs a transaction or packs lunch.

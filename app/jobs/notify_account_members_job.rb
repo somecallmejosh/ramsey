@@ -31,7 +31,7 @@ class NotifyAccountMembersJob < ApplicationJob
     when LunchLog
       "#{name} packed lunch today."
     end
-    { title: "Ramsey", body: body, icon: "/icons/icon-192.png" }
+    { title: "Clempo", body: body, icon: "/icons/icon-192.png" }
   end
 
   def deliver(subscription, payload)

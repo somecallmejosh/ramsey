@@ -1,3 +1,4 @@
+<div class="max-w-3xl mx-auto">
 <% if @meal_plan.pending? || @meal_plan.processing? %>
   <%# ── Processing spinner ─────────────────────────────────────────────────── %>
   <% content_for :head do %>
@@ -6,8 +7,8 @@
   <% end %>
 
   <div class="flex flex-col items-center justify-center py-20 gap-4 text-center px-4">
-    <div class="w-10 h-10 border-4 border-hs-blue-light border-t-hs-primary rounded-full animate-spin"></div>
-    <p class="text-lg font-semibold text-hs-navy">Cool, I can work with these!</p>
+    <div class="w-10 h-10 border-4 border-porcelain-3 border-t-accent rounded-full animate-spin"></div>
+    <p class="text-lg font-semibold text-ink">Cool, I can work with these!</p>
     <p class="<%= ui.label(:secondary) %>">Give me a minute to think about it, and I'll have your menu ready shortly.</p>
     <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
           class: "mt-6 #{ui.link(:subtle)}" %>
@@ -50,7 +51,7 @@
             <span class="<%= ui.label(:secondary) %>"><%= number_to_currency(meal.estimated_cost) %></span>
           <% end %>
         </div>
-        <p class="text-lg font-semibold text-hs-navy"><%= meal.dinner %></p>
+        <p class="text-lg font-semibold text-ink"><%= meal.dinner %></p>
         <p class="<%= ui.label(:secondary) %>">Lunch: <%= meal.lunch %></p>
         <% if meal.prep_note.present? %>
           <p class="<%= ui.label(:secondary) %> mt-1 italic"><%= meal.prep_note %></p>
@@ -61,7 +62,7 @@
 
   <%# Shopping list %>
   <% if @meal_plan.shopping_items.any? %>
-    <h2 class="<%= ui.section_heading %>">Shopping List</h2>
+    <h2 class="<%= ui.section_heading %> mb-4">Shopping List</h2>
     <%= render "shopping_list", meal_plan: @meal_plan %>
   <% end %>
 
@@ -111,12 +112,12 @@
 
     <%# Shopping items (read-only in preview) %>
     <% if shopping_items.any? %>
-      <h2 class="<%= ui.section_heading %>">Shopping List</h2>
+      <h2 class="<%= ui.section_heading %> mb-4">Shopping List</h2>
       <div class="<%= ui.card %> mb-6">
         <% shopping_items.each_with_index do |item, i| %>
-          <div class="flex items-center justify-between py-3 border-b border-hs-border last:border-0">
+          <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
             <div>
-              <p class="text-lg text-hs-navy"><%= item["name"] %></p>
+              <p class="text-lg text-ink"><%= item["name"] %></p>
               <p class="<%= ui.label(:secondary) %>"><%= item["quantity"] %> · <%= item["store"] %></p>
             </div>
             <% if item["estimated_cost"]&.positive? %>
@@ -146,3 +147,4 @@
   </div>
 
 <% end %>
+</div>

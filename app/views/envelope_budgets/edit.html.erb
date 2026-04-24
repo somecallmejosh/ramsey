@@ -1,3 +1,4 @@
+<div class="max-w-2xl mx-auto">
 <h1 class="<%= ui.page_heading %> mb-2">Edit Budget</h1>
 <p class="<%= ui.label(:secondary) %> mb-6">
   <%= @envelope_budget.envelope.name %> — <%= Date::MONTHNAMES[@envelope_budget.month] %> <%= @envelope_budget.year %>
@@ -23,4 +24,5 @@
       <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary) %>
     </div>
   <% end %>
+</div>
 </div>

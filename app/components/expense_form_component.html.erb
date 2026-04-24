@@ -27,7 +27,7 @@
             onkeydown: "if(event.key==='Enter'){event.preventDefault();this.form.requestSubmit()}",
             autofocus: true %>
       <% if @expense.errors[:amount].any? %>
-        <p id="expense_amount_error" class="text-hs-red text-[13px] mt-1">
+        <p id="expense_amount_error" class="<%= ui.type(:small, extra: "text-claret mt-1") %>">
           <%= @expense.errors[:amount].first %>
         </p>
       <% end %>

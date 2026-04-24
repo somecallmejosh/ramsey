@@ -9,7 +9,7 @@
 
 <%# Baby Step 2 — Snowball %>
 <% if @snowball_debts.any? %>
-  <h2 class="<%= ui.section_heading %>">Baby Step 2</h2>
+  <h2 class="<%= ui.section_heading %> mb-4">Baby Step 2</h2>
   <div class="grid grid-cols-1 gap-4 mb-8">
     <% @snowball_debts.each_with_index do |debt, index| %>
       <%= render DebtCardComponent.new(
@@ -22,7 +22,7 @@
 
 <%# Baby Step 6 — Mortgage %>
 <% if @mortgage %>
-  <h2 class="<%= ui.section_heading %>">Baby Step 6 — Mortgage</h2>
+  <h2 class="<%= ui.section_heading %> mb-4">Baby Step 6 — Mortgage</h2>
   <div class="mb-8">
     <%= render DebtCardComponent.new(debt: @mortgage, current_user: current_user) %>
   </div>
@@ -30,7 +30,7 @@
 
 <%# Paid off %>
 <% if @paid_off.any? %>
-  <h2 class="<%= ui.section_heading %> text-hs-muted">Paid Off</h2>
+  <h2 class="<%= ui.section_heading %> text-mute mb-4">Paid Off</h2>
   <div class="grid grid-cols-1 gap-4 opacity-60">
     <% @paid_off.each do |debt| %>
       <%= render DebtCardComponent.new(debt: debt, current_user: current_user) %>

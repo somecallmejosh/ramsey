@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title><%= content_for(:title) || "Ramsey" %></title>
+    <title><%= content_for(:title) || "Clempo" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="application-name" content="Ramsey">
+    <meta name="application-name" content="Clempo">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#4865DB">
+    <meta name="theme-color" content="#7a4fb8">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -22,7 +22,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" rel="stylesheet">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -30,7 +31,7 @@
 
   <body>
     <a href="#main-content"
-       class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-hs-primary focus:text-white focus:rounded">
+       class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-porcelain focus:rounded-[4px]">
       Skip to main content
     </a>
     <%= render "layouts/nav" if authenticated? %>
@@ -38,13 +39,13 @@
     <%= turbo_frame_tag "flash-messages" %>
 
     <% if notice.present? %>
-      <div class="bg-hs-green/90 text-hs-navy text-sm font-semibold px-4 py-3 rounded-xl shadow-card flex items-center gap-3"
+      <div class="bg-sage-soft border border-sage/30 text-ink text-[15px] px-4 py-3 rounded-[10px] flex items-center gap-3"
            role="status"
            data-controller="flash"
            data-action="animationend->flash#remove">
         <%= notice %>
         <button type="button"
-                class="shrink-0 -mr-1 p-1 rounded-lg hover:bg-hs-navy/10 active:bg-hs-navy/20"
+                class="shrink-0 -mr-1 p-1 rounded-[4px] hover:bg-ink/10 active:bg-ink/20"
                 aria-label="Dismiss"
                 data-action="flash#remove">
           <%= icon "close", classes: "w-4 h-4" %>
@@ -53,17 +54,16 @@
     <% end %>
 
     <% if alert.present? %>
-      <div class="bg-hs-red-soft/90 text-hs-navy text-sm font-semibold px-4 py-3 rounded-xl shadow-card"
+      <div class="bg-claret-soft border border-claret/30 text-ink text-[15px] px-4 py-3 rounded-[10px]"
            role="alert">
         <%= alert %>
       </div>
     <% end %>
 
     <main id="main-content" class="px-4 pb-24">
-      <div class="bg-hs-blue-pale/50 sticky top-0 z-50 mb-6 -mx-4 p-4 outline outline-1 outline-hs-primary/[15%] backdrop-blur-xl flex items-center justify-between">
+      <div class="bg-porcelain/80 sticky top-0 z-50 mb-6 -mx-4 px-4 py-3 border-b border-line backdrop-blur-[24px] flex items-center justify-between">
         <%= link_to root_path, class: "flex items-center items-center", aria: { label: "Dashboard" } do %>
-          <%= icon "ramsey2", classes: "size-12 translate-y-1" %>
-          <span class="text-xl font-semibold text-hs-primary-dark -translate-x-1">ramsey</span>
+          <%= image_tag "logos/logo.svg", class: "h-10 w-auto", alt: "Clempo" %>
         <% end %>
         <div class="flex items-center">
           <%= button_to session_path, method: :delete,

@@ -1,4 +1,4 @@
-const CACHE_NAME = "ramsey-v1"
+const CACHE_NAME = "clempo-v1"
 const OFFLINE_URL = "/offline"
 
 // Cache the app shell on install

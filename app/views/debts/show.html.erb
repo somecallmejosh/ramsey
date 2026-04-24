@@ -1,5 +1,5 @@
 <% content_for :title, @debt.name %>
-
+<div class="max-w-2xl mx-auto">
 <div class="mb-6 flex items-center gap-3">
   <%= link_to debts_path, class: ui.link(:subtle), aria: { label: "Back to debts" } do %>
     <%= icon "arrow-right", classes: "w-4 h-4 rotate-180" %>
@@ -23,10 +23,10 @@
     <% end %>
   </div>
 
-  <div class="h-2 rounded-full bg-hs-border overflow-hidden mb-1">
-    <div class="h-full rounded-full bg-hs-primary" style="width: <%= @debt.progress_pct %>%"></div>
+  <div class="h-2 rounded-full bg-border overflow-hidden mb-1">
+    <div class="h-full rounded-full bg-accent" style="width: <%= @debt.progress_pct %>%"></div>
   </div>
-  <p class="text-[12px] text-hs-muted"><%= @debt.progress_pct %>% paid off</p>
+  <p class="<%= ui.label(:meta) %>"><%= @debt.progress_pct %>% paid off</p>
 
   <% if @debt.interest_rate.present? %>
     <p class="<%= ui.label(:secondary) %> mt-3">
@@ -43,7 +43,7 @@
 <%# Balance history chart %>
 <% if @chart_data.size > 1 %>
   <div class="<%= ui.card %> mb-6">
-    <h2 class="<%= ui.section_heading %>">Balance History</h2>
+    <h2 class="<%= ui.section_heading %> mb-4">Balance History</h2>
     <%= line_chart @chart_data,
           prefix: "$",
           thousands: ",",
@@ -56,21 +56,21 @@
 
 <%# Payment history %>
 <div class="<%= ui.card %>">
-  <h2 class="<%= ui.section_heading %>">Payments</h2>
+  <h2 class="<%= ui.section_heading %> mb-4">Payments</h2>
 
   <% if @payments.any? %>
-    <div class="divide-y divide-hs-border">
+    <div class="divide-y divide-border">
       <% @payments.each do |payment| %>
         <div class="py-3 flex items-center justify-between">
           <div>
-            <p class="font-semibold text-hs-navy"><%= number_to_currency(payment.amount) %></p>
+            <p class="<%= ui.type(:body_strong) %>"><%= number_to_currency(payment.amount) %></p>
             <p class="<%= ui.label(:secondary) %>">
               <%= payment.paid_on.strftime("%b %-d, %Y") %>
               &middot; balance after: <%= number_to_currency(payment.balance_after) %>
               &middot; <%= payment.user.email_address.split("@").first %>
             </p>
             <% if payment.note.present? %>
-              <p class="text-[13px] text-hs-muted italic"><%= payment.note %></p>
+              <p class="<%= ui.type(:small, extra: "italic text-mute") %>"><%= payment.note %></p>
             <% end %>
           </div>
           <% if current_user.owner? %>
@@ -87,4 +87,5 @@
   <% else %>
     <p class="<%= ui.label(:secondary) %>">No payments logged yet.</p>
   <% end %>
+</div>
 </div>

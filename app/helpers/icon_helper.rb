@@ -1,38 +1,38 @@
 module IconHelper
-  VALID_ICONS = %w[
-    arrow-right arrow-diagonal-up arrow-diagonal-down
-    sleep star quote chevron-down ramsey2
-    logout settings check close info budget lock lunch meal debt
-  ].freeze
-
-  ICON_CACHE = Concurrent::Map.new
+  # Maps the app's internal icon names to Phosphor duotone icon names.
+  # Unknown names pass through as raw Phosphor names (e.g. icon("arrow-up-right")).
+  PHOSPHOR_MAP = {
+    "arrow-right"         => "arrow-right",
+    "arrow-diagonal-up"   => "arrow-up-right",
+    "arrow-diagonal-down" => "arrow-down-right",
+    "chevron-down"        => "caret-down",
+    "close"               => "x",
+    "check"               => "check",
+    "info"                => "info",
+    "lock"                => "lock",
+    "logout"              => "sign-out",
+    "settings"            => "gear",
+    "sleep"               => "moon",
+    "star"                => "star",
+    "quote"               => "quotes",
+    "budget"              => "wallet",
+    "meal"                => "fork-knife",
+    "lunch"               => "bowl-food",
+    "debt"                => "scales"
+  }.freeze
 
   def icon(name, classes: "w-5 h-5", decorative: true)
-    #raise ArgumentError, "Unknown icon: #{name}" unless VALID_ICONS.include?(name.to_s)
+    ph_name = PHOSPHOR_MAP[name.to_s] || name.to_s
 
-    svg = ICON_CACHE.compute_if_absent(name.to_s) do
-      path = Rails.root.join("app/assets/images/icons/#{name}.svg")
-      if path.exist?
-        # Safe: files are developer-controlled assets in the repo.
-        # Never pass user-provided content to html_safe.
-        File.read(path).html_safe
-      else
-        placeholder_icon_svg(name).html_safe
-      end
-    end
+    size_px = classes.to_s[/\bw-(\d+)\b/, 1]&.to_i&.*(4) || 20
+    residual = classes.to_s.gsub(/\b[wh]-\d+\b/, "").squeeze(" ").strip
 
-    attrs = { class: classes }
+    merged = [ "ph-duotone", "ph-#{ph_name}", "inline-flex", "items-center", "justify-center", "align-middle", residual ]
+      .reject(&:blank?).join(" ")
+
+    attrs = { class: merged, style: "font-size: #{size_px}px; line-height: 1;" }
     attrs[:"aria-hidden"] = "true" if decorative
 
-    content_tag(:span, svg, **attrs)
-  end
-
-  private
-
-  def placeholder_icon_svg(name)
-    %(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-        <title>#{ERB::Util.html_escape(name)}</title>
-        <circle cx="12" cy="12" r="10" opacity="0.3"/>
-      </svg>)
+    content_tag(:i, "", **attrs)
   end
 end

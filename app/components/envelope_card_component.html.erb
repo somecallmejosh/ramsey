@@ -21,7 +21,7 @@
     </p>
     <p class="<%= ui.label(:secondary) %>">
       <%= over_budget? ? "over budget" : "remaining" %>
-      <span class="ml-2 opacity-60">of <%= number_to_currency(@budget) %></span>
+      <span class="ml-2 text-fg-mute">of <%= number_to_currency(@budget) %></span>
     </p>
 
     <div class="flex items-center justify-between mt-4">
@@ -41,7 +41,8 @@
         <% if owner? && (eb = envelope_budget_for_edit) %>
           <%= link_to "Edit budget",
                 edit_envelope_budget_path(eb),
-                class: ui.link(:subtle) %>
+                class: ui.link(:subtle),
+                data: { turbo_frame: "_top" } %>
         <% end %>
       </div>
     </div>
