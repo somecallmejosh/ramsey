@@ -58,6 +58,17 @@ RSpec.describe DebtPayment, type: :model do
       expect(payment.balance_before).to eq(3_000)
     end
 
+    it "rejects a new balance higher than the balance before the payment" do
+      payment = build(:debt_payment, debt: debt, user: user, amount: 956, balance_after: 9_560)
+      expect(payment).not_to be_valid
+      expect(payment.errors[:balance_after].first).to include("$3,000.00")
+      expect(debt.reload.current_balance).to eq(3_000)
+    end
+
+    it "accepts a new balance equal to the balance before the payment" do
+      expect(build(:debt_payment, debt: debt, user: user, amount: 50, balance_after: 3_000)).to be_valid
+    end
+
     context "when the new balance is left blank" do
       it "takes the amount off the current balance" do
         payment = pay(250, nil)

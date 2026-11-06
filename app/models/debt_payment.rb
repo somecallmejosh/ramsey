@@ -8,6 +8,8 @@ class DebtPayment < ApplicationRecord
                       comparison: { less_than_or_equal_to: -> { Date.current },
                                     message: "cannot be a future date" }
 
+  validate :balance_after_not_above_prior_balance, on: :create
+
   scope :chronological, -> { order(:paid_on, :created_at, :id) }
 
   # Left blank, the new balance is the amount taken off the balance as of
@@ -57,6 +59,18 @@ class DebtPayment < ApplicationRecord
     return if balance_after.present? || paid_on.blank? || !amount.to_d.positive?
 
     self.balance_after = [ prior_balance - amount, 0 ].max
+  end
+
+  # A payment can only bring the balance down. A higher number is almost
+  # always a typo (an extra digit), so catch it before it lands.
+  def balance_after_not_above_prior_balance
+    return if balance_after.blank? || paid_on.blank? || debt.nil?
+
+    before = prior_balance
+    return if balance_after <= before
+
+    errors.add(:balance_after,
+               "can't be more than the balance before this payment (#{ActiveSupport::NumberHelper.number_to_currency(before)}). Check for an extra digit.")
   end
 
   def capture_balance_before

@@ -13,25 +13,35 @@
                 class: "#{ui.input(error_for.(:amount) ? :error : :default)} mt-1",
                 placeholder: "0.00", required: true,
                 aria: { invalid: error_for.(:amount).present?,
-                        describedby: ("debt_payment_amount_error" if error_for.(:amount)) } %>
+                        describedby: [ ("debt_payment_amount_error" if error_for.(:amount)),
+                                       "debt_payment_amount_hint" ].compact.join(" ") } %>
           <% if error_for.(:amount) %>
             <p id="debt_payment_amount_error" class="<%= ui.field_error %>"><%= error_for.(:amount) %></p>
           <% end %>
+          <p id="debt_payment_amount_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Comes off your <%= number_to_currency(@debt.current_balance) %> balance.</p>
         </div>
 
-        <div>
-          <%= f.label :balance_after, "New balance (optional)", class: ui.label %>
-          <%= f.number_field :balance_after, step: "0.01", min: "0", inputmode: "decimal",
-                class: "#{ui.input(error_for.(:balance_after) ? :error : :default)} mt-1",
-                placeholder: "From your statement",
-                aria: { invalid: error_for.(:balance_after).present?,
-                        describedby: [ ("debt_payment_balance_after_error" if error_for.(:balance_after)),
-                                       "debt_payment_balance_after_hint" ].compact.join(" ") } %>
-          <% if error_for.(:balance_after) %>
-            <p id="debt_payment_balance_after_error" class="<%= ui.field_error %>"><%= error_for.(:balance_after) %></p>
-          <% end %>
-          <p id="debt_payment_balance_after_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Leave blank to take the amount off <%= number_to_currency(@debt.current_balance) %>. If your statement shows a different balance (interest or fees), enter that instead.</p>
-        </div>
+        <%# Most payments just come off the balance. The statement balance is only
+            for when interest or fees make it differ, so it stays tucked away. %>
+        <details class="group" <%= "open" if @debt_payment.balance_after.present? || error_for.(:balance_after) %>>
+          <summary class="<%= ui.link(:subtle) %> cursor-pointer list-none inline-flex items-center gap-1 min-h-[44px] [&::-webkit-details-marker]:hidden">
+            My statement shows a different balance
+            <span aria-hidden="true" class="transition-transform group-open:rotate-90">›</span>
+          </summary>
+          <div class="mt-2">
+            <%= f.label :balance_after, "Balance after this payment", class: ui.label %>
+            <%= f.number_field :balance_after, step: "0.01", min: "0", inputmode: "decimal",
+                  class: "#{ui.input(error_for.(:balance_after) ? :error : :default)} mt-1",
+                  placeholder: "0.00",
+                  aria: { invalid: error_for.(:balance_after).present?,
+                          describedby: [ ("debt_payment_balance_after_error" if error_for.(:balance_after)),
+                                         "debt_payment_balance_after_hint" ].compact.join(" ") } %>
+            <% if error_for.(:balance_after) %>
+              <p id="debt_payment_balance_after_error" class="<%= ui.field_error %>"><%= error_for.(:balance_after) %></p>
+            <% end %>
+            <p id="debt_payment_balance_after_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Use this when interest or fees mean the balance isn't simply <%= number_to_currency(@debt.current_balance) %> minus the payment.</p>
+          </div>
+        </details>
 
         <div>
           <%= f.label :paid_on, "Date", class: ui.label %>
