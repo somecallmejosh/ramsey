@@ -88,6 +88,16 @@ RSpec.describe "Expenses", type: :request do
       expect(body).to include("Undo")
     end
 
+    it "lets the rest of the household know" do
+      post envelope_expenses_path(envelope), params: { expense: { amount: "12.50", transacted_on: Date.current.iso8601 } }, as: :turbo_stream
+      expect(NotifyAccountMembersJob).to have_been_enqueued.with("Expense", Expense.last.id)
+    end
+
+    it "doesn't notify anyone when the purchase isn't saved" do
+      post envelope_expenses_path(envelope), params: { expense: { amount: "" } }, as: :turbo_stream
+      expect(NotifyAccountMembersJob).not_to have_been_enqueued
+    end
+
     it "streams a readable error and keeps the expense unsaved" do
       post envelope_expenses_path(envelope), params: { expense: { amount: "5", transacted_on: (Date.current + 2).iso8601 } }, as: :turbo_stream
 
@@ -136,6 +146,7 @@ RSpec.describe "Expenses", type: :request do
       expect {
         post restore_envelope_expenses_path(envelope), params: { token: CGI.unescapeHTML(token) }, as: :turbo_stream
       }.to change(Expense, :count).by(1)
+      expect(NotifyAccountMembersJob).not_to have_been_enqueued
 
       restored = Expense.last
       expect(restored).to have_attributes(user_id: member.id, note: "Milk", amount: 12.34, transacted_on: Date.current)

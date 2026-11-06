@@ -3,6 +3,12 @@ import "controllers"
 import "chartkick"
 import "Chart.bundle"
 
+// Installable app + offline screen + push notifications.
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker", { scope: "/" })
+    .catch((error) => console.warn("Service worker registration failed", error))
+}
+
 // After each Turbo Drive navigation, move focus to main content so
 // keyboard/screen reader users land at the top of the new page.
 document.addEventListener("turbo:load", () => {

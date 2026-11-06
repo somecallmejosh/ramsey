@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eff0f5">
+  <title>You're offline · Clempo</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      min-height: 100vh; min-height: 100dvh;
+      display: grid; place-items: center; padding: 24px;
+      font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color: #1b1d29;
+      background:
+        radial-gradient(60rem 40rem at 110% -10%, rgb(232 222 245 / .55), transparent 60%),
+        radial-gradient(50rem 36rem at -20% 110%, rgb(220 241 232 / .6), transparent 60%),
+        #eff0f5;
+    }
+    main {
+      width: 100%; max-width: 360px; padding: 32px 24px; text-align: center;
+      background: #fff; border-radius: 24px;
+      box-shadow: 0 1px 2px rgb(30 33 50 / .04), 0 12px 32px -8px rgb(30 33 50 / .1);
+    }
+    img { width: 64px; height: 64px; border-radius: 16px; }
+    h1 { margin-top: 20px; font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+    p { margin-top: 8px; font-size: 16px; line-height: 1.5; color: #555a6b; }
+    button {
+      margin-top: 24px; width: 100%; min-height: 48px; border: 0; border-radius: 9999px;
+      background: #1b1d29; color: #fff; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+    }
+    button:focus-visible { outline: 2px solid #3e5bc8; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icon.svg" alt="" width="64" height="64">
+    <h1>You're offline</h1>
+    <p>Clempo needs a connection to show live balances. Check your Wi-Fi or signal, then try again.</p>
+    <button type="button" onclick="location.reload()">Try again</button>
+  </main>
+</body>
+</html>

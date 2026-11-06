@@ -14,7 +14,17 @@ class DebtPaymentsController < ApplicationController
     @debt_payment.user = current_user
 
     if @debt_payment.save
-      redirect_to debt_path(@debt), notice: "Payment logged. Balance is now #{helpers.number_to_currency(@debt.reload.current_balance)}."
+      notice = "Payment logged. Balance is now #{helpers.number_to_currency(@debt.reload.current_balance)}."
+      respond_to do |format|
+        format.html { redirect_to debt_path(@debt), notice: notice }
+        # The form lives in the "modal" frame, so a redirect would only swap that
+        # frame and leave the balances behind it stale. Refresh the whole page
+        # (debts list or debt detail, whichever the payment was logged from).
+        format.turbo_stream do
+          flash[:notice] = notice
+          render turbo_stream: turbo_stream.refresh(request_id: nil)
+        end
+      end
     else
       render :new, status: :unprocessable_entity
     end

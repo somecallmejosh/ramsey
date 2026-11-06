@@ -1,3 +1,36 @@
+# PWA + household push notifications — 2026-11-06
+
+Found: manifest/service worker/push job/subscription model/Stimulus controller all existed but were never wired: no SW registration, no `push_subscriptions` route, no VAPID meta tag, prompt partial never rendered, job never enqueued, SW `push` handler called `waitUntil` after an `await` (drops the notification), and no VAPID keys in credentials.
+
+### Notifications
+- [x] `ExpenseAlert` (budget-state crossing for one expense): spent through this expense vs. before it; "nearly spent" at `EnvelopeRowComponent::NEARLY_SPENT` (90%) and "over" at >100%; current month + budgeted envelopes only
+- [x] Job: other members get "X logged $Y to Z" (title escalates when a threshold is crossed); the person who logged it gets only the threshold alert; payload carries `url` (category page) + `tag`
+- [x] Enqueue from `ExpensesController#create` (not on Undo/restore)
+- [x] Specs: job (logged / nearly / over / already over / past month / no budget / actor), request spec enqueues
+
+### PWA wiring
+- [x] Route `resources :push_subscriptions, only: [:create, :destroy]`; create is an upsert by endpoint (same device, new user = reassign)
+- [x] Layout: VAPID public key (as a data attribute on the prompt), render push prompt, theme-color, OG/Twitter tags
+- [x] Register SW from `application.js`; SW: offline fallback page, fixed push handler, click opens the payload URL
+- [x] Prompt: show only when permission is "default"; if already granted, silently re-sync this device's subscription; iOS Safari outside the installed app gets "Add to Home Screen" guidance
+- [x] Manifest: id, new icons (any + maskable), brand colours, shortcut "Log a purchase"
+
+### Assets (new C-mark from `logos/logo.svg`)
+- [x] favicon.svg (light/dark aware), favicon.ico, favicon-96, apple-touch-icon 180, manifest 192/512 any + maskable, notification badge (mono alpha)
+- [x] Social share image 1200×630 in the redesign language (silver + glows, floating white card, ring, Plus Jakarta Sans)
+
+### Verify
+- [x] rspec, rubocop, brakeman; live check of manifest/SW in Chrome
+
+### Review
+- 355 examples, 0 failures (24 new: `ExpenseNotification`, job, push subscription requests, enqueue on create / not on Undo / not on failed save); rubocop clean; brakeman unchanged from main (1 pre-existing warning).
+- Live (headless Chrome, 390px): SW registers at scope `/`, activates and controls the page; `clempo-v2` cache holds `/offline.html` + `/icon.svg`; all 5 manifest icons load at their declared sizes; with the server stopped, navigating shows the offline screen.
+- Not verifiable here: real delivery to a phone. Needs VAPID keys in credentials (none exist yet) and HTTPS (production).
+- Lunch log push is supported by the job but still not enqueued (it was never wired, and past-day logging would say "today" wrongly); left out of scope.
+- Brand sources for regenerating assets: `script/brand/icons.py`, `script/brand/social-share.html`.
+
+---
+
 # Visual redesign from Dribbble references — 2026-11-06
 
 Direction (shared by the 3 references): soft silver background with faint lavender/mint glow, white 24px-radius cards with diffuse shadows and no hard borders, bold geometric numbers with small cents, round icon buttons, a floating pill nav, pastel tint per category with a progress ring around its icon, black pill primary buttons and dark segmented pills.

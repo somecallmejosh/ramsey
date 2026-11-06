@@ -1,5 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
-  <circle cx="40" cy="40" r="39" stroke="#1d1b2a" stroke-width="1"/>
-  <path d="M54 28 a18 18 0 1 0 0 24" stroke="#1d1b2a" stroke-width="3.2" stroke-linecap="round"/>
-  <circle cx="54" cy="40" r="2.2" fill="#7a4fb8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .ink { stroke: #1b1d29; } .dot { fill: #2f5bb0; }
+    @media (prefers-color-scheme: dark) { .ink { stroke: #eef0f6; } .dot { fill: #7f9cf0; } }
+  </style>
+  <circle cx="32" cy="32" r="29.40" fill="none" class="ink" stroke-width="3.20"/>
+  <path d="M46.00 22.00 A16.00 16.00 0 1 0 46.00 42.00" fill="none" class="ink" stroke-width="6.40" stroke-linecap="round"/>
+  <circle cx="46.00" cy="32" r="4.20" class="dot"/>
 </svg>

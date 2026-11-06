@@ -15,6 +15,7 @@ class ExpensesController < ApplicationController
     @expense.user = current_user
 
     if @expense.save
+      NotifyAccountMembersJob.perform_later("Expense", @expense.id)
       respond_to do |format|
         format.html { redirect_to root_path, notice: "Saved #{helpers.number_to_currency(@expense.amount)} to #{@envelope.name}." }
         format.turbo_stream { @budget_month = BudgetMonth.new(current_account) }

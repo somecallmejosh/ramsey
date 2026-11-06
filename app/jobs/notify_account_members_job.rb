@@ -1,56 +1,65 @@
+# Sends a web push to everyone in the household about something one member
+# did. Expenses: see ExpenseNotification for who hears what.
 class NotifyAccountMembersJob < ApplicationJob
   queue_as :default
 
+  RESOURCES = { "Expense" => "Expense", "LunchLog" => "LunchLog" }.freeze
+  ICON  = "/web-app-manifest-192x192.png".freeze
+  BADGE = "/notification-badge.png".freeze
+
   def perform(resource_type, resource_id)
-    resource = resource_type.constantize.find_by(id: resource_id)
+    return unless vapid_configured?
+
+    resource = RESOURCES.fetch(resource_type).constantize.find_by(id: resource_id)
     return unless resource
 
-    actor = resource.user
-    members = actor.account.users.where.not(id: actor.id)
+    actor  = resource.user
+    others = actor.account.users.where.not(id: actor.id)
 
-    payload = build_payload(resource)
-
-    members.find_each do |member|
-      subscriptions = member.push_subscriptions.to_a
-      subscriptions.each { |sub| deliver(sub, payload) }
+    case resource
+    when Expense
+      notification = ExpenseNotification.new(resource)
+      notify(others, notification.for_household)
+      notify([ actor ], notification.for_logger)
+    when LunchLog
+      notify(others, title: "Lunch packed", body: "#{actor.display_name} packed lunch today.", url: "/lunch_logs")
     end
   end
 
   private
 
-  def build_payload(resource)
-    name = resource.user.email_address.split("@").first.capitalize
-    body = case resource
-    when Expense
-      envelope    = resource.envelope
-      year, month = resource.transacted_on.year, resource.transacted_on.month
-      spent       = envelope.expenses.for_month(year, month).sum(:amount)
-      budget      = EnvelopeBudget.find_by(envelope: envelope, year: year, month: month)
-      remaining   = (budget&.amount || 0) - spent
-      "#{name} logged #{currency(resource.amount)} to #{envelope.name}. #{currency(remaining)} remaining."
-    when LunchLog
-      "#{name} packed lunch today."
-    end
-    { title: "Clempo", body: body, icon: "/icons/icon-192.png" }
+  def notify(users, payload)
+    return unless payload
+
+    message = payload.merge(icon: ICON, badge: BADGE).to_json
+    PushSubscription.where(user: users).find_each { |sub| deliver(sub, message) }
   end
 
-  def deliver(subscription, payload)
+  # One bad subscription must not stop the others, and must not raise: a retry
+  # would re-send to everyone who already got it.
+  def deliver(subscription, message)
     WebPush.payload_send(
-      message:    payload.to_json,
-      endpoint:   subscription.endpoint,
-      p256dh:     subscription.p256dh,
-      auth:       subscription.auth,
-      vapid: {
-        subject:     Rails.application.credentials.dig(:push_notifications, :subject),
-        public_key:  Rails.application.credentials.dig(:push_notifications, :vapid_public_key),
-        private_key: Rails.application.credentials.dig(:push_notifications, :vapid_private_key)
-      }
+      message:  message,
+      endpoint: subscription.endpoint,
+      p256dh:   subscription.p256dh,
+      auth:     subscription.auth,
+      vapid:    vapid
     )
   rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription
     subscription.destroy
+  rescue WebPush::Error, Net::OpenTimeout, Net::ReadTimeout, SocketError => e
+    Rails.logger.warn("[push] #{e.class} for subscription #{subscription.id}: #{e.message}")
   end
 
-  def currency(amount)
-    ActiveSupport::NumberHelper.number_to_currency(amount)
+  def vapid
+    creds = Rails.application.credentials.push_notifications || {}
+    { subject: creds[:subject], public_key: creds[:vapid_public_key], private_key: creds[:vapid_private_key] }
+  end
+
+  def vapid_configured?
+    return true if vapid.values.all?(&:present?)
+
+    Rails.logger.warn("[push] VAPID credentials missing; skipping notifications")
+    false
   end
 end

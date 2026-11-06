@@ -1,3 +1,4 @@
+<% content_for :share_title, "Join #{@invitation.account.name} on Clempo" %>
 <% user_errors = ->(attr) { @user ? @user.errors.full_messages_for(attr) : [] } %>
 <div class="flex items-center justify-center">
   <div class="w-full max-w-sm">

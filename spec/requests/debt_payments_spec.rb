@@ -18,6 +18,17 @@ RSpec.describe "DebtPayments", type: :request do
         expect(debt.reload.current_balance).to eq(9_500)
       end
 
+      it "refreshes the whole page for Turbo submissions from the modal frame" do
+        post debt_debt_payments_path(debt),
+          params: { debt_payment: { amount: "500", balance_after: "9500", paid_on: Date.current.to_s } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html, text/html", "Turbo-Frame" => "modal" }
+
+        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+        expect(response.body).to include('action="refresh"')
+        expect(debt.reload.current_balance).to eq(9_500)
+        expect(flash[:notice]).to eq("Payment logged. Balance is now $9,500.00.")
+      end
+
       it "re-renders form with inline errors and keeps entered values" do
         post debt_debt_payments_path(debt), params: {
           debt_payment: { amount: "-1", balance_after: "9500", paid_on: Date.current.to_s }

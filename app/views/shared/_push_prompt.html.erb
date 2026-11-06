@@ -1,23 +1,39 @@
-<% if authenticated? && !current_user.push_subscriptions.exists? %>
+<%# Hidden until push_notifications_controller decides this device should see it. %>
+<% if authenticated? && (public_key = Rails.application.credentials.dig(:push_notifications, :vapid_public_key)).present? %>
   <div data-controller="push-notifications"
-       class="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none">
-    <div class="<%= ui.card %> shadow-[var(--shadow-2)] max-w-sm w-full pointer-events-auto">
-      <h2 class="<%= ui.section_heading %> mb-2">Stay in the loop</h2>
-      <p class="<%= ui.label(:secondary) %> mb-6">
-        Get notified when someone in your household logs a transaction or packs lunch.
-      </p>
-      <div class="flex gap-3">
-        <button type="button"
-                data-action="push-notifications#enable"
-                class="<%= ui.button(:primary, extra: "flex-1") %>">
-          Enable notifications
-        </button>
-        <button type="button"
-                data-action="push-notifications#dismiss"
-                class="<%= ui.button(:secondary, extra: "flex-1") %>">
-          Not now
+       data-push-notifications-public-key-value="<%= public_key %>"
+       data-turbo-permanent
+       id="push-prompt"
+       hidden
+       class="fixed inset-x-0 bottom-[calc(92px+env(safe-area-inset-bottom))] z-50 px-4 pointer-events-none">
+    <section class="<%= ui.card %> shadow-[var(--shadow-2)] max-w-sm mx-auto pointer-events-auto"
+             aria-labelledby="push-prompt-heading">
+      <div data-push-notifications-target="ask" hidden>
+        <h2 id="push-prompt-heading" class="<%= ui.section_heading %> mb-2">Know when money moves</h2>
+        <p class="<%= ui.label(:secondary) %> mb-5">
+          Get a notification when someone in your household logs a purchase, and when a category is nearly spent or over budget.
+        </p>
+        <div class="flex gap-3">
+          <button type="button" data-action="push-notifications#enable" class="<%= ui.button(:primary, extra: "flex-1") %>">
+            Turn on
+          </button>
+          <button type="button" data-action="push-notifications#dismiss" class="<%= ui.button(:secondary, extra: "flex-1") %>">
+            Not now
+          </button>
+        </div>
+      </div>
+
+      <div data-push-notifications-target="install" hidden>
+        <h2 class="<%= ui.section_heading %> mb-2">Add Clempo to your Home Screen</h2>
+        <p class="<%= ui.label(:secondary) %> mb-5">
+          On iPhone, notifications only work from the Home Screen app. Tap
+          <span class="inline-grid place-items-center w-6 h-6 align-[-6px] rounded-full bg-porcelain-3 text-ink" aria-hidden="true"><%= icon "export", classes: "w-4 h-4" %></span><span class="sr-only">the Share button</span>,
+          then <strong class="text-ink">Add to Home Screen</strong>. Open Clempo from there to turn notifications on.
+        </p>
+        <button type="button" data-action="push-notifications#dismiss" class="<%= ui.button(:secondary, extra: "w-full") %>">
+          Got it
         </button>
       </div>
-    </div>
+    </section>
   </div>
 <% end %>
