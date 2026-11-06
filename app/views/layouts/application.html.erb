@@ -70,10 +70,8 @@
             </span>
           <% end %>
           <div class="flex items-center gap-2">
-            <% if current_user&.owner? %>
-              <%= link_to admin_settings_path, class: ui.icon_button, aria: { label: "Settings" } do %>
-                <%= icon "settings", classes: "w-5 h-5" %>
-              <% end %>
+            <%= link_to admin_settings_path, class: ui.icon_button, aria: { label: "Settings" } do %>
+              <%= icon "settings", classes: "w-5 h-5" %>
             <% end %>
             <%= button_to session_path, method: :delete,
                   class: ui.icon_button,

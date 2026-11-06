@@ -32,7 +32,9 @@ class NotifyAccountMembersJob < ApplicationJob
     return unless payload
 
     message = payload.merge(icon: ICON, badge: BADGE).to_json
-    PushSubscription.where(user: users).find_each { |sub| deliver(sub, message) }
+    PushSubscription.joins(:user)
+      .where(user: users, users: { notifications_enabled: true })
+      .find_each { |sub| deliver(sub, message) }
   end
 
   # One bad subscription must not stop the others, and must not raise: a retry

@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   resource :session
   resource :registration, only: [ :new, :create ]
   resources :passwords, param: :token
+  resource :account_password, only: [ :edit, :update ], path: "account/password"
+  resource :notification_preference, only: [ :update ], path: "account/notifications"
   resources :invitations, only: [ :index, :create, :destroy ]
   get  "join/:token", to: "invitation_acceptances#new", as: :accept_invitation
   post "join/:token", to: "invitation_acceptances#create"

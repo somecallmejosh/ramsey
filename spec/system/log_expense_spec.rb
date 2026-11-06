@@ -56,9 +56,11 @@ RSpec.describe "Log a purchase", type: :system do
     find(%([data-logger-key-param="#{key}"])).click
   end
 
-  it "Sally cannot reach the settings page" do
+  it "Sally sees only her own account on the settings page" do
     visit admin_settings_path
-    expect(page).to have_current_path(root_path)
+    expect(page).to have_link("Change password")
+    expect(page).not_to have_text("Monthly budgets")
+    expect(page).not_to have_text("Delete household")
   end
 
   it "shows the current month, labelled, with no way forward into the future" do

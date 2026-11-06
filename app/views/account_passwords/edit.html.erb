@@ -1,0 +1,38 @@
+<% content_for :title, "Change password" %>
+<div class="max-w-lg mx-auto">
+  <%= render "shared/breadcrumbs", trail: [ [ "Settings", admin_settings_path ], [ "Change password" ] ] %>
+  <h1 class="<%= ui.page_heading %> mb-1">Change password</h1>
+  <p class="<%= ui.label(:secondary) %> mb-6">For <%= @user.email_address %></p>
+
+  <div class="<%= ui.card %>">
+    <%= form_with url: account_password_path, method: :patch do |f| %>
+      <%= render FormErrorsComponent.new(record: @user) %>
+
+      <%= render "shared/password_field",
+            f: f, field: :current_password, label: "Current password",
+            autocomplete: "current-password",
+            autofocus: true,
+            errors: @user.errors.full_messages_for(:current_password) %>
+
+      <%= render "shared/password_field",
+            f: f, field: :password, label: "New password",
+            autocomplete: "new-password",
+            hint: "At least 8 characters",
+            errors: @user.errors.full_messages_for(:password) %>
+
+      <%= render "shared/password_field",
+            f: f, field: :password_confirmation, label: "Confirm new password",
+            autocomplete: "new-password",
+            errors: @user.errors.full_messages_for(:password_confirmation),
+            wrapper_class: "mb-6" %>
+
+      <%= f.submit "Save new password", class: "#{ui.button(:primary)} w-full", data: { turbo_submits_with: "Saving…" } %>
+    <% end %>
+
+    <p class="<%= ui.type(:small, extra: "text-mute mt-4") %>">You'll stay signed in here. Any other phones or browsers will be signed out.</p>
+
+    <div class="mt-4">
+      <%= link_to "Cancel", admin_settings_path, class: ui.link(:subtle) %>
+    </div>
+  </div>
+</div>

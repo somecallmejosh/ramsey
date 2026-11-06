@@ -3,6 +3,48 @@
 <div class="max-w-lg mx-auto">
   <h1 class="<%= ui.page_heading %> mb-6">Settings</h1>
 
+  <section aria-labelledby="your-account-heading" class="mb-10">
+    <h2 id="your-account-heading" class="text-[20px] font-semibold text-ink mb-3">Your account</h2>
+    <div class="panel px-5 py-4 flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-[15px] font-medium text-ink">Password</p>
+        <p class="text-[13px] text-mute truncate"><%= current_user.email_address %></p>
+      </div>
+      <%= link_to "Change password", edit_account_password_path, class: ui.button(:secondary, extra: "px-4 py-2.5 shrink-0 whitespace-nowrap") %>
+    </div>
+  </section>
+
+  <% notifications_on = current_user.notifications_enabled? %>
+  <section aria-labelledby="notifications-heading" class="mb-10"
+           data-controller="notification-setting"
+           data-notification-setting-enabled-value="<%= notifications_on %>">
+    <h2 id="notifications-heading" class="text-[20px] font-semibold text-ink mb-3">Notifications</h2>
+    <div class="panel px-5 py-4">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-[15px] font-medium text-ink">
+            Household alerts
+            <span class="<%= ui.badge(notifications_on ? :success : :neutral) %> ml-1"><%= notifications_on ? "On" : "Off" %></span>
+          </p>
+          <p class="text-[13px] text-mute">When someone logs a purchase or packs lunch, and when a category is nearly spent.</p>
+        </div>
+        <%= button_to (notifications_on ? "Turn off" : "Turn on"), notification_preference_path,
+              method: :patch,
+              params: { notifications_enabled: !notifications_on },
+              class: ui.button(notifications_on ? :secondary : :primary, extra: "px-4 py-2.5 shrink-0 whitespace-nowrap"),
+              data: (notifications_on ? {} : { action: "notification-setting#turnOn" }) %>
+      </div>
+      <button type="button" hidden
+              data-notification-setting-target="setup"
+              data-action="notification-setting#setUp"
+              class="<%= ui.button(:secondary, extra: "w-full mt-4") %>">
+        Set up this device
+      </button>
+      <p hidden data-notification-setting-target="device" class="text-[13px] text-graphite mt-3"></p>
+    </div>
+  </section>
+
+  <% if current_user.owner? %>
   <section aria-labelledby="members-heading" class="mb-10">
     <div class="flex items-center justify-between gap-3 mb-3">
       <h2 id="members-heading" class="text-[20px] font-semibold text-ink">People</h2>
@@ -117,4 +159,5 @@
       </details>
     </div>
   </section>
+  <% end %>
 </div>

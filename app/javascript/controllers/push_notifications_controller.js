@@ -5,15 +5,17 @@ import { Controller } from "@hotwired/stimulus"
 // - Already allowed: quietly make sure this device's subscription is on file.
 // - iPhone/iPad Safari outside the installed app: Apple only allows web push
 //   from a Home Screen app, so explain how to add it instead.
+// - Opted out in Settings: never ask. Settings can still turn this device on
+//   by dispatching a "push:enable" event on window.
 const SNOOZE_KEY = "pushSnoozedUntil"
 const SNOOZE_MS = 14 * 24 * 60 * 60 * 1000
 
 export default class extends Controller {
   static targets = ["ask", "install"]
-  static values = { publicKey: String }
+  static values = { publicKey: String, optedIn: { type: Boolean, default: true } }
 
   connect() {
-    if (!("serviceWorker" in navigator) || !this.publicKeyValue) return
+    if (!("serviceWorker" in navigator) || !this.publicKeyValue || !this.optedInValue) return
 
     if (this.#canPush) {
       if (Notification.permission === "granted") this.#subscribe()
@@ -25,6 +27,7 @@ export default class extends Controller {
 
   async enable() {
     this.#hide()
+    if (!this.#canPush) return
     if (await Notification.requestPermission() === "granted") await this.#subscribe()
   }
 

@@ -2,6 +2,8 @@
 <% if authenticated? && (public_key = Rails.application.credentials.dig(:push_notifications, :vapid_public_key)).present? %>
   <div data-controller="push-notifications"
        data-push-notifications-public-key-value="<%= public_key %>"
+       data-push-notifications-opted-in-value="<%= current_user.notifications_enabled? %>"
+       data-action="push:enable@window->push-notifications#enable"
        data-turbo-permanent
        id="push-prompt"
        hidden

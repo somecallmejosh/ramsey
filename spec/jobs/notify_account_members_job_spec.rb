@@ -51,6 +51,18 @@ RSpec.describe NotifyAccountMembersJob, type: :job do
       expect(sent_to(josh_sub).sole["body"]).to start_with("You logged $47.23.")
     end
 
+    it "skips people who turned notifications off, on every device" do
+      sally_phone = create(:push_subscription, user: sally)
+      sally.update!(notifications_enabled: false)
+      create(:expense, user: sally, envelope: envelope, amount: 690, transacted_on: Date.current)
+
+      described_class.perform_now("Expense", expense.id)
+
+      expect(WebPush).not_to have_received(:payload_send).with(hash_including(endpoint: sally_sub.endpoint))
+      expect(WebPush).not_to have_received(:payload_send).with(hash_including(endpoint: sally_phone.endpoint))
+      expect(sent_to(josh_sub).sole["title"]).to eq("Groceries is over budget")
+    end
+
     it "no-ops when the resource no longer exists" do
       expect { described_class.perform_now("Expense", 0) }.not_to raise_error
       expect(WebPush).not_to have_received(:payload_send)

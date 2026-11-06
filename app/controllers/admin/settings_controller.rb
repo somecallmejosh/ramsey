@@ -2,9 +2,13 @@ module Admin
   class SettingsController < ApplicationController
     include RequireOwner
 
-    before_action :require_owner_role
+    # Everyone can open Settings (for their own account, e.g. changing their
+    # password); the household sections are shown to and changed by owners only.
+    before_action :require_owner_role, only: [ :update ]
 
     def show
+      return unless current_user.owner?
+
       load_envelopes_and_budgets
       @users = current_account.users.order(:email_address)
     end
