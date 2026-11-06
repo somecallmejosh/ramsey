@@ -44,21 +44,21 @@ class AccountDataExportService
   end
 
   def export_envelopes(rows)
-    section_header(rows, "Envelopes", %w[Name Active])
+    section_header(rows, "Categories", %w[Name Shown])
     @account.envelopes.find_each do |env|
       rows << [ env.name, env.active ]
     end
   end
 
   def export_envelope_budgets(rows)
-    section_header(rows, "Envelope Budgets", %w[Envelope Year Month Amount])
+    section_header(rows, "Monthly Budgets", %w[Category Year Month Amount])
     @account.envelope_budgets.includes(:envelope).find_each do |budget|
       rows << [ budget.envelope.name, budget.year, budget.month, budget.amount.to_f ]
     end
   end
 
   def export_expenses(rows)
-    section_header(rows, "Expenses", %w[Envelope User Amount Note Date])
+    section_header(rows, "Purchases", %w[Category User Amount Note Date])
     @account.expenses.includes(:envelope, :user).find_each do |expense|
       rows << [ expense.envelope.name, expense.user.email_address, expense.amount.to_f,
                expense.note, expense.transacted_on ]

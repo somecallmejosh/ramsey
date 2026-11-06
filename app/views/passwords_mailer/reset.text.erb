@@ -1,4 +1,11 @@
-You can reset your password on
+Hi <%= @user.display_name %>,
+
+We got a request to reset the password for your Clempo account. Open this link to choose a new one:
+
 <%= edit_password_url(@user.password_reset_token) %>
 
-This link will expire in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
+This link works for <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>. After that, you can ask for a new one from the sign-in page.
+
+Didn't ask for this? You can ignore this email — your password won't change.
+
+— Clempo

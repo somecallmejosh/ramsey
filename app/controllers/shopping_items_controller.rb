@@ -2,7 +2,7 @@ class ShoppingItemsController < ApplicationController
   before_action :set_shopping_item, only: [ :update, :destroy ]
 
   def create
-    @meal_plan = MealPlan.find(params[:shopping_item][:meal_plan_id])
+    @meal_plan = current_account.meal_plans.find(params[:shopping_item][:meal_plan_id])
     @shopping_item = @meal_plan.shopping_items.build(shopping_item_params)
     @shopping_item.save
     respond_to do |format|
@@ -34,10 +34,27 @@ class ShoppingItemsController < ApplicationController
     end
   end
 
+  # POST /shopping_items/restore — the toast's "Undo" after a removal.
+  # The removed item's attributes travel in the Undo form; the plan must
+  # belong to this household, so this is no more powerful than create.
+  def restore
+    @meal_plan = current_account.meal_plans.find(params[:meal_plan_id])
+    @shopping_item = @meal_plan.shopping_items.create!(
+      params.slice(:name, :quantity, :store, :estimated_cost).permit!
+    )
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to meal_plan_path(@meal_plan) }
+    end
+  end
+
   private
 
   def set_shopping_item
-    @shopping_item = ShoppingItem.find(params[:id])
+    @shopping_item = ShoppingItem
+      .joins(:meal_plan)
+      .where(meal_plans: { account_id: current_account.id })
+      .find(params[:id])
   end
 
   def shopping_item_params

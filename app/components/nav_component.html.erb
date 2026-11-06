@@ -1,21 +1,21 @@
 <nav class="<%= ui.nav_bar %>" aria-label="Main navigation">
-  <div class="flex items-center justify-around max-w-md mx-auto">
-    <%= link_to root_path, class: ui.nav_item(active: active?(root_path)), aria: { label: "Dashboard" } do %>
-      <%= icon "budget", classes: "w-6 h-6 text-blue-500" %>
+  <div class="<%= ui.nav_island %>">
+    <%= link_to root_path, **link_options(root_path) do %>
+      <%= icon "budget", classes: "w-6 h-6" %>
       <span>Budget</span>
     <% end %>
 
-    <%= link_to meal_plans_path, class: ui.nav_item(active: active?(meal_plans_path)), aria: { label: "Meal Planner" } do %>
+    <%= link_to meal_plans_path, **link_options(meal_plans_path) do %>
       <%= icon "meal", classes: "w-6 h-6" %>
       <span>Meals</span>
     <% end %>
 
-    <%= link_to lunch_logs_path, class: ui.nav_item(active: active?(lunch_logs_path)), aria: { label: "Lunch Tracker" } do %>
+    <%= link_to lunch_logs_path, **link_options(lunch_logs_path) do %>
       <%= icon "lunch", classes: "w-6 h-6" %>
       <span>Lunch</span>
     <% end %>
 
-    <%= link_to debts_path, class: ui.nav_item(active: active?(debts_path)), aria: { label: "Debt Snowball" } do %>
+    <%= link_to debts_path, **link_options(debts_path) do %>
       <%= icon "debt", classes: "w-6 h-6" %>
       <span>Debts</span>
     <% end %>

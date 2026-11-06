@@ -1,0 +1,14 @@
+<span class="relative inline-grid place-items-center shrink-0" style="width: <%= @size %>px; height: <%= @size %>px"
+      <% if @label %>role="img" aria-label="<%= @label %>"<% else %>aria-hidden="true"<% end %>>
+  <svg class="absolute inset-0 -rotate-90" width="<%= @size %>" height="<%= @size %>" viewBox="0 0 <%= @size %> <%= @size %>" aria-hidden="true">
+    <circle class="<%= @track %>" cx="<%= @size / 2.0 %>" cy="<%= @size / 2.0 %>" r="<%= radius %>"
+            fill="none" stroke="currentColor" stroke-width="<%= @stroke %>" />
+    <% if @percent.positive? %>
+      <circle class="<%= @color %> transition-[stroke-dashoffset] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              cx="<%= @size / 2.0 %>" cy="<%= @size / 2.0 %>" r="<%= radius %>"
+              fill="none" stroke="currentColor" stroke-width="<%= @stroke %>" stroke-linecap="round"
+              pathLength="100" stroke-dasharray="100" stroke-dashoffset="<%= (100 - @percent).round(2) %>" />
+    <% end %>
+  </svg>
+  <%= content %>
+</span>

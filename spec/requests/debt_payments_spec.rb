@@ -18,11 +18,14 @@ RSpec.describe "DebtPayments", type: :request do
         expect(debt.reload.current_balance).to eq(9_500)
       end
 
-      it "re-renders form on invalid data" do
+      it "re-renders form with inline errors and keeps entered values" do
         post debt_debt_payments_path(debt), params: {
           debt_payment: { amount: "-1", balance_after: "9500", paid_on: Date.current.to_s }
         }
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include('id="debt_payment_amount_error"')
+        expect(response.body).to include('aria-invalid="true"')
+        expect(response.body).to include('value="9500')
       end
     end
 
@@ -42,9 +45,10 @@ RSpec.describe "DebtPayments", type: :request do
     context "member" do
       before { sign_in(member) }
 
-      it "redirects with not authorized" do
+      it "redirects with a plain explanation" do
         delete debt_debt_payment_path(debt, payment)
         expect(response).to redirect_to(debt_path(debt))
+        expect(flash[:alert]).to eq("Only the household owner can remove payments.")
         expect(payment.reload).to be_persisted
       end
     end
@@ -52,9 +56,12 @@ RSpec.describe "DebtPayments", type: :request do
     context "owner" do
       before { sign_in(owner) }
 
-      it "deletes the payment" do
+      it "deletes the payment and restores the balance" do
+        expect(debt.reload.current_balance).to eq(9_500)
         delete debt_debt_payment_path(debt, payment)
         expect { payment.reload }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(debt.reload.current_balance).to eq(10_000)
+        expect(flash[:notice]).to eq("Removed the $500.00 payment. Balance is now $10,000.00.")
       end
     end
   end

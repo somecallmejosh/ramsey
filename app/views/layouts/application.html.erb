@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="application-name" content="Clempo">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#7a4fb8">
+    <meta name="theme-color" content="#eff0f5"><%# matches --color-bg %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -22,8 +22,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" rel="stylesheet">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -36,51 +36,43 @@
     </a>
     <%= render "layouts/nav" if authenticated? %>
 
-    <%= turbo_frame_tag "flash-messages" %>
+    <%# Toasts sit above the bottom nav, in thumb reach and out of the way. %>
+    <div id="toasts"
+         class="fixed inset-x-0 bottom-[calc(92px+env(safe-area-inset-bottom))] z-[60] px-4 pointer-events-none"
+         aria-live="polite"><% if notice.present? %><%= render ToastComponent.new(message: notice) %><% end %></div>
 
-    <% if notice.present? %>
-      <div class="bg-sage-soft border border-sage/30 text-ink text-[15px] px-4 py-3 rounded-[10px] flex items-center gap-3"
-           role="status"
-           data-controller="flash"
-           data-action="animationend->flash#remove">
-        <%= notice %>
-        <button type="button"
-                class="shrink-0 -mr-1 p-1 rounded-[4px] hover:bg-ink/10 active:bg-ink/20"
-                aria-label="Dismiss"
-                data-action="flash#remove">
-          <%= icon "close", classes: "w-4 h-4" %>
-        </button>
-      </div>
-    <% end %>
-
-    <% if alert.present? %>
-      <div class="bg-claret-soft border border-claret/30 text-ink text-[15px] px-4 py-3 rounded-[10px]"
-           role="alert">
-        <%= alert %>
-      </div>
-    <% end %>
-
-    <main id="main-content" class="px-4 pb-24">
-      <div class="bg-porcelain/80 sticky top-0 z-50 mb-6 -mx-4 px-4 py-3 border-b border-line backdrop-blur-[24px] flex items-center justify-between">
-        <%= link_to root_path, class: "flex items-center items-center", aria: { label: "Dashboard" } do %>
-          <%= image_tag "logos/logo.svg", class: "h-10 w-auto", alt: "Clempo" %>
-        <% end %>
-        <div class="flex items-center">
-          <%= button_to session_path, method: :delete,
-            class: ui.nav_item,
-            aria: { label: "Sign out" },
-            form: { "data-turbo-confirm": "Sign out?" } do %>
-            <%= icon "lock", classes: "w-6 h-6" %>
-            <span class="sr-only">Sign out</span>
+    <main id="main-content" tabindex="-1" class="px-4 pb-32 focus:outline-none">
+      <% if authenticated? %>
+        <header class="max-w-lg mx-auto flex items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-2 mb-4">
+          <%= link_to root_path, class: "flex items-center gap-3 min-w-0 rounded-full pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent", aria: { label: "Clempo home" } do %>
+            <span class="grid place-items-center w-11 h-11 rounded-full bg-lilac text-lilac-ink font-bold text-[17px]" aria-hidden="true">
+              <%= current_user.display_name.first %>
+            </span>
+            <span class="min-w-0 leading-tight">
+              <span class="block text-[13px] text-mute"><%= greeting %></span>
+              <span class="block text-[17px] font-bold text-ink truncate"><%= current_user.display_name %></span>
+            </span>
           <% end %>
-          <% if current_user&.owner? %>
-            <%= link_to admin_settings_path, class: ui.nav_item, aria: { label: "Settings" } do %>
-              <%= icon "settings", classes: "w-6 h-6" %>
-              <span class="sr-only">Settings</span>
+          <div class="flex items-center gap-2">
+            <% if current_user&.owner? %>
+              <%= link_to admin_settings_path, class: ui.icon_button, aria: { label: "Settings" } do %>
+                <%= icon "settings", classes: "w-5 h-5" %>
+              <% end %>
             <% end %>
-          <% end %>
-        </div>
-      </div>
+            <%= button_to session_path, method: :delete,
+                  class: ui.icon_button,
+                  aria: { label: "Sign out" },
+                  form: { "data-turbo-confirm": "Sign out of Clempo?" } do %>
+              <%= icon "logout", classes: "w-5 h-5" %>
+            <% end %>
+          </div>
+        </header>
+      <% end %>
+
+      <% if alert.present? %>
+        <div class="max-w-lg mx-auto"><%= render FormErrorsComponent.new(messages: alert) %></div>
+      <% end %>
+
       <div class="max-w-7xl mx-auto">
         <%= yield %>
       </div>

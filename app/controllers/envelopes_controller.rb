@@ -14,20 +14,17 @@ class EnvelopesController < ApplicationController
   def create
     @envelope = current_account.envelopes.build(envelope_params)
     @envelope.position = current_account.envelopes.maximum(:position).to_i + 1
+    @envelope_budget = @envelope.envelope_budgets.build(
+      year: Date.current.year, month: Date.current.month,
+      amount: params[:envelope_budget_amount].presence
+    )
 
-    Envelope.transaction do
-      @envelope.save!
-      @envelope.envelope_budgets.create!(
-        year: Date.current.year, month: Date.current.month,
-        amount: params[:envelope_budget_amount].to_d
-      )
+    if [ @envelope.valid?, @envelope_budget.valid? ].all?
+      Envelope.transaction { @envelope.save! }
+      redirect_to admin_settings_path, notice: "Added #{@envelope.name}."
+    else
+      render :new, status: :unprocessable_entity
     end
-
-    redirect_to admin_settings_path, notice: "Envelope created."
-  rescue ActiveRecord::RecordInvalid => e
-    @envelope_budget = @envelope.envelope_budgets.build
-    flash.now[:alert] = e.message
-    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -38,7 +35,7 @@ class EnvelopesController < ApplicationController
 
   def update
     if @envelope.update(envelope_params)
-      redirect_to admin_settings_path, notice: "Envelope updated."
+      redirect_to admin_settings_path, notice: "Saved #{@envelope.name}."
     else
       render :edit, status: :unprocessable_entity
     end

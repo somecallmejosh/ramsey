@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      expense:
+        transacted_on: "Date"
+      debt:
+        original_balance: "Starting balance"

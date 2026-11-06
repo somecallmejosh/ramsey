@@ -1,20 +1,38 @@
-<div class="flex items-center justify-center px-4">
+<div class="flex items-center justify-center">
   <div class="w-full max-w-sm">
 
     <div class="mt-8 mb-4">
       <%= image_tag "logos/logo.svg", class: "h-16 w-auto", alt: "Clempo" %>
-      <h1 class="sr-only">Reset your Clempo password</h1>
-      <p class="<%= ui.label(:secondary) %> mt-2">Enter a new password for your account.</p>
+      <h1 class="<%= ui.section_heading(extra: "mt-4") %>">Choose a new password</h1>
+      <p class="<%= ui.label(:secondary) %> mt-1">For <%= @user.email_address %></p>
     </div>
-
-    <%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
 
     <div class="<%= ui.card %>">
-    <%= form_with url: password_path(params[:token]), method: :put do |form| %>
-      <div class="mb-4"><%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72 %><br></div>
-      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72 %><br>
-      <%= form.submit "Save" %>
-    <% end %>
+      <%= form_with url: password_path(params[:token]), method: :put do |f| %>
+
+        <%= render FormErrorsComponent.new(record: @user) %>
+
+        <%= render "shared/password_field",
+              f: f, field: :password, label: "New password",
+              autocomplete: "new-password",
+              autofocus: true,
+              hint: "At least 8 characters",
+              errors: @user.errors.full_messages_for(:password) %>
+
+        <%= render "shared/password_field",
+              f: f, field: :password_confirmation, label: "Confirm new password",
+              autocomplete: "new-password",
+              errors: @user.errors.full_messages_for(:password_confirmation),
+              wrapper_class: "mb-6" %>
+
+        <%= f.submit "Save new password", class: "#{ui.button(:primary)} w-full", data: { turbo_submits_with: "Saving…" } %>
+
+      <% end %>
+
+      <div class="mt-4">
+        <%= link_to "Back to sign in", new_session_path, class: ui.link(:subtle) %>
+      </div>
     </div>
+
   </div>
 </div>

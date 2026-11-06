@@ -27,7 +27,7 @@ module IconHelper
     size_px = classes.to_s[/\bw-(\d+)\b/, 1]&.to_i&.*(4) || 20
     residual = classes.to_s.gsub(/\b[wh]-\d+\b/, "").squeeze(" ").strip
 
-    merged = [ "ph-duotone", "ph-#{ph_name}", "inline-flex", "items-center", "justify-center", "align-middle", residual ]
+    merged = [ "ph", "ph-#{ph_name}", "inline-flex", "items-center", "justify-center", "align-middle", residual ]
       .reject(&:blank?).join(" ")
 
     attrs = { class: merged, style: "font-size: #{size_px}px; line-height: 1;" }

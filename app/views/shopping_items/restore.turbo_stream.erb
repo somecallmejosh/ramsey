@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "shopping-list" do %>
+  <%= render "meal_plans/shopping_list", meal_plan: @meal_plan %>
+<% end %>
+
+<%= turbo_stream.update "toasts" do %>
+  <%= render ToastComponent.new(message: "Put #{@shopping_item.name} back on the list") %>
+<% end %>

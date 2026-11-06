@@ -19,6 +19,24 @@ RSpec.describe "LunchLogs", type: :request do
         get lunch_logs_path
         expect(response).to have_http_status(:ok)
       end
+
+      it "shows a friendly note when nothing is logged this month" do
+        get lunch_logs_path
+        expect(response.body).to include("Nothing logged this month yet.")
+        expect(response.body).to include("Savings assume about $20")
+      end
+
+      it "only offers Log buttons for days in the shown month" do
+        get lunch_logs_path(year: 2026, month: 3)
+        expect(response.body).to include("Log packed lunch for Mar 2")
+        expect(response.body).not_to include("Log packed lunch for Feb")
+        expect(response.body).not_to include("Log packed lunch for Apr")
+      end
+
+      it "falls back to this month for a bad month" do
+        get lunch_logs_path(year: 2026, month: 13)
+        expect(response).to have_http_status(:ok)
+      end
     end
   end
 
@@ -34,6 +52,22 @@ RSpec.describe "LunchLogs", type: :request do
     it "ignores user_id param and always scopes to current_user" do
       post lunch_logs_path, params: { logged_on: Date.current.to_s, user_id: other_user.id }
       expect(LunchLog.last.user).to eq(user)
+    end
+
+    it "explains why when a day can't be logged" do
+      post lunch_logs_path, params: { logged_on: Date.tomorrow.to_s },
+           headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("toasts")
+      expect(response.body).to include("hasn&#39;t happened yet")
+    end
+
+    it "says so when the day is already logged" do
+      create(:lunch_log, user: user, logged_on: Date.current)
+      post lunch_logs_path, params: { logged_on: Date.current.to_s },
+           headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("That day is already logged.")
     end
   end
 

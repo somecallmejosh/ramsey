@@ -5,8 +5,11 @@ class ExpenseRowComponent < ApplicationComponent
   end
 
   def can_delete?
-    return true if @current_user&.owner?
-    !@expense.prior_month?
+    @expense.deletable_by?(@current_user)
+  end
+
+  def amount
+    helpers.number_to_currency(@expense.amount)
   end
 
   def envelope

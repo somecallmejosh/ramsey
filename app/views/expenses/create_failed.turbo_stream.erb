@@ -1,0 +1,5 @@
+<%= turbo_stream.update "logger-error" do %>
+  <% @expense.errors.full_messages.each do |message| %>
+    <p class="mb-1 text-[15px] text-claret"><%= message %></p>
+  <% end %>
+<% end %>

@@ -14,11 +14,13 @@ Rails.application.routes.draw do
 
   # Envelope dashboard and detail
   resources :envelopes, only: [ :new, :create, :edit, :update ] do
-    resources :expenses, only: [ :index, :new, :create, :destroy ]
+    resources :expenses, only: [ :index, :new, :create, :destroy ] do
+      post :restore, on: :collection
+    end
     resources :envelope_budgets, only: [ :edit, :update ], shallow: true
   end
 
-  # Debt snowball
+  # Debts (snowball)
   resources :debts, only: [ :index, :show ] do
     resources :debt_payments, only: [ :new, :create, :destroy ]
   end
@@ -35,7 +37,9 @@ Rails.application.routes.draw do
         patch :reactivate
       end
     end
-    resources :debts, only: [ :new, :create, :edit, :update ]
+    resources :debts, only: [ :new, :create, :edit, :update ] do
+      patch :move, on: :member
+    end
   end
 
   # Dashboard with month selector
@@ -49,7 +53,9 @@ Rails.application.routes.draw do
       post  :reuse
     end
   end
-  resources :shopping_items, only: [ :create, :update, :destroy ]
+  resources :shopping_items, only: [ :create, :update, :destroy ] do
+    post :restore, on: :collection
+  end
 
   # Lunch tracker
   resources :lunch_logs, only: [ :index, :create, :destroy ]

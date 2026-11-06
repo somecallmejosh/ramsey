@@ -14,7 +14,7 @@ class DebtPaymentsController < ApplicationController
     @debt_payment.user = current_user
 
     if @debt_payment.save
-      redirect_to debt_path(@debt), notice: "Payment logged."
+      redirect_to debt_path(@debt), notice: "Payment logged. Balance is now #{helpers.number_to_currency(@debt.reload.current_balance)}."
     else
       render :new, status: :unprocessable_entity
     end
@@ -22,12 +22,14 @@ class DebtPaymentsController < ApplicationController
 
   def destroy
     unless current_user.owner?
-      redirect_to debt_path(@debt), alert: "Not authorized."
+      redirect_to debt_path(@debt), alert: "Only the household owner can remove payments."
       return
     end
 
-    @debt_payment.destroy
-    redirect_to debt_path(@debt), notice: "Payment removed."
+    @debt_payment.destroy!
+    redirect_to debt_path(@debt),
+                notice: "Removed the #{helpers.number_to_currency(@debt_payment.amount)} payment. " \
+                        "Balance is now #{helpers.number_to_currency(@debt.reload.current_balance)}."
   end
 
   private

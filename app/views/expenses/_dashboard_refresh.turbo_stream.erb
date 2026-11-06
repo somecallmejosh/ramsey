@@ -1,0 +1,7 @@
+<%# Re-render every part of the dashboard a purchase affects. Targets that
+    aren't on the current page (e.g. on History) are ignored by Turbo. %>
+<%= turbo_stream.replace dom_id(@envelope, :row) do %>
+  <%= render EnvelopeRowComponent.new(envelope: @envelope, budget_month: @budget_month) %>
+<% end %>
+<%= turbo_stream.replace "month-summary", partial: "dashboard/summary", locals: { budget_month: @budget_month } %>
+<%= turbo_stream.replace "recent-expenses", partial: "dashboard/recent", locals: { budget_month: @budget_month } %>

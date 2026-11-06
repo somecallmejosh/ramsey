@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "envelope-month", partial: "expenses/month", locals: { envelope_month: @envelope_month } %>
+<%= render "expenses/dashboard_refresh" %>
+
+<%= turbo_stream.update "toasts" do %>
+  <%= render ToastComponent.new(message: "Put back #{number_to_currency(@expense.amount)} in #{@envelope.name}") %>
+<% end %>

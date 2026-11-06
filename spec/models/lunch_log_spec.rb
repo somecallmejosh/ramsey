@@ -17,6 +17,12 @@ RSpec.describe LunchLog, type: :model do
       expect(duplicate).not_to be_valid
     end
 
+    it "rejects a day that hasn't happened yet" do
+      log = build(:lunch_log, user: user, logged_on: Date.tomorrow)
+      expect(log).not_to be_valid
+      expect(log.errors[:logged_on]).to include("You can't log a day that hasn't happened yet.")
+    end
+
     it "allows the same date for different users" do
       create(:lunch_log, user: user, logged_on: Date.new(2026, 3, 3))
       other = build(:lunch_log, user: other_user, logged_on: Date.new(2026, 3, 3))

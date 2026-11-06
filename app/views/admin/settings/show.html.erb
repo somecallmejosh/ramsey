@@ -1,121 +1,120 @@
-<div class="max-w-2xl mx-auto">
-<div class="flex items-center justify-between mb-6">
-  <h1 class="<%= ui.page_heading %> mb-0">Settings</h1>
-  <%= link_to "Invite member", invitations_path, class: ui.button(:secondary, extra: "text-sm px-5 py-2") %>
-</div>
+<% content_for :title, "Settings · Clempo" %>
+<% month_name = Date.current.strftime("%B") %>
+<div class="max-w-lg mx-auto">
+  <h1 class="<%= ui.page_heading %> mb-6">Settings</h1>
 
-<div class="mb-8">
-  <h2 class="<%= ui.section_heading %> mb-4">Members</h2>
-  <div class="<%= ui.card %>">
-    <% @users.each do |user| %>
-      <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
-        <p class="text-lg text-ink"><%= user.email_address %></p>
-        <span class="text-[13px] font-semibold <%= user.owner? ? "text-accent" : "text-mute" %>">
-          <%= user.role.capitalize %>
-        </span>
+  <section aria-labelledby="members-heading" class="mb-10">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <h2 id="members-heading" class="text-[20px] font-semibold text-ink">People</h2>
+      <%= link_to "Invite someone", invitations_path, class: ui.button(:secondary, extra: "px-4 py-2.5") %>
+    </div>
+    <ul class="panel px-5" role="list">
+      <% @users.each do |user| %>
+        <li class="flex items-center justify-between gap-3 py-3 border-b border-line last:border-0">
+          <div class="min-w-0">
+            <p class="text-[15px] font-medium text-ink"><%= user.display_name %><%= " (you)" if user == current_user %></p>
+            <p class="text-[13px] text-mute truncate"><%= user.email_address %></p>
+          </div>
+          <span class="<%= ui.badge(user.owner? ? :accent : :neutral) %>"><%= user.owner? ? "Owner" : "Member" %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <section aria-labelledby="categories-heading" class="mb-10">
+    <div class="flex items-center justify-between gap-3 mb-1">
+      <h2 id="categories-heading" class="text-[20px] font-semibold text-ink">Monthly budgets</h2>
+      <%= link_to "Add category", new_envelope_path, class: ui.button(:secondary, extra: "px-4 py-2.5") %>
+    </div>
+    <p class="text-[13px] text-mute mb-3">
+      Amounts for <%= month_name %>. Each new month starts with the same amounts.
+    </p>
+
+    <% if @envelopes.empty? %>
+      <div class="panel px-5 py-8 text-center">
+        <p class="text-[15px] text-graphite mb-3">No categories yet. Add one for each thing you budget for, like Groceries or Gas.</p>
+        <%= link_to "Add your first category", new_envelope_path, class: ui.button(:primary) %>
       </div>
-    <% end %>
-  </div>
-</div>
-
-<div class="flex items-center justify-between mb-4">
-  <h2 class="<%= ui.section_heading %> mb-0">Envelopes</h2>
-  <%= link_to "Add envelope", new_envelope_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" %>
-</div>
-
-<% if @envelopes.empty? %>
-  <div class="<%= ui.card %> text-center py-8">
-    <p class="<%= ui.label(:secondary) %>">No envelopes yet.</p>
-  </div>
-<% else %>
-  <%# Bulk budget update form — one submit covers all inline inputs %>
-  <%= form_with url: admin_settings_path, method: :patch, data: { turbo: false } do |f| %>
-    <div class="<%= ui.card %> mb-4">
-      <% @envelopes.each_with_index do |envelope, i| %>
-        <div class="py-4 border-b border-border last:border-0">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <%# Name + status %>
-            <div class="flex-1 min-w-0">
-              <p class="text-lg font-semibold text-ink <%= "opacity-40" unless envelope.active? %> truncate">
-                <%= envelope.name %>
-                <% unless envelope.active? %>
-                  <span class="ml-2 text-[13px] font-normal text-mute">(inactive)</span>
-                <% end %>
-              </p>
-            </div>
-
-            <%# Inline budget amount input %>
-            <% if envelope.active? %>
-              <% budget = @budgets[envelope.id] %>
-              <div class="flex items-center gap-2 shrink-0">
-                <span class="text-mute text-lg">$</span>
-                <input type="number"
+    <% else %>
+      <% active, hidden = @envelopes.partition(&:active?) %>
+      <%= form_with url: admin_settings_path, method: :patch do |f| %>
+        <ul class="panel px-5 mb-4" role="list">
+          <% active.each do |envelope| %>
+            <li class="flex items-center gap-3 py-3 border-b border-line last:border-0">
+              <div class="flex-1 min-w-0">
+                <label for="budget_envelope_<%= envelope.id %>" class="block text-[15px] font-medium text-ink truncate"><%= envelope.name %></label>
+                <div class="flex gap-3 text-[13px]">
+                  <%= link_to "Edit", edit_envelope_path(envelope), class: "text-accent hover:underline py-1",
+                        aria: { label: "Edit #{envelope.name}" } %>
+                  <%= link_to "Hide", deactivate_admin_envelope_path(envelope),
+                        data: { turbo_method: :patch, turbo_confirm: "Hide #{envelope.name}? It disappears from Budget, but its past purchases are kept. You can show it again here." },
+                        class: "text-graphite hover:text-claret py-1",
+                        aria: { label: "Hide #{envelope.name}" } %>
+                </div>
+              </div>
+              <div class="relative w-32 shrink-0">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-mute" aria-hidden="true">$</span>
+                <input type="number" inputmode="decimal"
                        name="budgets[<%= envelope.id %>]"
                        id="budget_envelope_<%= envelope.id %>"
-                       value="<%= budget&.amount || 0 %>"
-                       step="0.01"
-                       min="0"
-                       placeholder="0.00"
-                       class="w-28 rounded-[10px] border border-border px-3 py-2 text-lg text-ink placeholder:text-mute focus:outline-none focus-visible:ring-2 focus-visible:border-accent focus-visible:ring-accent text-right"
-                       aria-label="Budget for <%= envelope.name %>" />
+                       value="<%= format("%.2f", @budgets[envelope.id]&.amount || 0) %>"
+                       step="0.01" min="0"
+                       class="<%= ui.input %> !pl-7 !pr-3 text-right tabular-nums">
               </div>
-            <% end %>
-
-            <%# Deactivate / reactivate toggle %>
-            <div class="shrink-0">
-              <% if envelope.active? %>
-                <%= link_to "Deactivate", deactivate_admin_envelope_path(envelope),
-                      data: { turbo_method: :patch, turbo_confirm: "Deactivate #{envelope.name}? It will hide from the dashboard." },
-                      class: "text-[13px] text-mute hover:text-claret transition-colors font-semibold" %>
-              <% else %>
-                <%= link_to "Reactivate", reactivate_admin_envelope_path(envelope),
-                      data: { turbo_method: :patch },
-                      class: "text-[13px] text-accent hover:underline font-semibold" %>
-              <% end %>
-            </div>
-          </div>
-
-          <%# Per-envelope link to rename/edit %>
-          <div class="mt-2">
-            <%= link_to "Edit name & position", edit_envelope_path(envelope), class: ui.link(:subtle) %>
-          </div>
-        </div>
+            </li>
+          <% end %>
+        </ul>
+        <%= f.submit "Save budgets", class: ui.button(:primary, extra: "w-full"), data: { turbo_submits_with: "Saving…" } %>
       <% end %>
-    </div>
 
-    <%# Submit budgets %>
-    <div class="mb-6">
-      <%= f.submit "Save budgets",
-            class: "#{ui.button(:primary, extra: "text-sm px-8 py-3")} w-full",
-            data: { disable_with: "Saving…" } %>
-    </div>
-  <% end %>
-<% end %>
+      <% if hidden.any? %>
+        <h3 class="text-[15px] font-semibold text-graphite mt-6 mb-2">Hidden categories</h3>
+        <ul class="panel px-5" role="list">
+          <% hidden.each do |envelope| %>
+            <li class="flex items-center justify-between gap-3 py-3 border-b border-line last:border-0">
+              <span class="text-[15px] text-graphite truncate"><%= envelope.name %></span>
+              <%= link_to "Show again", reactivate_admin_envelope_path(envelope),
+                    data: { turbo_method: :patch },
+                    class: "text-[15px] text-accent hover:underline min-h-[44px] inline-flex items-center",
+                    aria: { label: "Show #{envelope.name} again" } %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  </section>
 
-<div class="mt-12">
-  <h2 class="<%= ui.section_heading %> mb-4">Account</h2>
-  <div class="<%= ui.card %> space-y-4">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div class="space-y-1.5">
-        <p class="text-lg font-semibold text-ink">Download your data</p>
-        <p class="text-sm text-mute">Export all account data as a CSV file.</p>
+  <section aria-labelledby="household-heading" class="mb-6">
+    <h2 id="household-heading" class="text-[20px] font-semibold text-ink mb-3">Household</h2>
+    <div class="panel px-5 py-4 space-y-5">
+      <div>
+        <p class="text-[15px] font-medium text-ink">Download your data</p>
+        <p class="text-[13px] text-mute mb-3">Everything in <%= current_account.name %> as a spreadsheet (CSV) file.</p>
+        <%= link_to "Download", export_admin_account_path, class: ui.button(:secondary), data: { turbo: false } %>
       </div>
-      <div><%= link_to "Download CSV", export_admin_account_path, class: ui.button(:secondary, extra: "text-sm px-8 py-3") %></div>
-    </div>
 
-    <hr class="<%= ui.divider %>">
+      <hr class="border-line">
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div class="space-y-1.5">
-        <p class="text-lg font-semibold text-claret">Cancel account</p>
-        <p class="text-sm text-mute">Permanently delete your account and all data. This cannot be undone.</p>
-      </div>
-      <div class="shrink-0">
-        <%= button_to "Cancel account", admin_account_path, method: :delete,
-              class: ui.button(:error, extra: "text-sm px-8 py-3"),
-              data: { turbo_confirm: "Are you sure you want to cancel your account? All data will be permanently deleted." } %>
-      </div>
+      <details class="group">
+        <summary class="cursor-pointer list-none text-[15px] font-medium text-claret min-h-[44px] flex items-center justify-between">
+          Delete household
+          <%= icon "caret-down", classes: "w-5 h-5 transition-transform group-open:rotate-180" %>
+        </summary>
+        <div class="pt-2">
+          <p class="text-[15px] text-graphite mb-3">
+            This permanently deletes <strong class="text-ink"><%= current_account.name %></strong>: everyone's sign-in,
+            every category, purchase, debt and meal plan. It can't be undone. Download your data first if you might want it.
+          </p>
+          <%= form_with url: admin_account_path, method: :delete, class: "space-y-3" do |f| %>
+            <div>
+              <label for="confirm_name" class="<%= ui.label %> block mb-1">Type <strong class="text-ink"><%= current_account.name %></strong> to confirm</label>
+              <%= text_field_tag :confirm_name, nil, id: "confirm_name", autocomplete: "off", required: true, class: ui.input %>
+            </div>
+            <%= f.submit "Delete #{current_account.name} forever", class: ui.button(:error, extra: "w-full"),
+                  data: { turbo_submits_with: "Deleting…" } %>
+          <% end %>
+        </div>
+      </details>
     </div>
-  </div>
-</div>
+  </section>
 </div>

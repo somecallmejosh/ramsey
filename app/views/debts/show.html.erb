@@ -1,56 +1,62 @@
 <% content_for :title, @debt.name %>
-<div class="max-w-2xl mx-auto">
-<div class="mb-6 flex items-center gap-3">
-  <%= link_to debts_path, class: ui.link(:subtle), aria: { label: "Back to debts" } do %>
-    <%= icon "arrow-right", classes: "w-4 h-4 rotate-180" %>
-  <% end %>
-  <h1 class="<%= ui.page_heading %>"><%= @debt.name %></h1>
-</div>
+<div class="max-w-lg mx-auto">
+<%= render "shared/breadcrumbs", trail: [ [ "Debts", debts_path ], [ @debt.name ] ] %>
+<h1 class="<%= ui.page_heading %> mb-6"><%= @debt.name %></h1>
 
 <%# Summary card %>
-<div class="<%= ui.card %> mb-6">
-  <div class="flex items-start justify-between mb-4">
-    <div>
-      <p class="<%= ui.label(:secondary) %>"><%= @debt.debt_type.humanize.titleize %></p>
-      <p class="<%= ui.stat_value %>"><%= number_to_currency(@debt.current_balance) %></p>
-      <p class="<%= ui.label(:secondary) %>">remaining of <%= number_to_currency(@debt.original_balance) %></p>
+<% paid = @debt.paid_off? %>
+<div class="shell mb-7 rise" style="--i: 1">
+  <div class="shell-core p-5">
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <p class="text-[14px] font-medium text-graphite">Left to pay</p>
+        <p class="mt-1 text-[44px] leading-none font-extrabold tracking-[-0.035em] tabular-nums text-ink"><%= money_with_cents(@debt.current_balance) %></p>
+        <p class="mt-2 text-[13px] text-mute tabular-nums">of <%= number_to_currency(@debt.original_balance) %> · <%= @debt.debt_type.humanize %></p>
+      </div>
+      <%= render RingComponent.new(percent: @debt.progress_pct, size: 84, stroke: 8, color: (paid ? "text-sage" : "text-accent"),
+            label: "#{@debt.progress_pct}% paid off") do %>
+        <span class="text-[15px] font-bold tabular-nums text-ink"><%= @debt.progress_pct.round %>%</span>
+      <% end %>
     </div>
-    <% unless @debt.paid_off? %>
-      <%= link_to "Log payment",
-            new_debt_debt_payment_path(@debt),
-            class: ui.button(:primary, extra: "text-sm px-5 py-2"),
-            data: { turbo_frame: "modal" } %>
+
+    <div class="mt-4 flex flex-wrap gap-2 text-[13px]">
+      <% if paid %>
+        <span class="<%= ui.badge(:success) %> !py-1.5 !px-3">Paid off <%= @debt.paid_off_at.strftime("%B %-d, %Y") %></span>
+      <% end %>
+      <span class="rounded-full bg-porcelain-2 px-3 py-1.5 text-graphite tabular-nums"><%= number_to_currency(@debt.minimum_payment) %>/mo minimum</span>
+      <% if @debt.interest_rate.present? %>
+        <span class="rounded-full bg-porcelain-2 px-3 py-1.5 text-graphite tabular-nums"><%= number_to_percentage(@debt.interest_rate, precision: 3, strip_insignificant_zeros: true) %> APR</span>
+      <% end %>
+    </div>
+
+    <% unless paid %>
+      <%= link_to new_debt_debt_payment_path(@debt),
+            class: ui.button(:primary, extra: "group w-full mt-4 !justify-between pl-6 pr-1.5"),
+            data: { turbo_frame: "modal" } do %>
+        <span>Log payment</span>
+        <span class="grid place-items-center w-9 h-9 rounded-full bg-surface/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" aria-hidden="true"><%= icon "plus", classes: "w-4 h-4" %></span>
+      <% end %>
     <% end %>
   </div>
-
-  <div class="h-2 rounded-full bg-border overflow-hidden mb-1">
-    <div class="h-full rounded-full bg-accent" style="width: <%= @debt.progress_pct %>%"></div>
-  </div>
-  <p class="<%= ui.label(:meta) %>"><%= @debt.progress_pct %>% paid off</p>
-
-  <% if @debt.interest_rate.present? %>
-    <p class="<%= ui.label(:secondary) %> mt-3">
-      <%= number_to_percentage(@debt.interest_rate, precision: 3).delete_suffix("0").delete_suffix(".") %>% APR &middot;
-      Min. <%= number_to_currency(@debt.minimum_payment) %>/mo
-    </p>
-  <% end %>
-
-  <% if @debt.paid_off? %>
-    <p class="text-green-700 font-semibold mt-3">Paid off <%= @debt.paid_off_at.strftime("%B %-d, %Y") %></p>
-  <% end %>
 </div>
 
 <%# Balance history chart %>
 <% if @chart_data.size > 1 %>
   <div class="<%= ui.card %> mb-6">
-    <h2 class="<%= ui.section_heading %> mb-4">Balance History</h2>
-    <%= line_chart @chart_data,
+    <h2 class="<%= ui.section_heading %> mb-1">Balance history</h2>
+    <p class="text-[13px] text-mute mb-4">
+      <%= @chart_summary %>
+    </p>
+    <div aria-hidden="true">
+    <%= line_chart @chart_data.transform_keys { |d| d.strftime("%b %-d, %Y") },
           prefix: "$",
           thousands: ",",
-          colors: ["#2E5CFF"],
+          colors: [ "#4c5fd5" ],
+          discrete: true,
           curve: false,
           points: true,
           height: "200px" %>
+    </div>
   </div>
 <% end %>
 
@@ -59,26 +65,32 @@
   <h2 class="<%= ui.section_heading %> mb-4">Payments</h2>
 
   <% if @payments.any? %>
-    <div class="divide-y divide-border">
-      <% @payments.each do |payment| %>
-        <div class="py-3 flex items-center justify-between">
+    <div class="divide-y divide-line">
+      <% @payments.each_with_index do |payment, index| %>
+        <div class="py-3 flex items-center justify-between gap-3">
           <div>
             <p class="<%= ui.type(:body_strong) %>"><%= number_to_currency(payment.amount) %></p>
             <p class="<%= ui.label(:secondary) %>">
               <%= payment.paid_on.strftime("%b %-d, %Y") %>
-              &middot; balance after: <%= number_to_currency(payment.balance_after) %>
-              &middot; <%= payment.user.email_address.split("@").first %>
+              &middot; Balance after: <%= number_to_currency(payment.balance_after) %>
+              &middot; <%= payment.user.display_name %>
             </p>
             <% if payment.note.present? %>
               <p class="<%= ui.type(:small, extra: "italic text-mute") %>"><%= payment.note %></p>
             <% end %>
           </div>
           <% if current_user.owner? %>
+            <% amount = number_to_currency(payment.amount) %>
+            <% paid_on = payment.paid_on.strftime("%b %-d") %>
             <%= button_to debt_debt_payment_path(@debt, payment),
                   method: :delete,
-                  class: ui.link(:subtle),
-                  form: { "data-turbo-confirm": "Remove this payment? The balance will not be automatically adjusted." } do %>
-              <%= icon "close", classes: "w-4 h-4" %>
+                  class: "shrink-0 grid place-items-center w-11 h-11 rounded-full text-mute hover:text-ink hover:bg-porcelain-3",
+                  aria: { label: "Remove the #{amount} payment from #{paid_on}" },
+                  form: { data: {
+                    turbo_confirm: "Remove the #{amount} payment from #{paid_on}? " \
+                                   "The balance goes back to #{number_to_currency(index.zero? ? @balance_if_latest_removed : @debt.current_balance)}."
+                  } } do %>
+              <%= icon "close", classes: "w-5 h-5" %>
             <% end %>
           <% end %>
         </div>

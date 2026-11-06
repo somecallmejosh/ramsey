@@ -80,4 +80,55 @@ RSpec.describe Debt, type: :model do
       expect(debt.progress_pct).to eq(0)
     end
   end
+
+  describe "paid_off_at sync" do
+    it "marks the debt paid off when the balance is set to zero" do
+      debt = create(:debt)
+      debt.update!(current_balance: 0)
+      expect(debt.paid_off_at).to eq(Date.current)
+    end
+
+    it "clears paid_off_at when the balance is raised above zero" do
+      debt = create(:debt, :paid_off)
+      debt.update!(current_balance: 250)
+      expect(debt.paid_off_at).to be_nil
+    end
+
+    it "keeps an existing paid_off_at when other fields change" do
+      debt = create(:debt, :paid_off, paid_off_at: 1.month.ago.to_date)
+      debt.update!(name: "Renamed")
+      expect(debt.paid_off_at).to eq(1.month.ago.to_date)
+    end
+  end
+
+  describe "#move!" do
+    let(:account) { create(:account) }
+    let!(:a) { create(:debt, account: account, position: 1) }
+    let!(:b) { create(:debt, account: account, position: 2) }
+    let!(:c) { create(:debt, account: account, position: 3) }
+
+    def order = account.debts.snowball.active.ordered.to_a
+
+    it "moves a debt up" do
+      c.move!(:up)
+      expect(order).to eq([ a, c, b ])
+    end
+
+    it "moves a debt down" do
+      a.move!(:down)
+      expect(order).to eq([ b, a, c ])
+    end
+
+    it "does nothing past either end" do
+      a.move!(:up)
+      c.move!(:down)
+      expect(order).to eq([ a, b, c ])
+    end
+
+    it "handles duplicate positions" do
+      Debt.where(id: [ a.id, b.id, c.id ]).update_all(position: 1)
+      c.move!(:up)
+      expect(order).to eq([ a, c, b ])
+    end
+  end
 end

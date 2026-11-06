@@ -7,12 +7,12 @@ module Admin
 
     def deactivate
       @envelope.update!(active: false)
-      redirect_to admin_settings_path, notice: "#{@envelope.name} deactivated."
+      redirect_to admin_settings_path, notice: "Hid #{@envelope.name}."
     end
 
     def reactivate
       @envelope.update!(active: true)
-      redirect_to admin_settings_path, notice: "#{@envelope.name} reactivated."
+      redirect_to admin_settings_path, notice: "#{@envelope.name} is back on Budget."
     end
 
     private

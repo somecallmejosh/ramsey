@@ -2,13 +2,7 @@
       id: "add-shopping-item-form" do |f| %>
   <%= f.hidden_field :meal_plan_id, value: meal_plan.id %>
 
-  <% if shopping_item.errors.any? %>
-    <div class="<%= ui.warning_banner %> mb-3" role="alert">
-      <% shopping_item.errors.full_messages.each do |msg| %>
-        <p><%= msg %></p>
-      <% end %>
-    </div>
-  <% end %>
+  <%= render FormErrorsComponent.new(record: shopping_item) %>
 
   <div class="<%= ui.card %>">
     <h3 class="<%= ui.label %> mb-4">Add item</h3>
@@ -27,7 +21,7 @@
 
     <div class="grid grid-cols-2 gap-3 mb-3">
       <div>
-        <label for="new_item_quantity" class="<%= ui.label(:secondary) %> block mb-1">Qty</label>
+        <label for="new_item_quantity" class="<%= ui.label(:secondary) %> block mb-1">Quantity</label>
         <%= f.text_field :quantity,
               id: "new_item_quantity",
               placeholder: "e.g. 2 lbs",
@@ -44,7 +38,7 @@
     </div>
 
     <div class="mb-4">
-      <label for="new_item_cost" class="<%= ui.label(:secondary) %> block mb-1">Est. cost (optional)</label>
+      <label for="new_item_cost" class="<%= ui.label(:secondary) %> block mb-1">Estimated cost <span class="font-normal text-mute">(optional)</span></label>
       <%= f.number_field :estimated_cost,
             id: "new_item_cost",
             placeholder: "0.00",
@@ -54,6 +48,7 @@
     </div>
 
     <%= f.submit "Add to list",
-          class: "#{ui.button(:secondary, extra: "text-base px-6 py-2")} w-full" %>
+          class: "#{ui.button(:secondary, extra: "text-base px-6 py-2")} w-full",
+          data: { turbo_submits_with: "Adding…" } %>
   </div>
 <% end %>

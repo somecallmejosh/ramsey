@@ -1,0 +1,16 @@
+<%# locals: (f:, envelope:) %>
+<% name_error = envelope.errors[:name].first %>
+<div>
+  <label for="envelope_name" class="<%= ui.label %> block mb-1">Name</label>
+  <%= f.text_field :name,
+        id: "envelope_name",
+        placeholder: "e.g. Groceries",
+        required: true,
+        maxlength: 50,
+        class: ui.input(name_error ? :error : :default),
+        aria: { invalid: name_error.present?, describedby: ("envelope_name_error" if name_error) },
+        autofocus: true %>
+  <% if name_error %>
+    <p id="envelope_name_error" class="<%= ui.field_error %>">Name <%= name_error %></p>
+  <% end %>
+</div>

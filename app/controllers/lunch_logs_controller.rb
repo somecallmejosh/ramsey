@@ -2,9 +2,9 @@ class LunchLogsController < ApplicationController
   before_action :set_lunch_log, only: [ :destroy ]
 
   def index
-    @year          = (params[:year]  || Date.current.year).to_i
-    @month         = (params[:month] || Date.current.month).to_i
-    @selected_date = Date.new(@year, @month)
+    @selected_date = selected_month
+    @year          = @selected_date.year
+    @month         = @selected_date.month
     @logs          = current_user.lunch_logs.for_month(@year, @month)
     load_stats(@year, @month)
   end
@@ -21,7 +21,11 @@ class LunchLogsController < ApplicationController
         format.html { redirect_to lunch_logs_path }
       end
     else
-      head :unprocessable_content
+      @error = @lunch_log.errors.map(&:message).first || "Couldn't log that day. Please try again."
+      respond_to do |format|
+        format.turbo_stream { render :create_failed, status: :unprocessable_content }
+        format.html { redirect_to lunch_logs_path, alert: @error }
+      end
     end
   end
 
@@ -38,6 +42,14 @@ class LunchLogsController < ApplicationController
   end
 
   private
+
+  # The month in the URL, or this month. Never a future month.
+  def selected_month
+    month = Date.new(params[:year].to_i, params[:month].to_i) if params[:year].present? && params[:month].present?
+    [ month || Date.current, Date.current ].min.beginning_of_month
+  rescue Date::Error
+    Date.current.beginning_of_month
+  end
 
   def set_lunch_log
     @lunch_log = current_user.lunch_logs.find(params[:id])

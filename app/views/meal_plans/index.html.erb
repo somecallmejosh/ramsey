@@ -1,51 +1,85 @@
-<div class="max-w-3xl mx-auto">
-<div class="flex items-center gap-3 mb-6 justify-between">
-
-  <h1 class="<%= ui.page_heading %>">Meal History</h1>
-  <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2 shrink-0")}" do %>
-    New plan
-  <% end %>
-</div>
-
-<% if @meal_plans.any? %>
-  <div class="grid grid-cols-1 gap-4">
-    <% @meal_plans.each do |plan| %>
-      <% this_week = plan.week_start == Date.current.beginning_of_week(:sunday) %>
-      <div class="<%= ui.card %>">
-        <div class="<%= ui.card_header %>">
-          <div>
-            <p class="<%= ui.label %>">Week of <%= plan.week_start.strftime("%B %-d, %Y") %></p>
-            <% if this_week %>
-              <span class="<%= ui.label(:secondary) %>">Current week</span>
-            <% end %>
-          </div>
-          <div class="flex gap-2">
-            <%= link_to "View", meal_plan_path(plan), class: ui.button(:secondary, extra: "text-sm px-4 py-1.5") %>
-            <% unless this_week %>
-              <%= button_to "Use this week", reuse_meal_plan_path(plan), method: :post,
-                    class: ui.button(:primary, extra: "text-sm px-4 py-1.5") %>
-            <% end %>
-          </div>
-        </div>
-
-        <% meals = plan.meals.order(:day_of_week) %>
-        <% if meals.any? %>
-          <div class="mt-3 divide-y divide-border">
-            <% meals.each do |meal| %>
-              <div class="py-2 flex items-baseline gap-2">
-                <span class="<%= ui.label(:secondary) %> w-10 shrink-0"><%= meal.day_name.first(3) %></span>
-                <span class="text-ink text-sm"><%= meal.dinner %></span>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
+<% content_for :title, "Meals · Clempo" %>
+<% this_week_start = Date.current.beginning_of_week(:sunday) %>
+<% current, past   = @meal_plans.partition { |plan| plan.week_start == this_week_start } %>
+<% day_tints = %w[bg-mint\ text-mint-ink bg-lilac\ text-lilac-ink bg-sky\ text-sky-ink bg-peach\ text-peach-ink bg-rose\ text-rose-ink bg-butter\ text-butter-ink bg-mint\ text-mint-ink] %>
+<div class="max-w-lg mx-auto">
+  <div class="flex items-center justify-between gap-3 mb-6 rise">
+    <h1 class="<%= ui.page_heading %>">Meals</h1>
+    <%= link_to new_meal_plan_path, class: ui.button(:primary, extra: "px-5 shrink-0") do %>
+      <%= icon "plus", classes: "w-4 h-4" %> New plan
     <% end %>
   </div>
-<% else %>
-  <div class="<%= ui.card %> text-center py-10">
-    <p class="<%= ui.label(:secondary) %>">No confirmed meal plans yet.</p>
-    <%= link_to "Create your first plan", new_meal_plan_path, class: "mt-4 inline-block #{ui.link}" %>
-  </div>
-<% end %>
+
+  <% if @meal_plans.empty? %>
+    <div class="panel px-6 py-10 text-center rise" style="--i: 1">
+      <span class="mx-auto mb-4 grid place-items-center w-16 h-16 rounded-full bg-peach text-peach-ink" aria-hidden="true">
+        <%= icon "cooking-pot", classes: "w-8 h-8" %>
+      </span>
+      <p class="text-[17px] font-bold text-ink">No meal plans yet</p>
+      <p class="text-[15px] text-graphite mt-1 mb-5">Tell us what's in the fridge and we'll plan the week and the shopping list.</p>
+      <%= link_to "Plan this week", new_meal_plan_path, class: ui.button(:primary) %>
+    </div>
+  <% end %>
+
+  <% if (plan = current.first) %>
+    <section aria-labelledby="this-week-heading" class="mb-8 rise" style="--i: 1">
+      <div class="shell">
+        <div class="shell-core p-5">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="<%= ui.badge(:success) %> mb-1.5">This week</span>
+              <h2 id="this-week-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink">Week of <%= plan.week_start.strftime("%B %-d") %></h2>
+            </div>
+            <span class="grid place-items-center w-12 h-12 rounded-full bg-peach text-peach-ink shrink-0" aria-hidden="true">
+              <%= icon "cooking-pot", classes: "w-6 h-6" %>
+            </span>
+          </div>
+          <ul class="space-y-1" role="list">
+            <% plan.meals.sort_by(&:day_of_week).each do |meal| %>
+              <% today = this_week_start + meal.day_of_week.to_i == Date.current %>
+              <li class="flex items-center gap-3 rounded-[16px] px-2 py-1.5 <%= "bg-porcelain-2" if today %>">
+                <span class="grid place-items-center w-9 h-9 shrink-0 rounded-full text-[12px] font-bold <%= day_tints[meal.day_of_week.to_i] %>" aria-hidden="true"><%= meal.day_name.first(3) %></span>
+                <span class="sr-only"><%= meal.day_name %>:</span>
+                <span class="flex-1 min-w-0 text-[15px] <%= today ? "font-bold" : "font-medium" %> text-ink truncate"><%= meal.dinner %></span>
+                <% if today %><span class="<%= ui.badge(:accent) %>">Tonight</span><% end %>
+              </li>
+            <% end %>
+          </ul>
+          <%= link_to meal_plan_path(plan), class: ui.button(:primary, extra: "group w-full mt-4 !justify-between pl-6 pr-1.5") do %>
+            <span>Open plan &amp; shopping list</span>
+            <span class="grid place-items-center w-9 h-9 rounded-full bg-surface/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" aria-hidden="true"><%= icon "arrow-right", classes: "w-4 h-4" %></span>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <% if past.any? %>
+    <section aria-labelledby="past-heading" class="rise" style="--i: 2">
+      <h2 id="past-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink mb-1 px-1">Past plans</h2>
+      <p class="text-[14px] text-graphite mb-3 px-1">Liked a week? Use it again with one tap.</p>
+      <ul class="panel p-1.5" role="list">
+        <% past.each_with_index do |plan, i| %>
+          <% dinners = plan.meals.sort_by(&:day_of_week).map(&:dinner) %>
+          <li class="flex items-center gap-2 pr-1.5">
+            <%= link_to meal_plan_path(plan),
+                  class: "flex-1 min-w-0 flex items-center gap-3 px-3 py-3 rounded-[20px] transition-colors duration-200 hover:bg-porcelain-2 active:bg-porcelain-3" do %>
+              <span class="grid place-items-center w-11 h-11 shrink-0 rounded-full <%= day_tints[i % 6] %>" aria-hidden="true">
+                <%= icon "calendar-blank", classes: "w-5 h-5" %>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[16px] font-bold text-ink truncate">Week of <%= plan.week_start.strftime("%b %-d") %></span>
+                <span class="block text-[13px] text-mute truncate">
+                  <%= dinners.first(2).join(", ") %><%= ", +#{dinners.size - 2} more" if dinners.size > 2 %>
+                </span>
+              </span>
+            <% end %>
+            <%= button_to "Use again", reuse_meal_plan_path(plan), method: :post,
+                  class: "press shrink-0 min-h-[40px] px-4 rounded-full bg-porcelain-2 text-[14px] font-semibold text-ink hover:bg-porcelain-3",
+                  aria: { label: "Use the week of #{plan.week_start.strftime("%B %-d")} again this week" } %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
 </div>

@@ -37,8 +37,14 @@ RSpec.describe "Admin::Accounts", type: :request do
     context "owner" do
       before { sign_in(owner) }
 
+      it "keeps everything when the household name isn't typed" do
+        delete admin_account_path, params: { confirm_name: "nope" }
+        expect(response).to redirect_to(admin_settings_path)
+        expect(Account.find_by(id: account.id)).to be_present
+      end
+
       it "destroys the account and redirects to login" do
-        delete admin_account_path
+        delete admin_account_path, params: { confirm_name: account.name }
         expect(response).to redirect_to(new_session_path)
         expect(Account.find_by(id: account.id)).to be_nil
       end
@@ -46,7 +52,7 @@ RSpec.describe "Admin::Accounts", type: :request do
       it "destroys all associated data" do
         create(:envelope, account: account)
         create(:debt, account: account)
-        delete admin_account_path
+        delete admin_account_path, params: { confirm_name: account.name.upcase }
         expect(Envelope.where(account_id: account.id)).to be_empty
         expect(Debt.where(account_id: account.id)).to be_empty
       end

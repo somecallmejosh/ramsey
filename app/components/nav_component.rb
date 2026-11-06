@@ -8,7 +8,17 @@ class NavComponent < ApplicationComponent
     @current_user&.owner?
   end
 
+  # Budget owns "/" and "/dashboard…" plus category pages; other tabs match by prefix.
   def active?(path)
-    @current_path.start_with?(path)
+    if path == root_path
+      @current_path == "/" || @current_path.start_with?("/dashboard", "/envelopes", "/envelope_budgets")
+    else
+      @current_path.start_with?(path)
+    end
+  end
+
+  def link_options(path)
+    active = active?(path)
+    { class: ui.nav_item(active: active), aria: { current: (active ? "page" : nil) } }
   end
 end

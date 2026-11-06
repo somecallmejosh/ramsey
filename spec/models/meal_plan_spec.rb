@@ -55,4 +55,30 @@ RSpec.describe MealPlan, type: :model do
       expect(plan.confirmed?).to be false
     end
   end
+
+  describe "pantry photo size" do
+    it "rejects a photo over 3.75 MB with a plain message" do
+      plan = build(:meal_plan)
+      plan.pantry_images.attach(io: StringIO.new("0" * (MealPlan::MAX_IMAGE_BYTES + 1)), filename: "big.jpg", content_type: "image/jpeg")
+      expect(plan).not_to be_valid
+      expect(plan.errors.full_messages).to include("big.jpg is too large. Each photo must be 3.75 MB or smaller.")
+    end
+
+    it "accepts photos within the limit" do
+      plan = build(:meal_plan)
+      plan.pantry_images.attach(io: StringIO.new("0" * 1024), filename: "ok.jpg", content_type: "image/jpeg")
+      expect(plan).to be_valid
+    end
+  end
+
+  describe "#taking_too_long?" do
+    it "is true for a plan still generating after two minutes" do
+      expect(build(:meal_plan, status: "processing", created_at: 3.minutes.ago).taking_too_long?).to be true
+    end
+
+    it "is false for a fresh or finished plan" do
+      expect(build(:meal_plan, status: "processing", created_at: 30.seconds.ago).taking_too_long?).to be false
+      expect(build(:meal_plan, status: "ready", created_at: 3.minutes.ago).taking_too_long?).to be false
+    end
+  end
 end

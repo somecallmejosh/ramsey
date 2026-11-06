@@ -31,7 +31,7 @@ module Admin
         EnvelopeBudget.upsert_all(records, unique_by: [ :envelope_id, :year, :month ])
       end
 
-      redirect_to admin_settings_path, notice: "Budgets saved."
+      redirect_to admin_settings_path, notice: "Saved budgets for #{Date.current.strftime("%B")}."
     end
 
     private

@@ -1,58 +1,37 @@
 <div id="shopping-list">
-  <% total     = meal_plan.shopping_items.sum { |i| i.estimated_cost || 0 } %>
+  <% items     = meal_plan.shopping_items.order(:store, :name).to_a %>
+  <% total     = items.sum { |i| i.estimated_cost || 0 } %>
   <% remaining = current_groceries_remaining %>
 
-  <% if total > remaining %>
-    <div class="<%= ui.warning_banner %> mb-4">
-      Estimated cart (<%= number_to_currency(total) %>) exceeds your remaining grocery budget (<%= number_to_currency(remaining) %>).
+  <% if items.any? %>
+    <% if total > remaining %>
+      <div class="<%= ui.warning_banner %> mb-4">
+        Estimated cart (<%= number_to_currency(total) %>) is more than what's left for groceries (<%= number_to_currency(remaining) %>).
+      </div>
+    <% end %>
+
+    <div class="<%= ui.card %> mb-4">
+      <% items.group_by(&:store).each do |store, store_items| %>
+        <h3 class="<%= ui.label %> pt-2 pb-1 border-b border-line mb-1 text-graphite uppercase tracking-wide"><%= store %></h3>
+        <% store_items.each do |item| %>
+          <%= render "shopping_items/shopping_item", shopping_item: item %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="<%= ui.stat_card %> mb-4">
+      <p class="<%= ui.label %> mb-1">Estimated total</p>
+      <p class="<%= ui.stat_value %>"><%= number_to_currency(total) %></p>
+      <p class="<%= ui.label(:secondary) %>">
+        <%= number_to_currency(remaining) %> left for groceries this month
+      </p>
+    </div>
+  <% else %>
+    <div class="<%= ui.card %> mb-4 text-center py-8">
+      <p class="text-ink font-medium">Your shopping list is empty.</p>
+      <p class="<%= ui.label(:secondary) %> mt-1">Add anything you need to buy below.</p>
     </div>
   <% end %>
-
-  <div class="<%= ui.card %> mb-4">
-    <% meal_plan.shopping_items.order(:store, :name).group_by(&:store).each do |store, items| %>
-      <h3 class="<%= ui.label %> pt-2 pb-1 border-b border-border mb-1 text-graphite uppercase tracking-wide"><%= store %></h3>
-      <% items.each do |item| %>
-        <div id="shopping_item_<%= item.id %>">
-          <div class="flex items-center gap-3 py-3 border-b border-border last:border-0">
-            <%= form_with model: item, url: shopping_item_path(item), method: :patch do |f| %>
-              <%= f.check_box :checked,
-                    id: "item_#{item.id}",
-                    class: "w-5 h-5 rounded border-border text-accent focus:ring-accent shrink-0",
-                    onchange: "this.form.requestSubmit()",
-                    checked: item.checked %>
-            <% end %>
-            <label for="item_<%= item.id %>"
-                   class="flex-1 text-lg <%= item.checked? ? "line-through text-mute" : "text-ink" %>">
-              <%= item.name %>
-              <% if item.quantity.present? %>
-                <span class="<%= ui.label(:secondary) %> ml-1"><%= item.quantity %></span>
-              <% end %>
-            </label>
-            <% if item.estimated_cost&.positive? %>
-              <span class="<%= ui.label(:secondary) %> shrink-0"><%= number_to_currency(item.estimated_cost) %></span>
-            <% end %>
-            <% unless item.checked? %>
-              <%= button_to shopping_item_path(item), method: :delete,
-                    class: "shrink-0 text-mute hover:text-claret transition-colors ml-1",
-                    aria: { label: "Remove #{item.name}" } do %>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true">
-                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                </svg>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
-
-  <div class="<%= ui.stat_card %> mb-4">
-    <p class="<%= ui.label %> mb-1">Estimated total</p>
-    <p class="<%= ui.stat_value %>"><%= number_to_currency(total) %></p>
-    <p class="<%= ui.label(:secondary) %>">
-      <%= number_to_currency(remaining) %> remaining in groceries
-    </p>
-  </div>
 
   <%= render "shopping_items/form", shopping_item: ShoppingItem.new(store: "Aldi"), meal_plan: meal_plan %>
 </div>

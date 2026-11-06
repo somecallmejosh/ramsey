@@ -8,19 +8,19 @@ RSpec.describe ExpenseRowComponent, type: :component do
   it "shows delete control for admin on prior month expense" do
     expense = create(:expense, :prior_month, envelope: envelope, user: standard)
     result  = render_inline(ExpenseRowComponent.new(expense: expense, current_user: admin))
-    expect(result.to_html).to include("Delete expense")
+    expect(result.to_html).to include("Remove $25.00")
   end
 
   it "hides delete control for standard user on prior month expense" do
-    expense = create(:expense, :prior_month, envelope: envelope, user: standard)
+    expense = create(:expense, :prior_month, envelope: envelope, user: standard, created_at: 1.hour.ago)
     result  = render_inline(ExpenseRowComponent.new(expense: expense, current_user: standard))
-    expect(result.to_html).not_to include("Delete expense")
+    expect(result.to_html).not_to include("Remove $25.00")
   end
 
   it "shows delete control for standard user on current month expense" do
     expense = create(:expense, envelope: envelope, user: standard)
     result  = render_inline(ExpenseRowComponent.new(expense: expense, current_user: standard))
-    expect(result.to_html).to include("Delete expense")
+    expect(result.to_html).to include("Remove $25.00")
   end
 
   it "displays the expense amount" do

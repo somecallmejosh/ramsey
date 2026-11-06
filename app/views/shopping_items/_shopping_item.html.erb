@@ -1,0 +1,30 @@
+<%# One row of the shopping list. Shared by the list and the check/uncheck stream. %>
+<%# locals: (shopping_item:) %>
+<div id="<%= dom_id(shopping_item) %>">
+  <div class="flex items-center gap-3 py-1 min-h-14 border-b border-line last:border-0">
+    <%= form_with model: shopping_item, url: shopping_item_path(shopping_item), method: :patch do |f| %>
+      <%= f.check_box :checked,
+            id: "item_#{shopping_item.id}",
+            class: "w-5 h-5 rounded border-line text-accent focus:ring-accent shrink-0",
+            onchange: "this.form.requestSubmit()",
+            checked: shopping_item.checked %>
+    <% end %>
+    <label for="item_<%= shopping_item.id %>"
+           class="flex-1 py-2 text-lg <%= shopping_item.checked? ? "line-through text-mute" : "text-ink" %>">
+      <%= shopping_item.name %>
+      <% if shopping_item.quantity.present? %>
+        <span class="<%= ui.label(:secondary) %> ml-1"><%= shopping_item.quantity %></span>
+      <% end %>
+    </label>
+    <% if shopping_item.estimated_cost&.positive? %>
+      <span class="<%= ui.label(:secondary) %> shrink-0"><%= number_to_currency(shopping_item.estimated_cost) %></span>
+    <% end %>
+    <% unless shopping_item.checked? %>
+      <%= button_to shopping_item_path(shopping_item), method: :delete,
+            class: "shrink-0 grid place-items-center w-11 h-11 -mr-2 rounded-full text-mute hover:text-claret hover:bg-claret-soft transition-colors",
+            aria: { label: "Remove #{shopping_item.name}" } do %>
+        <%= icon "close", classes: "w-5 h-5" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<div class="flex items-center justify-center px-4">
+<div class="flex items-center justify-center">
   <div class="w-full max-w-sm">
 
     <div class="mt-8 mb-4">
@@ -7,44 +7,36 @@
       <p class="<%= ui.label(:secondary) %> mt-2">Sign in to your account</p>
     </div>
 
-    <% if flash[:alert].present? %>
-      <div class="<%= ui.warning_banner %> mb-4" role="alert">
-        <%= flash[:alert] %>
+    <% if flash[:reset_sent] %>
+      <div class="<%= ui.type(:body_strong) %> bg-accent-soft border border-accent/30 rounded-[10px] px-4 py-3 mb-4 flex items-start gap-2" role="status">
+        <%= icon "envelope-simple", classes: "w-5 h-5 shrink-0 mt-0.5 text-accent" %>
+        <p>If that email has an account, we've sent a reset link. Check your inbox.</p>
       </div>
     <% end %>
 
     <div class="<%= ui.card %>">
-      <%= form_with url: session_path, data: { turbo: false } do |f| %>
+      <%= form_with url: session_path, data: { turbo: false, controller: "submit-feedback", action: "submit->submit-feedback#busy" } do |f| %>
 
-        <div class="mb-4">
-          <label for="email_address" class="<%= ui.label %> block mb-1">Email address</label>
-          <%= f.email_field :email_address,
-                id: "email_address",
-                required: true,
-                autofocus: true,
-                autocomplete: "username",
-                placeholder: "you@example.com",
-                value: params[:email_address],
-                class: ui.input %>
-        </div>
+        <%= render "shared/text_field",
+              f: f, type: :email_field, field: :email_address, label: "Email address",
+              required: true,
+              autofocus: params[:email_address].blank?,
+              autocomplete: "username",
+              placeholder: "you@example.com",
+              value: params[:email_address] %>
 
-        <div class="mb-6">
-          <label for="password" class="<%= ui.label %> block mb-1">Password</label>
-          <%= f.password_field :password,
-                id: "password",
-                required: true,
-                autocomplete: "current-password",
-                maxlength: 72,
-                class: ui.input %>
-        </div>
+        <%= render "shared/password_field",
+              f: f, field: :password, label: "Password",
+              autocomplete: "current-password",
+              autofocus: params[:email_address].present?,
+              wrapper_class: "mb-6" %>
 
-        <%= f.submit "Sign in", class: "#{ui.button(:primary)} w-full" %>
+        <%= f.submit "Sign in", class: "#{ui.button(:primary)} w-full", data: { turbo_submits_with: "Signing in…" } %>
 
       <% end %>
 
-      <div class="mt-4 space-y-2">
+      <div class="mt-4 flex flex-col items-start gap-3">
         <%= link_to "Forgot password?", new_password_path, class: ui.link(:subtle) %>
-        <br>
         <%= link_to "Create an account", new_registration_path, class: ui.link(:subtle) %>
       </div>
     </div>

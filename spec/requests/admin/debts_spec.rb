@@ -82,4 +82,52 @@ RSpec.describe "Admin::Debts", type: :request do
       end
     end
   end
+
+  describe "PATCH /admin/debts/:id (balance to zero)" do
+    let(:debt) { create(:debt, account: account) }
+
+    before { sign_in(owner) }
+
+    it "marks the debt paid off" do
+      patch admin_debt_path(debt), params: { debt: { current_balance: "0" } }
+      expect(debt.reload.paid_off_at).to eq(Date.current)
+    end
+
+    it "ignores a submitted position" do
+      expect {
+        patch admin_debt_path(debt), params: { debt: { position: "99" } }
+      }.not_to change { debt.reload.position }
+    end
+
+    it "re-renders with inline errors" do
+      patch admin_debt_path(debt), params: { debt: { name: "" } }
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include('id="debt_name_error"')
+    end
+  end
+
+  describe "PATCH /admin/debts/:id/move" do
+    let!(:first)  { create(:debt, account: account, position: 1) }
+    let!(:second) { create(:debt, account: account, position: 2) }
+
+    context "owner" do
+      before { sign_in(owner) }
+
+      it "moves the debt up" do
+        patch move_admin_debt_path(second, direction: "up")
+        expect(response).to redirect_to(debts_path)
+        expect(account.debts.ordered.to_a).to eq([ second, first ])
+      end
+    end
+
+    context "member" do
+      before { sign_in(member) }
+
+      it "is not allowed" do
+        patch move_admin_debt_path(second, direction: "up")
+        expect(response).to redirect_to(root_path)
+        expect(account.debts.ordered.to_a).to eq([ first, second ])
+      end
+    end
+  end
 end

@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   private
 
   def check_session_expiry
-    if Current.session&.last_active_at&.before?(24.hours.ago)
+    if Current.session&.idle_expired?
       Current.session.destroy
       redirect_to new_session_path, alert: "Your session expired. Please sign in again."
     else

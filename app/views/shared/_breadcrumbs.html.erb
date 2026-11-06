@@ -1,0 +1,26 @@
+<%# Where you are, and one tap back up. trail: [["Budget", path], ["Groceries"]]
+    The round arrow goes to the nearest parent; the last item is this page. %>
+<%# locals: (trail:) %>
+<% parent = trail[0..-2].reverse.find { |(_, path)| path } %>
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 mb-4 min-w-0">
+  <% if parent %>
+    <%= link_to parent[1], class: ui.icon_button(extra: "w-10 h-10 shrink-0"), aria: { label: "Back to #{parent[0]}" } do %>
+      <%= icon "arrow-left", classes: "w-4 h-4" %>
+    <% end %>
+  <% end %>
+  <ol class="flex items-center gap-1.5 min-w-0 text-[14px]">
+    <% trail.each_with_index do |(label, path), i| %>
+      <% last = i == trail.size - 1 %>
+      <li class="flex items-center gap-1.5 <%= last ? "min-w-0" : "shrink-0" %>">
+        <% if i.positive? %>
+          <span class="text-silver" aria-hidden="true">/</span>
+        <% end %>
+        <% if last || path.nil? %>
+          <span class="font-semibold text-ink truncate" <%= "aria-current=page" if last %>><%= label %></span>
+        <% else %>
+          <%= link_to label, path, class: "font-medium text-graphite hover:text-ink underline-offset-4 hover:underline" %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>

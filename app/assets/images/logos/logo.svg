@@ -2,7 +2,7 @@
   <g transform="translate(8 8)">
     <circle cx="32" cy="32" r="31" stroke="currentColor" stroke-width="1"/>
     <path d="M46 22 a16 16 0 1 0 0 20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="46" cy="32" r="1.8" fill="#7a4fb8"/>
+    <circle cx="46" cy="32" r="1.8" fill="#2f5bb0"/>
   </g>
-  <text x="82" y="52" font-family="Newsreader, 'Times New Roman', serif" font-size="42" font-weight="500" letter-spacing="-0.5" fill="currentColor">Clempo</text>
+  <text x="82" y="52" font-family="'Instrument Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.5" fill="currentColor">Clempo</text>
 </svg>

@@ -1,23 +1,35 @@
 require "capybara/rspec"
 
-# Chrome 146 headless: WebDriver Element Click does not fire JS events on checkboxes,
-# and input.select() is invalid for number inputs, causing set() to silently fail.
-# Patch to use JS for checkboxes and number inputs.
+# Chrome 146 headless: WebDriver Element Click intermittently never reaches the
+# page (no pointer or click events), and typed keys are sometimes lost. Capybara
+# still finds elements the normal way (visible, enabled); only the final
+# click / value entry goes through JS so specs test the app, not the driver.
 Capybara::Selenium::Node.prepend(Module.new do
+  JS_SET_TYPES = %w[number text email password search tel url].freeze
+
   def set(value, **options)
-    input_type = (tag_name == "input") ? native.attribute("type") : nil
-    case input_type
-    when "checkbox"
+    input_type = (tag_name == "input") ? (native.attribute("type") || "text") : nil
+    if input_type == "checkbox"
       driver.execute_script("arguments[0].click()", native) if value != checked?
-    when "number"
-      driver.execute_script("arguments[0].value = arguments[1]", native, value.to_s)
-      driver.execute_script("arguments[0].dispatchEvent(new Event('input', {bubbles:true}))", native)
-      driver.execute_script("arguments[0].dispatchEvent(new Event('change', {bubbles:true}))", native)
+    elsif JS_SET_TYPES.include?(input_type) || tag_name == "textarea"
+      driver.execute_script(<<~JS, native, value.to_s)
+        const el = arguments[0]
+        el.focus()
+        el.value = arguments[1]
+        el.dispatchEvent(new Event("input", { bubbles: true }))
+        el.dispatchEvent(new Event("change", { bubbles: true }))
+      JS
     else
       super
     end
-  rescue
+  rescue Selenium::WebDriver::Error::WebDriverError
     super
+  end
+
+  def click(keys = [], **options)
+    return super if keys.any? || options[:x] || options[:y]
+
+    driver.execute_script("arguments[0].click()", native)
   end
 end)
 

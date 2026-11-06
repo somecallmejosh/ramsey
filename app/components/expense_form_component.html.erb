@@ -53,9 +53,9 @@
     </div>
 
     <div class="mt-6">
-      <%= f.submit "Confirm",
+      <%= f.submit "Save purchase",
             class: "#{ui.button(:primary)} w-full",
-            data: { disable_with: "Saving…" } %>
+            data: { turbo_submits_with: "Saving…" } %>
     </div>
 
   <% end %>

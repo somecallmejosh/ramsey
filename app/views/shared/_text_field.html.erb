@@ -1,0 +1,14 @@
+<%# locals: (f:, type: :text_field, field:, label:, errors: [], wrapper_class: "mb-4", **options) %>
+<%# Text/email input with a visible label and inline error. Extra options go to the input. %>
+<% id = field.to_s %>
+<div class="<%= wrapper_class %>">
+  <label for="<%= id %>" class="<%= ui.label %> block mb-1"><%= label %></label>
+  <%= f.public_send type, field,
+        id: id,
+        class: ui.input(errors.any? ? :error : :default),
+        aria: { describedby: ("#{id}_error" if errors.any?), invalid: (errors.any? ? "true" : nil) },
+        **options %>
+  <% if errors.any? %>
+    <p id="<%= id %>_error" class="<%= ui.field_error %>"><%= errors.first %></p>
+  <% end %>
+</div>

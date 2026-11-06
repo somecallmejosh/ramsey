@@ -1,0 +1,84 @@
+<%# Summary, purchases and weekly breakdown for one category's month.
+    Replaced as a whole by the delete / undo Turbo Streams. %>
+<%# locals: (envelope_month:) %>
+<% em = envelope_month %>
+<div id="envelope-month">
+  <% look = CategoryLook.for(em.envelope) %>
+  <div class="shell mb-7 rise" style="--i: 1">
+    <section class="shell-core p-5" aria-label="Summary">
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0">
+          <% if em.budget %>
+            <% left = em.left %>
+            <p class="text-[14px] font-medium text-graphite"><%= left.negative? ? "Over budget by" : (em.current? ? "Left to spend" : "Left over") %></p>
+            <p class="mt-1 text-[44px] leading-none font-extrabold tracking-[-0.035em] tabular-nums <%= left.negative? ? "text-claret" : "text-ink" %>">
+              <%= money_with_cents(left) %>
+            </p>
+            <p class="mt-2 text-[13px] text-mute tabular-nums">
+              <%= number_to_currency(em.spent) %> spent of <%= number_to_currency(em.budget) %>
+            </p>
+          <% else %>
+            <p class="text-[14px] font-medium text-graphite">Spent</p>
+            <p class="mt-1 text-[44px] leading-none font-extrabold tracking-[-0.035em] tabular-nums text-ink"><%= money_with_cents(em.spent) %></p>
+            <p class="mt-2 text-[13px] text-mute">No budget set for this month.</p>
+          <% end %>
+        </div>
+        <% pct = em.budget&.positive? ? (em.spent / em.budget * 100).round : 0 %>
+        <% ring = em.budget.nil? ? "text-line" : (em.left.negative? ? "text-claret" : (pct >= 90 ? "text-gilt" : "text-sage")) %>
+        <%= render RingComponent.new(percent: pct, size: 84, stroke: 8, color: ring,
+              label: (em.budget ? "#{pct}% of the budget spent" : nil)) do %>
+          <span class="grid place-items-center w-14 h-14 rounded-full <%= look.tile %> <%= look.ink %>" aria-hidden="true">
+            <%= icon look.icon, classes: "w-7 h-7" %>
+          </span>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <section aria-labelledby="purchases-heading" class="mb-7 rise" style="--i: 2">
+    <h2 id="purchases-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink mb-3 px-1">
+      Purchases <span class="font-normal text-mute tabular-nums">· <%= em.expenses.size %></span>
+    </h2>
+    <% if em.expenses.empty? %>
+      <div class="panel px-5 py-8 text-center">
+        <p class="text-[15px] text-graphite">Nothing logged in <%= em.date.strftime("%B") %>.</p>
+        <% if em.current? %>
+          <p class="mt-2"><%= link_to "Log a purchase on Budget", root_path, class: ui.link %></p>
+        <% end %>
+      </div>
+    <% else %>
+      <ul class="panel p-1.5" role="list">
+        <% em.expenses.each do |expense| %>
+          <%= render ExpenseRowComponent.new(expense: expense, current_user: current_user) %>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <% if em.spent.positive? %>
+    <section aria-labelledby="weeks-heading" class="mb-7 rise" style="--i: 3">
+      <h2 id="weeks-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink mb-3 px-1">By week</h2>
+      <div class="panel px-5 py-4">
+        <% scale = [ em.busiest_week_spent, em.weekly_pace.to_d ].max %>
+        <ul class="space-y-3" role="list">
+          <% em.weeks.each do |week| %>
+            <% over = em.weekly_pace && week.spent > em.weekly_pace %>
+            <li class="grid grid-cols-[5.5rem_1fr_auto] items-center gap-3">
+              <span class="text-[13px] text-graphite tabular-nums"><%= week.label %></span>
+              <span class="h-2.5 rounded-full bg-porcelain-2 overflow-hidden" aria-hidden="true">
+                <span class="block h-full rounded-full <%= over ? "bg-gilt" : "bg-ink" %>"
+                      style="width: <%= scale.positive? ? (week.spent / scale * 100).round : 0 %>%"></span>
+              </span>
+              <span class="text-[15px] tabular-nums text-ink text-right"><%= number_to_currency(week.spent) %></span>
+            </li>
+          <% end %>
+        </ul>
+        <% if em.weekly_pace %>
+          <p class="text-[13px] text-mute mt-3">
+            Staying on budget means about <%= number_to_currency(em.weekly_pace) %> a week.
+          </p>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

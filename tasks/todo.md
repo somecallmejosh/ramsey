@@ -1,3 +1,95 @@
+# Visual redesign from Dribbble references — 2026-11-06
+
+Direction (shared by the 3 references): soft silver background with faint lavender/mint glow, white 24px-radius cards with diffuse shadows and no hard borders, bold geometric numbers with small cents, round icon buttons, a floating pill nav, pastel tint per category with a progress ring around its icon, black pill primary buttons and dark segmented pills.
+
+- [x] Tokens: Plus Jakarta Sans, silver bg + fixed glow, soft shadows, pastel category palette, ink primary, indigo accent, motion curve
+- [x] UiPresenter: card/panel, pill buttons (press scale), inputs, badges, floating island nav
+- [x] Phosphor regular (thin line) icons instead of duotone
+- [x] `CategoryLook` (icon + pastel tint per category) and `RingComponent` (SVG progress ring)
+- [x] Layout: greeting header with round buttons, island nav, toast
+- [x] Budget: hero balance card (double bezel + ring), category rows with ringed icons, recent list with icons, logger sheet + keypad + segmented pill
+- [x] Category history, Debts, Lunch, Meals, Settings, auth pages pick up the system; hand-tune where needed
+- [x] Entry fade-up (CSS, reduced-motion safe)
+- [x] Verify: specs, rubocop, live 390px + desktop screenshots
+- [x] Breadcrumbs (`shared/_breadcrumbs`: round back arrow + trail) on category history, debt detail/add/edit, Settings sub-pages, invites, meal plan new/show (user feedback)
+- [x] Meal plan list: "This week" hero with day chips and Tonight marker; past plans as compact rows with "Use again" (user feedback)
+- [x] Debt detail: hero card with ring; balance chart fixed (Chart.js had no date adapter → discrete labels, oldest first, correct starting balance)
+- [x] Category rows: the row opens the category page (purchases + spending); a separate black "+" opens the logger; each row shows "$X spent" and "left of $budget" (user feedback: spending was only reachable through the logger)
+- [x] Month switcher: labelled bar "‹ Oct · November 2026 / This month · Dec ›"; next month greyed (aria-disabled) instead of missing; page title on its own line (user feedback: lone arrow was unclear)
+
+### Review
+- 331 examples, 0 failures; rubocop clean. Keyboard spec now dispatches keydown events (Chrome 146 drops WebDriver keys).
+- Live at 357px: Budget (hero ring, ringed category rows, logger sheet), category history, Debts, Lunch calendar, Meals, sign-in, month bar in current and past months.
+- Deliberate departures from the skill's agency defaults, for low-tech users: labels kept under nav icons; section spacing stays compact (py-24 would push the core task off screen); motion limited to a short fade-up and press feedback, all off under reduced motion.
+
+---
+
+# All-pages audit fixes — 2026-11-06
+
+Source: [heuristics-audit.md](heuristics-audit.md) (all pages, 4.9/10).
+
+### Data & correctness (Sev 4)
+- [x] Shopping items scoped to `current_account` (create/update/destroy) + request specs
+- [x] Groceries remaining read from the current household (replace `current_groceries_remaining`)
+- [x] Deleting a debt payment restores balance / paid_off_at; payment delete toast with Undo-free clear copy
+- [x] Envelope + budget edit forms show errors (shared `FormErrorsComponent`)
+
+### Shared fixes
+- [x] `FormErrorsComponent` used by envelopes, envelope budgets, debts, debt payments, registrations, invitations, passwords
+- [x] `disable_with` → `data-turbo-submits-with` everywhere; add to forms missing it
+- [x] Nav: exact active match, `aria-current`, aria-labels match visible text
+- [x] One alert banner (layout, via `ui.warning_banner`); remove per-page duplicates
+- [x] Shared month switcher (arrows) for History + Lunch
+
+### Pages
+- [x] Category History: list first with heading + `friendly_day`, summary updates on delete, empty state, Undo on delete, drop weak chart
+- [x] Debts: plain vocabulary + one-line explainer, APR fix, "Paying off next", payer display_name, delete-payment copy, inline errors, move up/down ordering, `bottom` contrast, members' empty state, all-paid-off state, accent token chart
+- [x] Meals: Start over confirm, resume unconfirmed plan, retry keeps message, generation timeout message, shopping ✕ 44px + Undo, label `for`, required prompt, photo size check, confirm bar spacing, empty shopping list
+- [x] Lunch: month arrows, bigger tap targets, failure message, no scroll hint, token colors
+- [x] Auth: password reset pages rebuilt + clear errors + back link; branded reset email; password min 8 + hint + show/hide toggle; rate limits on registration/join; clearer reset-sent copy and rate-limit copy; expired invite message
+- [x] Settings: "category" wording, Hide/Show, "Delete household" with type-to-confirm, budget input `ui.input`, envelope edit position/active confirm, blank budget validation, help text
+- [x] Invitations: copy link button, expiry note, revoke confirm, empty state
+- [x] Push prompt copy without hard-coded names
+- [x] Branded 404 / 422 / 500
+- [x] "category" everywhere users see "envelope"
+
+### Verify
+- [x] Specs green (except pre-existing meal_plans failures), rubocop, brakeman
+- [x] Live check at 390px as member and owner
+
+### Review
+- Specs: 331 examples, 0 failures (was 231 with 9 pre-existing meal-plan failures). System suite passed 3 of 3 runs after making the documented Chrome 146 workaround global in `spec/support/capybara.rb` (JS click + value entry; Capybara still finds elements normally).
+- Rubocop clean (incl. the 2 old `debt.rb` offenses). Brakeman: only the Ruby 3.2.2 EOL warning.
+- Live at 390px: History delete + Undo with a real click (restores same person, date, note and timestamp), nav highlights one tab, Debts, Lunch (no sideways scroll), Meals groceries figure from this household, sign-in, password reset, Settings, Invitations.
+- Migration added: `debt_payments.balance_before` (run in dev and test).
+- Follow-ups for the owner: set `MAILER_FROM` and configure SMTP in production (reset emails can't send today; `production.rb` SMTP is commented out). Ruby 3.2 is past end of life.
+
+---
+
+# Instant expense logging redesign — 2026-11-05
+
+Goal: logging a purchase is three taps (category → amount → Save) for every kind of user. Audit: [heuristics-audit.md](heuristics-audit.md).
+
+- [x] Session idle timeout 24h → 60 days (`Session::IDLE_TIMEOUT`)
+- [x] Tokens: trust-blue accent, sans display font, clearer semantic colors, 16px inputs
+- [x] `EnvelopeRowComponent` (replaces card + pip `EmojiComponent`)
+- [x] Dashboard: month summary, "Tap a category" hint, rows, Recent activity, prev/next month
+- [x] Inline logger sheet + `logger` Stimulus controller (keypad, Today/Yesterday/Other, note, live "after" balance)
+- [x] Turbo stream create/destroy: replace row, recent list, toast with Undo
+- [x] `Expense#deletable_by?` — owner, current month, or own expense < 15 min
+- [x] Layout: sign-out icon, nav labels, header only when signed in
+- [x] Specs updated; full suite + rubocop green; verified in browser at 390px
+
+### Review
+- Path to log a purchase: tap category → keypad → Save (Enter works on desktop). Sheet is in-page, no fetch to open.
+- Verified live at 390px and desktop: save, live "left after this", toast + Undo, inline server error, past-month read-only view.
+- Specs: 231 examples. The only 9 failures (meal plan + shopping list) fail identically on untouched HEAD (Chrome 146 headless + meal planner request specs).
+- Rubocop: 2 existing offenses in `app/models/debt.rb` (untouched). Brakeman: only the Ruby 3.2 EOL notice.
+- Follow-ups noticed, not changed: `ApplicationHelper#current_groceries_remaining` isn't account-scoped; debts show "22.990%% APR".
+
+
+---
+
 # Clempo Rebrand (visual-only)
 
 Visual rebrand from Ramsey → Clempo on branch `redesign`. No module rename, no DB / Kamal changes, no env-var renames. User-visible strings + visual system only.

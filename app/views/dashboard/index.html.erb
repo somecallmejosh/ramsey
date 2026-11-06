@@ -1,57 +1,78 @@
-<%= render PageHeadingComponent.new(current_user: current_user, selected_date: @selected_date) %>
+<% content_for :title, "Budget · Clempo" %>
 
-<%# Month selector %>
-<div class="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide" role="navigation" aria-label="Month navigation">
-  <% 0.upto(6) do |n| %>
-    <% d = Date.current.beginning_of_month - n.months %>
-    <% is_current = d.month == @month && d.year == @year %>
-    <%= link_to "#{d.strftime("%b")} #{d.year != Date.current.year ? d.year : ""}".strip,
-          dashboard_path(year: d.year, month: d.month),
-          class: "flex-none px-4 py-2 rounded-full font-sans font-medium text-[13px] whitespace-nowrap transition-colors #{is_current ? "bg-accent text-porcelain" : "bg-porcelain text-graphite border border-border hover:border-accent"}" %>
-  <% end %>
-</div>
+<div class="max-w-lg mx-auto"
+     data-controller="logger"
+     data-logger-today-value="<%= Date.current.iso8601 %>"
+     data-logger-yesterday-value="<%= Date.yesterday.iso8601 %>">
 
-<%# Envelope cards %>
-<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-  <% @envelopes.each do |envelope| %>
-    <%= render EnvelopeCardComponent.new(
-          envelope:     envelope,
-          budget:       @budgets[envelope.id] || 0,
-          spent:        @totals[envelope.id]  || 0,
-          current_user: current_user,
-          year:         @year,
-          month:        @month) %>
-  <% end %>
+  <%= render "dashboard/summary", budget_month: @budget_month %>
 
-  <% if @envelopes.empty? %>
-    <div class="<%= ui.card %> text-center py-12">
-      <p class="<%= ui.label(:secondary) %>">No envelopes yet.</p>
-      <% if current_user&.owner? %>
-        <%= link_to "Add your first envelope", new_envelope_path, class: "#{ui.button(:primary)} mt-4 inline-block" %>
+  <% if @budget_month.envelopes.any? %>
+    <div class="flex items-end justify-between gap-3 mb-3 px-1 rise" style="--i: 2">
+      <div>
+        <h2 class="text-[20px] font-bold tracking-[-0.015em] text-ink">Categories</h2>
+        <p class="text-[14px] text-graphite">
+          <% if @budget_month.current? %>
+            Tap <span class="inline-grid place-items-center w-5 h-5 align-[-4px] rounded-full bg-ink text-surface" aria-hidden="true"><%= icon "plus", classes: "w-3 h-3" %></span><span class="sr-only">plus</span> to log a purchase. Tap a category to see its spending.
+          <% else %>
+            Tap a category to see what was spent.
+          <% end %>
+        </p>
+      </div>
+    </div>
+    <ul class="panel p-1 rise" style="--i: 3">
+      <% @budget_month.envelopes.each do |envelope| %>
+        <%= render EnvelopeRowComponent.new(envelope: envelope, budget_month: @budget_month) %>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="<%= ui.card %> text-center py-10">
+      <p class="text-[17px] font-semibold text-ink">No categories yet</p>
+      <% if current_user.owner? %>
+        <p class="<%= ui.label(:secondary) %> mt-1 mb-5">Add one (like Groceries or Gas) and give it a monthly budget.</p>
+        <%= link_to "Add a category", new_envelope_path, class: ui.button(:primary) %>
+      <% else %>
+        <p class="<%= ui.label(:secondary) %> mt-1">Ask the account owner to set up categories. They'll show up here.</p>
       <% end %>
     </div>
   <% end %>
+
+  <%= render "dashboard/recent", budget_month: @budget_month %>
+
+  <% if @snowball_target %>
+    <section class="mt-8 rise" style="--i: 5" aria-labelledby="snowball-heading">
+      <div class="flex items-baseline justify-between mb-2 px-1">
+        <h2 id="snowball-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink">Debts</h2>
+        <%= link_to "See all debts", debts_path, class: ui.link(:subtle) %>
+      </div>
+      <%= link_to debts_path, class: "press block panel px-5 py-4 hover:shadow-[var(--shadow-2)]" do %>
+        <div class="flex items-center gap-3">
+          <span class="grid place-items-center w-10 h-10 rounded-full bg-sky text-sky-ink shrink-0" aria-hidden="true">
+            <%= icon "flag-checkered", classes: "w-5 h-5" %>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] text-mute">Paying off now</p>
+            <p class="text-[16px] font-bold text-ink truncate"><%= @snowball_target.name %></p>
+          </div>
+          <p class="text-[17px] font-bold tabular-nums text-ink"><%= number_to_currency(@snowball_target.current_balance) %></p>
+        </div>
+        <div class="h-2 rounded-full bg-porcelain-3 overflow-hidden mt-4"
+             role="progressbar"
+             aria-label="<%= @snowball_target.name %> paid off"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="<%= @snowball_target.progress_pct %>"
+             aria-valuetext="<%= @snowball_target.progress_pct %>% paid off">
+          <div class="h-full rounded-full bg-accent" style="width: <%= @snowball_target.progress_pct %>%"></div>
+        </div>
+        <p class="text-[13px] text-mute mt-2 tabular-nums">
+          <%= @snowball_target.progress_pct %>% paid off · <%= number_to_currency(@total_snowball) %> total debt left
+        </p>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if @budget_month.current? && @budget_month.envelopes.any? %>
+    <%= render "dashboard/logger" %>
+  <% end %>
 </div>
-
-<%# Debt Snowball summary card %>
-<% if @snowball_target %>
-  <div class="<%= ui.card %> mt-6">
-    <div class="<%= ui.card_header %>">
-      <h2 class="<%= ui.subsection_heading %>">Debt Snowball</h2>
-      <%= link_to "View all", debts_path, class: ui.link(:subtle) %>
-    </div>
-
-    <p class="<%= ui.label(:meta) %> mb-1">Current target</p>
-    <p class="<%= ui.type(:body_strong) %>"><%= @snowball_target.name %></p>
-    <p class="<%= ui.stat_value %> mt-1"><%= number_to_currency(@snowball_target.current_balance) %></p>
-
-    <div class="h-2 rounded-full bg-border overflow-hidden mt-3 mb-1">
-      <div class="h-full rounded-full bg-accent" style="width: <%= @snowball_target.progress_pct %>%"></div>
-    </div>
-    <p class="<%= ui.label(:meta) %>"><%= @snowball_target.progress_pct %>% paid off</p>
-
-    <p class="<%= ui.label(:secondary) %> mt-3">
-      Total non-mortgage debt: <%= number_to_currency(@total_snowball) %>
-    </p>
-  </div>
-<% end %>

@@ -9,6 +9,6 @@ module RequireOwner
   private
 
   def require_owner_role
-    redirect_to root_path, alert: "Not authorized." unless current_user.owner?
+    redirect_to root_path, alert: "Only the household owner can do that." unless current_user.owner?
   end
 end

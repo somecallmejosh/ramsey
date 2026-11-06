@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "modal" do %>
-  <%= render ModalComponent.new(title: "Log Expense", id: "expense-modal", open: true) do |m| %>
+  <%= render ModalComponent.new(title: "Log a purchase", id: "expense-modal", open: true) do |m| %>
     <% m.with_body do %>
       <p class="<%= ui.label(:secondary) %> -mt-4 mb-6"><%= @envelope.name %></p>
       <%= render ExpenseFormComponent.new(expense: @expense, envelope: @envelope) %>

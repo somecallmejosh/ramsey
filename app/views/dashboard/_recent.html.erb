@@ -1,0 +1,35 @@
+<%# locals: (budget_month:) %>
+<section id="recent-expenses" aria-labelledby="recent-heading" class="mt-8 rise" style="--i: 4">
+  <% expenses = budget_month.recent_expenses %>
+  <h2 id="recent-heading" class="text-[20px] font-bold tracking-[-0.015em] text-ink mb-3 px-1">
+    <%= budget_month.current? ? "Recently logged" : "Last logged in #{budget_month.date.strftime("%B")}" %>
+  </h2>
+  <% if expenses.empty? %>
+    <p class="panel px-5 py-6 text-[15px] text-mute text-center">
+      <%= budget_month.current? ? "Nothing logged yet this month." : "Nothing was logged this month." %>
+    </p>
+  <% else %>
+    <ul class="panel p-1.5">
+      <% expenses.each do |expense| %>
+        <% look = CategoryLook.for(expense.envelope) %>
+        <li>
+          <%= link_to envelope_expenses_path(expense.envelope, year: budget_month.year, month: budget_month.month),
+                class: "flex items-center gap-3 px-3 py-2.5 rounded-[20px] transition-colors duration-200 hover:bg-porcelain-2 active:bg-porcelain-3" do %>
+            <span class="grid place-items-center w-10 h-10 rounded-full shrink-0 <%= look.tile %> <%= look.ink %>" aria-hidden="true">
+              <%= icon look.icon, classes: "w-5 h-5" %>
+            </span>
+            <span class="flex-1 min-w-0">
+              <span class="block text-[15px] font-bold text-ink truncate">
+                <%= expense.note.presence || expense.envelope.name %>
+              </span>
+              <span class="block text-[13px] text-mute truncate">
+                <%= expense.note.present? ? "#{expense.envelope.name} · " : "" %><%= expense.user.display_name %> · <%= friendly_day(expense.transacted_on) %>
+              </span>
+            </span>
+            <span class="text-[15px] font-bold text-ink tabular-nums">−<%= number_to_currency(expense.amount) %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

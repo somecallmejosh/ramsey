@@ -1,23 +1,28 @@
-<div id="day_<%= date.to_s %>" class="p-2 <% if Date.current == date %> bg-accent/10<% elsif date.month != @month %> bg-neutral-100<% end %>">
-  <div class="text-center">
-    <p class="text-xs lg:mb-1"><%= date.strftime("%a") %></p>
-    <p class="font-serif lg:text-2xl lg:mb-1"><%= date.day %></p>
-    <% if date > Date.current %>
-      <div class="h-7"></div>
-    <% elsif log %>
-      <%= button_to lunch_log_path(log), method: :delete,
-            class: "inline-flex py-px px-1 lg:px-1.5 rounded-lg bg-accent text-porcelain text-xs font-semibold transition-colors",
-            aria: { label: "Unlog #{date.strftime("%b %-d")}" } do %>
-        Packed
-      <% end %>
-    <% else %>
-      <div>
-        <%= button_to lunch_logs_path(logged_on: date.to_s), method: :post,
-              class: "inline-flex py-px px-1 lg:px-1.5 rounded-lg border border-border text-mute text-xs transition-colors hover:border-accent",
-              aria: { label: "Log packed lunch for #{date.strftime("%b %-d")}" } do %>
-          Log
-        <% end %>
-      </div>
+<%# One weekday in the lunch calendar. The whole tile is the button.
+    Only past days of the shown month can be logged. %>
+<%# locals: (date:, log:, month:) %>
+<% today    = date == Date.current %>
+<% in_month = date.month == month %>
+<% loggable = in_month && date <= Date.current %>
+<% tile     = "press w-full h-[68px] rounded-[18px] flex flex-col items-center justify-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2" %>
+<div id="day_<%= date.to_s %>" class="min-w-0" <%= "aria-current=date" if today %>>
+  <% if !loggable %>
+    <div class="h-[68px] rounded-[18px] flex flex-col items-center justify-center <%= in_month ? "text-mute" : "text-silver" %>">
+      <span class="text-[15px] font-semibold tabular-nums"><%= date.day %></span>
+    </div>
+  <% elsif log %>
+    <%= button_to lunch_log_path(log), method: :delete,
+          class: "#{tile} bg-ink text-surface shadow-[0_8px_18px_-8px_oklch(0.2_0.02_265/0.6)]",
+          aria: { label: "Packed lunch on #{date.strftime("%b %-d")}. Tap to undo." } do %>
+      <span class="text-[15px] font-bold tabular-nums"><%= date.day %></span>
+      <span class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-sage-bright"><%= icon "check", classes: "w-3 h-3" %>Packed</span>
     <% end %>
-  </div>
+  <% else %>
+    <%= button_to lunch_logs_path(logged_on: date.to_s), method: :post,
+          class: "#{tile} bg-porcelain-2 text-ink hover:bg-porcelain-3 #{"ring-2 ring-accent" if today}",
+          aria: { label: "Log packed lunch for #{date.strftime("%b %-d")}" } do %>
+      <span class="text-[15px] font-bold tabular-nums <%= "text-accent" if today %>"><%= date.day %></span>
+      <span class="text-[11px] font-semibold <%= today ? "text-accent" : "text-mute" %>"><%= today ? "Today" : "Log" %></span>
+    <% end %>
+  <% end %>
 </div>

@@ -1,7 +1,7 @@
 class EnvelopeBudgetsController < ApplicationController
   include RequireOwner
 
-  before_action :require_owner_role, only: [ :update ]
+  before_action :require_owner_role, only: [ :edit, :update ]
   before_action :set_envelope_budget
 
   def edit
@@ -9,7 +9,7 @@ class EnvelopeBudgetsController < ApplicationController
 
   def update
     if @envelope_budget.update(envelope_budget_params)
-      redirect_to admin_settings_path, notice: "Budget updated."
+      redirect_to admin_settings_path, notice: "Saved the #{@envelope_budget.envelope.name} budget."
     else
       render :edit, status: :unprocessable_entity
     end

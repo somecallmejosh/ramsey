@@ -11,6 +11,16 @@ RSpec.describe User, type: :model do
   describe "validations" do
     it { should validate_presence_of(:email_address) }
     it { should have_secure_password }
+
+    it "requires passwords to be at least 8 characters" do
+      expect(build(:user, password: "short12", password_confirmation: "short12")).not_to be_valid
+      expect(build(:user, password: "longer12", password_confirmation: "longer12")).to be_valid
+    end
+
+    it "does not require a password when updating other fields" do
+      user = create(:user)
+      expect(User.find(user.id).update(email_address: "changed@example.com")).to be true
+    end
   end
 
   describe "role enum" do

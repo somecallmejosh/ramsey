@@ -1,57 +1,79 @@
 <%= form_with model: [:admin, debt], class: "space-y-6" do |f| %>
-  <% if debt.errors.any? %>
-    <div class="<%= ui.warning_banner %>">
-      <%= icon "info", classes: "w-5 h-5 flex-none text-claret" %>
-      <span><%= debt.errors.full_messages.first %></span>
-    </div>
-  <% end %>
+  <%= render FormErrorsComponent.new(record: debt) %>
+  <% error_for = ->(attr) { debt.errors.full_messages_for(attr).first } %>
+  <% input_class = ->(attr) { "#{ui.input(error_for.(attr) ? :error : :default)} mt-1" } %>
+  <% aria_for = ->(attr, hint: nil) {
+       { invalid: error_for.(attr).present?,
+         describedby: [ ("debt_#{attr}_error" if error_for.(attr)), hint ].compact.join(" ").presence }
+     } %>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
     <div class="sm:col-span-2">
       <%= f.label :name, class: ui.label %>
-      <%= f.text_field :name, class: "#{ui.input} mt-1", placeholder: "e.g. Chase Personal Loan", required: true %>
+      <%= f.text_field :name, class: input_class.(:name), placeholder: "e.g. Chase Personal Loan",
+            required: true, aria: aria_for.(:name) %>
+      <% if error_for.(:name) %>
+        <p id="debt_name_error" class="<%= ui.field_error %>"><%= error_for.(:name) %></p>
+      <% end %>
     </div>
 
-    <div>
+    <div class="sm:col-span-2">
       <%= f.label :debt_type, "Type", class: ui.label %>
       <%= f.select :debt_type,
-            Debt.debt_types.keys.map { |k| [k.humanize.titleize, k] },
+            Debt.debt_types.keys.map { |k| [ k.humanize.titleize, k ] },
             { prompt: "Select type" },
-            class: "#{ui.input} mt-1", required: true %>
+            class: input_class.(:debt_type), required: true, aria: aria_for.(:debt_type) %>
+      <% if error_for.(:debt_type) %>
+        <p id="debt_debt_type_error" class="<%= ui.field_error %>"><%= error_for.(:debt_type) %></p>
+      <% end %>
     </div>
 
     <div>
-      <%= f.label :position, "Snowball order", class: ui.label %>
-      <%= f.number_field :position, min: "1", class: "#{ui.input} mt-1", required: true %>
-      <p class="<%= ui.type(:small, extra: "text-mute mt-1") %>">1 = current target.</p>
-    </div>
-
-    <div>
-      <%= f.label :original_balance, "Original balance", class: ui.label %>
-      <%= f.number_field :original_balance, step: "0.01", min: "0",
-            class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+      <%= f.label :original_balance, "Starting balance", class: ui.label %>
+      <%= f.number_field :original_balance, step: "0.01", min: "0", inputmode: "decimal",
+            class: input_class.(:original_balance), placeholder: "0.00", required: true,
+            aria: aria_for.(:original_balance, hint: "debt_original_balance_hint") %>
+      <% if error_for.(:original_balance) %>
+        <p id="debt_original_balance_error" class="<%= ui.field_error %>"><%= error_for.(:original_balance) %></p>
+      <% end %>
+      <p id="debt_original_balance_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">What you owed when you started tracking it.</p>
     </div>
 
     <div>
       <%= f.label :current_balance, "Current balance", class: ui.label %>
-      <%= f.number_field :current_balance, step: "0.01", min: "0",
-            class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+      <%= f.number_field :current_balance, step: "0.01", min: "0", inputmode: "decimal",
+            class: input_class.(:current_balance), placeholder: "0.00", required: true,
+            aria: aria_for.(:current_balance, hint: "debt_current_balance_hint") %>
+      <% if error_for.(:current_balance) %>
+        <p id="debt_current_balance_error" class="<%= ui.field_error %>"><%= error_for.(:current_balance) %></p>
+      <% end %>
+      <p id="debt_current_balance_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Set to 0 to mark it paid off.</p>
     </div>
 
     <div>
       <%= f.label :minimum_payment, "Minimum monthly payment", class: ui.label %>
-      <%= f.number_field :minimum_payment, step: "0.01", min: "0",
-            class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+      <%= f.number_field :minimum_payment, step: "0.01", min: "0", inputmode: "decimal",
+            class: input_class.(:minimum_payment), placeholder: "0.00", required: true,
+            aria: aria_for.(:minimum_payment) %>
+      <% if error_for.(:minimum_payment) %>
+        <p id="debt_minimum_payment_error" class="<%= ui.field_error %>"><%= error_for.(:minimum_payment) %></p>
+      <% end %>
     </div>
 
     <div>
       <%= f.label :interest_rate, "Interest rate % (optional)", class: ui.label %>
-      <%= f.number_field :interest_rate, step: "0.001", min: "0",
-            class: "#{ui.input} mt-1", placeholder: "e.g. 6.25" %>
+      <%= f.number_field :interest_rate, step: "0.001", min: "0", inputmode: "decimal",
+            class: input_class.(:interest_rate), placeholder: "e.g. 6.25",
+            aria: aria_for.(:interest_rate) %>
+      <% if error_for.(:interest_rate) %>
+        <p id="debt_interest_rate_error" class="<%= ui.field_error %>"><%= error_for.(:interest_rate) %></p>
+      <% end %>
     </div>
   </div>
 
   <div class="pt-2 sm:flex">
-    <%= f.submit class: "#{ui.button(:primary)} w-full sm:w-auto" %>
+    <%= f.submit debt.new_record? ? "Add debt" : "Save changes",
+          class: "#{ui.button(:primary)} w-full sm:w-auto",
+          data: { turbo_submits_with: "Saving…" } %>
   </div>
 <% end %>

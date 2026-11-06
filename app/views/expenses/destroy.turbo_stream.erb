@@ -1,13 +1,11 @@
-<%# Remove the expense row immediately %>
-<%= turbo_stream.remove dom_id(@expense) %>
+<%= turbo_stream.replace "envelope-month", partial: "expenses/month", locals: { envelope_month: @envelope_month } %>
+<%= render "expenses/dashboard_refresh" %>
 
-<%# Update the envelope card after deletion %>
-<%= turbo_stream.replace "envelope_card_#{@envelope.id}" do %>
-  <%= render EnvelopeCardComponent.new(
-        envelope:     @envelope,
-        budget:       @envelope.budget_for(year: Date.current.year, month: Date.current.month),
-        spent:        @envelope.spent_in(year: Date.current.year, month: Date.current.month),
-        current_user: current_user,
-        year:         Date.current.year,
-        month:        Date.current.month) %>
+<%= turbo_stream.update "toasts" do %>
+  <%= render ToastComponent.new(
+        message: "Removed #{number_to_currency(@expense.amount)} from #{@envelope.name}",
+        undo_path: restore_envelope_expenses_path(@envelope),
+        undo_method: :post,
+        undo_params: { token: @expense.restore_token },
+        tone: :info) %>
 <% end %>

@@ -35,7 +35,7 @@ RSpec.describe AccountDataExportService do
       EnvelopeBudget.create!(envelope: envelope, year: 2026, month: 4, amount: 500)
       result = described_class.new(account: account).call
 
-      expect(result.csv).to include("Envelope Budgets")
+      expect(result.csv).to include("Monthly Budgets")
       expect(result.csv).to include("500.0")
     end
 
@@ -78,7 +78,7 @@ RSpec.describe AccountDataExportService do
     it "includes section headers" do
       result = described_class.new(account: account).call
 
-      %w[Users Envelopes Expenses Debts Meals].each do |section|
+      %w[Users Categories Purchases Debts Meals].each do |section|
         expect(result.csv).to include(section)
       end
     end

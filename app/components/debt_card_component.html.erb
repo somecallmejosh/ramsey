@@ -1,50 +1,75 @@
-<div class="<%= ui.stat_card %>">
-  <div class="<%= ui.card_header %>">
-    <div>
-      <h3 class="<%= ui.subsection_heading %>"><%= @debt.name %></h3>
-      <p class="<%= ui.type(:small) %>"><%= type_label %></p>
+<div class="panel p-5">
+  <div class="flex items-center gap-3">
+    <span class="grid place-items-center w-11 h-11 shrink-0 rounded-full <%= paid_off? ? "bg-mint text-mint-ink" : "bg-sky text-sky-ink" %>" aria-hidden="true">
+      <%= icon icon_name, classes: "w-5 h-5" %>
+    </span>
+    <div class="flex-1 min-w-0">
+      <h3 class="text-[16px] font-bold text-ink truncate"><%= @debt.name %></h3>
+      <p class="text-[13px] text-mute truncate"><%= type_label %></p>
     </div>
+  </div>
+
+  <div class="mt-4 flex items-center justify-between gap-2">
+    <p class="text-[13px] text-mute">Left to pay</p>
     <% if snowball_target? %>
-      <span class="<%= ui.badge(:accent) %>">Target</span>
+      <span class="<%= ui.badge(:accent) %>">Paying off next</span>
     <% end %>
     <% if paid_off? %>
       <span class="<%= ui.badge(:success) %>">Paid off</span>
     <% end %>
   </div>
+  <p class="text-[34px] leading-tight font-extrabold tracking-[-0.03em] tabular-nums text-ink"><%= helpers.money_with_cents(@debt.current_balance) %></p>
 
-  <p class="<%= ui.stat_value %> mt-2"><%= number_to_currency(@debt.current_balance) %></p>
-  <p class="<%= ui.label(:secondary) %>">
-    remaining
-    <% if @debt.interest_rate.present? %>
-      <span class="ml-2 opacity-60"><%= number_to_percentage(@debt.interest_rate, precision: 3).delete_suffix("0").delete_suffix(".") %>% APR</span>
-    <% end %>
-  </p>
-
-  <%# Progress bar %>
-  <div class="mt-3 mb-1">
-    <div class="h-2 rounded-full bg-border overflow-hidden">
-      <div class="h-full rounded-full bg-accent transition-all" style="width: <%= progress_bar_width %>"></div>
-    </div>
-    <p class="<%= ui.label(:meta) %> mt-1"><%= @debt.progress_pct %>% paid off</p>
+  <div class="mt-3 h-2.5 rounded-full bg-porcelain-2 overflow-hidden"
+       role="progressbar"
+       aria-label="<%= @debt.name %> paid off"
+       aria-valuemin="0"
+       aria-valuemax="100"
+       aria-valuenow="<%= @debt.progress_pct %>"
+       aria-valuetext="<%= @debt.progress_pct %>% paid off">
+    <div class="h-full rounded-full <%= paid_off? ? "bg-sage" : "bg-accent" %> transition-[width] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]" style="width: <%= progress_bar_width %>"></div>
   </div>
 
-  <p class="<%= ui.label(:secondary) %> mt-2">
-    Min. payment: <%= number_to_currency(@debt.minimum_payment) %>/mo
-  </p>
+  <div class="mt-3 flex flex-wrap gap-2 text-[13px]">
+    <span class="rounded-full bg-porcelain-2 px-3 py-1.5 font-semibold text-ink tabular-nums"><%= @debt.progress_pct %>% paid off</span>
+    <span class="rounded-full bg-porcelain-2 px-3 py-1.5 text-graphite tabular-nums"><%= number_to_currency(@debt.minimum_payment) %>/mo minimum</span>
+    <% if apr_label %>
+      <span class="rounded-full bg-porcelain-2 px-3 py-1.5 text-graphite tabular-nums"><%= apr_label %></span>
+    <% end %>
+  </div>
 
-  <div class="flex items-center justify-between mt-4">
+  <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
     <% unless paid_off? %>
       <%= link_to "Log payment",
             new_debt_debt_payment_path(@debt),
-            class: "#{ui.button(:primary, extra: "text-sm px-5 py-2")}",
+            class: ui.button(:primary, extra: "px-5"),
             data: { turbo_frame: "modal" } %>
     <% end %>
 
     <div class="flex items-center gap-3 ml-auto">
-      <%= link_to "History", debt_path(@debt), class: ui.link(:subtle) %>
+      <% if reorderable? %>
+        <% if @can_move_up %>
+          <%= button_to move_admin_debt_path(@debt, direction: "up"),
+                method: :patch,
+                class: "#{ui.link(:subtle)} inline-flex items-center gap-1 min-h-[44px] px-1",
+                aria: { label: "Move #{@debt.name} up (pay sooner)" } do %>
+            <%= icon "arrow-up", classes: "w-4 h-4" %> Move up
+          <% end %>
+        <% end %>
+        <% if @can_move_down %>
+          <%= button_to move_admin_debt_path(@debt, direction: "down"),
+                method: :patch,
+                class: "#{ui.link(:subtle)} inline-flex items-center gap-1 min-h-[44px] px-1",
+                aria: { label: "Move #{@debt.name} down (pay later)" } do %>
+            <%= icon "arrow-down", classes: "w-4 h-4" %> Move down
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= link_to "History", debt_path(@debt), class: "#{ui.link(:subtle)} font-semibold min-h-[44px] inline-flex items-center px-1" %>
 
       <% if owner? %>
-        <%= link_to "Edit", edit_admin_debt_path(@debt), class: ui.link(:subtle) %>
+        <%= link_to "Edit", edit_admin_debt_path(@debt), class: "#{ui.link(:subtle)} font-semibold min-h-[44px] inline-flex items-center px-1" %>
       <% end %>
     </div>
   </div>

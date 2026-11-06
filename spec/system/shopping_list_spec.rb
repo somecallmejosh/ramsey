@@ -55,7 +55,13 @@ RSpec.describe "Shopping list management", type: :system do
 
     find("button[aria-label='Remove Ground beef']").click
 
-    expect(page).not_to have_text("Ground beef", wait: 5)
+    within("#shopping-list") { expect(page).not_to have_text("Ground beef", wait: 5) }
+    expect(page).to have_text("Removed Ground beef")
     expect(ShoppingItem.find_by(name: "Ground beef")).to be_nil
+
+    click_button "Undo"
+
+    within("#shopping-list") { expect(page).to have_text("Ground beef", wait: 5) }
+    expect(ShoppingItem.find_by(name: "Ground beef")).to be_present
   end
 end

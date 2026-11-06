@@ -7,47 +7,63 @@
 @source "../../../app/helpers/**/*.rb";
 
 /* =============================================================
-   Clempo design tokens
-   Editorial, quiet-confident palette — porcelain/ink with amethyst
-   as the single jewel accent. Semantic pairs (sage / claret / gilt)
-   sit on a shared muted chroma so they read as annotations, not alerts.
+   Clempo design tokens — "soft structural"
+   Airy silver backdrop, white cards that float on diffuse shadows
+   (no hard borders), bold geometric numbers, one ink-black action
+   colour, and a pastel tint per category. Green / amber / red still
+   only ever mean "fine", "nearly spent", "over".
    ============================================================= */
 
 @theme {
-  /* ---- Fonts ---- */
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: 'Newsreader', 'Times New Roman', Georgia, serif;
-  --font-italic: 'Instrument Serif', Georgia, serif;
+  /* ---- Fonts ---- geometric grotesk with clear, even numerals */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* ---- Colors — Clempo neutrals (hue 260) ---- */
-  --color-porcelain: oklch(0.985 0.004 260);
-  --color-porcelain-2: oklch(0.965 0.005 260);
-  --color-porcelain-3: oklch(0.94 0.006 260);
-  --color-silver: oklch(0.88 0.008 260);
-  --color-line: oklch(0.92 0.006 260);
-  --color-mute: oklch(0.48 0.018 260);
-  --color-graphite: oklch(0.38 0.018 260);
-  --color-ink-2: oklch(0.28 0.02 260);
-  --color-ink: oklch(0.18 0.02 260);
-  --color-ink-deep: oklch(0.12 0.022 260);
+  /* ---- Neutrals (cool silver) ---- */
+  --color-surface: oklch(1 0 0);
+  --color-porcelain: oklch(0.955 0.006 265);
+  --color-porcelain-2: oklch(0.965 0.005 265);
+  --color-porcelain-3: oklch(0.93 0.008 265);
+  --color-silver: oklch(0.87 0.01 265);
+  --color-line: oklch(0.92 0.006 265);
+  --color-mute: oklch(0.52 0.016 265);
+  --color-graphite: oklch(0.42 0.018 265);
+  --color-ink-2: oklch(0.3 0.02 265);
+  --color-ink: oklch(0.2 0.02 265);
+  --color-ink-deep: oklch(0.14 0.02 265);
 
-  /* ---- Colors — Clempo accent (amethyst) ---- */
-  --color-accent: oklch(0.52 0.14 310);
-  --color-accent-soft: oklch(0.52 0.14 310 / 0.12);
-  --color-accent-ring: oklch(0.52 0.14 310 / 0.35);
+  /* ---- Action / link colour (calm indigo-blue) ---- */
+  --color-accent: oklch(0.5 0.17 268);
+  --color-accent-soft: oklch(0.5 0.17 268 / 0.1);
+  --color-accent-ring: oklch(0.5 0.17 268 / 0.35);
 
-  /* ---- Colors — Clempo semantic (shared chroma ~0.08) ---- */
-  --color-sage: oklch(0.62 0.08 160);
-  --color-sage-soft: oklch(0.62 0.08 160 / 0.12);
-  --color-claret: oklch(0.52 0.12 15);
-  --color-claret-soft: oklch(0.52 0.12 15 / 0.12);
-  --color-gilt: oklch(0.7 0.1 75);
-  --color-gilt-soft: oklch(0.7 0.1 75 / 0.14);
+  /* ---- Status ---- */
+  --color-sage: oklch(0.64 0.15 158);
+  --color-sage-bright: oklch(0.82 0.15 158);
+  --color-sage-soft: oklch(0.64 0.15 158 / 0.13);
+  --color-claret: oklch(0.6 0.2 22);
+  --color-claret-soft: oklch(0.6 0.2 22 / 0.1);
+  --color-gilt: oklch(0.78 0.15 72);
+  --color-gilt-soft: oklch(0.78 0.15 72 / 0.18);
+
+  /* ---- Category pastels (tile background / icon colour) ---- */
+  --color-mint: oklch(0.95 0.045 165);
+  --color-mint-ink: oklch(0.5 0.12 165);
+  --color-lilac: oklch(0.94 0.04 300);
+  --color-lilac-ink: oklch(0.5 0.15 300);
+  --color-sky: oklch(0.94 0.04 245);
+  --color-sky-ink: oklch(0.5 0.14 250);
+  --color-peach: oklch(0.95 0.045 60);
+  --color-peach-ink: oklch(0.56 0.14 50);
+  --color-rose: oklch(0.94 0.04 10);
+  --color-rose-ink: oklch(0.55 0.17 10);
+  --color-butter: oklch(0.96 0.06 98);
+  --color-butter-ink: oklch(0.52 0.11 85);
 
   /* ---- Semantic surface/text pairings ---- */
   --color-bg: var(--color-porcelain);
-  --color-bg-elev: var(--color-porcelain-2);
+  --color-bg-elev: var(--color-surface);
   --color-bg-inset: var(--color-porcelain-3);
   --color-fg: var(--color-ink);
   --color-fg-2: var(--color-ink-2);
@@ -55,48 +71,99 @@
   --color-border: var(--color-line);
 
   /* ---- Radii ---- */
-  --radius-sm: 4px;   /* chips, inputs */
-  --radius-md: 10px;  /* cards, buttons, sheets */
-  --radius-lg: 16px;
-  --radius-xl: 20px;  /* modals, bottom sheets */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;   /* cards */
+  --radius-xl: 32px;   /* hero shells, sheets */
   --radius-full: 9999px;
 
-  /* ---- Shadows (stacked pair, cool undertone) ---- */
+  /* ---- Shadows: wide, faint, cool — light falling on paper ---- */
   --shadow-1:
-    0 1px 2px oklch(0.18 0.02 260 / 0.04),
-    0 8px 24px oklch(0.18 0.02 260 / 0.06);
+    0 1px 2px oklch(0.25 0.03 265 / 0.04),
+    0 12px 32px -8px oklch(0.25 0.03 265 / 0.1);
   --shadow-2:
-    0 2px 4px oklch(0.18 0.02 260 / 0.05),
-    0 18px 40px oklch(0.18 0.02 260 / 0.1);
+    0 2px 6px oklch(0.25 0.03 265 / 0.05),
+    0 24px 56px -12px oklch(0.25 0.03 265 / 0.18);
   --shadow-card: var(--shadow-1);
 
-  /* ---- Motion ---- */
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --duration-fast: 180ms;
-  --duration-med: 240ms;
-  --duration-slow: 400ms;
+  /* ---- Motion: soft spring settle ---- */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 200ms;
+  --duration-med: 320ms;
+  --duration-slow: 700ms;
 
-  /* ---- Type scale markers (used via arbitrary values) ---- */
-  --text-preset-1: 56px;  /* num-hero */
-  --text-preset-3: 32px;  /* h1 */
-  --text-preset-7: 15px;  /* body */
-  --text-preset-8: 13px;  /* small */
-
-  /* ---- Tracking ---- */
-  --tracking-tight: -0.02em;
+  --tracking-tight: -0.025em;
   --tracking-caps: 0.12em;
 }
 
-/* Page background — flat porcelain */
+/* Page background: silver with two faint glows, pinned so it never repaints on scroll. */
 body {
   background: var(--color-bg);
   min-height: 100dvh;
   font-family: var(--font-sans);
   color: var(--color-fg);
-  font-feature-settings: 'ss01', 'cv11', 'tnum';
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 110% -10%, oklch(0.9 0.05 300 / 0.55), transparent 60%),
+    radial-gradient(50rem 36rem at -20% 110%, oklch(0.93 0.05 170 / 0.6), transparent 60%);
+}
+
+/* A white card floating on a soft shadow. */
+@utility panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+/* Hero "double bezel": a frosted tray holding a white plate. */
+@utility shell {
+  padding: 6px;
+  border-radius: var(--radius-xl);
+  background: oklch(1 0 0 / 0.55);
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.9), var(--shadow-1);
+}
+
+@utility shell-core {
+  background: var(--color-surface);
+  border-radius: calc(var(--radius-xl) - 6px);
+  box-shadow: inset 0 1px 0 oklch(1 0 0), 0 1px 2px oklch(0.25 0.03 265 / 0.05);
+}
+
+/* Small cents next to big numbers: $315<span class="cents">.01</span> */
+.cents {
+  font-size: 0.55em;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--color-mute);
+  vertical-align: 0.6em;
+  margin-left: 0.04em;
+}
+
+/* Gentle fade-up as a page settles; stagger with style="--i: n". */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.rise {
+  animation: rise var(--duration-slow) var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Physical press on anything tappable that opts in. */
+.press {
+  transition: transform var(--duration-fast) var(--ease), background-color var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease);
+}
+.press:active { transform: scale(0.97); }
 
 /* Tabular numerics on monetary values */
 .num,
@@ -118,6 +185,79 @@ body {
 
 @utility animate-modal-in {
   animation: modal-in var(--duration-med, 240ms) var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) both;
+}
+
+/* Toast entrance — rises from the nav. */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-toast-in {
+  animation: toast-in var(--duration-med) var(--ease) both;
+}
+
+/* -------------------------------------------------------------
+   Log-a-purchase sheet (native <dialog>)
+   Bottom sheet on phones, centered card on wider screens.
+   ------------------------------------------------------------- */
+.logger-sheet {
+  width: 100%;
+  max-width: 28rem;
+  max-height: 100dvh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 32px 32px 0 0;
+  box-shadow: var(--shadow-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.logger-sheet[open] {
+  animation: sheet-in var(--duration-med) var(--ease) both;
+}
+
+.logger-sheet::backdrop {
+  background: oklch(0.2 0.02 265 / 0.35);
+  backdrop-filter: blur(6px);
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(48px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (min-width: 640px) {
+  .logger-sheet {
+    margin: auto;
+    border-radius: 32px;
+  }
+}
+
+.logger-key {
+  min-height: 56px;
+  border-radius: 18px;
+  background: var(--color-porcelain-2);
+  color: var(--color-ink);
+  font-size: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: background-color var(--duration-fast) var(--ease), transform var(--duration-fast) var(--ease);
+}
+
+.logger-key:hover { background: var(--color-porcelain-3); }
+.logger-key:active { background: var(--color-silver); transform: scale(0.95); }
+.logger-key:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+@media (max-height: 700px) {
+  .logger-key { min-height: 48px; font-size: 22px; }
 }
 
 /* Respect reduced motion */

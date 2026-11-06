@@ -16,4 +16,9 @@ class User < ApplicationRecord
   scope :owner, -> { where(role: :owner) }
 
   validates :email_address, presence: true, uniqueness: true
+  validates :password, length: { minimum: 8 }, allow_nil: true
+
+  def display_name
+    email_address.split("@").first.capitalize
+  end
 end

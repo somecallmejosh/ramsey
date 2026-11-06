@@ -1,1 +1,18 @@
-<%= turbo_stream.remove "shopping_item_#{@shopping_item.id}" %>
+<%# Re-render the whole list so the total and empty state stay correct. %>
+<%= turbo_stream.replace "shopping-list" do %>
+  <%= render "meal_plans/shopping_list", meal_plan: @meal_plan %>
+<% end %>
+
+<%= turbo_stream.update "toasts" do %>
+  <%= render ToastComponent.new(
+        message:   "Removed #{@shopping_item.name}",
+        undo_path:   restore_shopping_items_path,
+        undo_method: :post,
+        undo_params: {
+          meal_plan_id:   @meal_plan.id,
+          name:           @shopping_item.name,
+          quantity:       @shopping_item.quantity,
+          store:          @shopping_item.store,
+          estimated_cost: @shopping_item.estimated_cost
+        }.compact) %>
+<% end %>

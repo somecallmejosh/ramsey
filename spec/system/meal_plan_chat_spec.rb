@@ -36,6 +36,7 @@ RSpec.describe "Meal plan chat journey", type: :system do
 
   it "Sally views the chat form" do
     click_link "Meals"
+    click_link "New plan"
     expect(page).to have_text("Meal Planner")
     expect(page).to have_field("What are you working with this week?")
     expect(page).to have_button("Generate meal plan")
@@ -43,14 +44,14 @@ RSpec.describe "Meal plan chat journey", type: :system do
 
   context "with an AI-generated preview already stored" do
     let!(:draft_plan) do
-      create(:meal_plan, user: sally, ai_response: ai_response)
+      create(:meal_plan, user: sally, ai_response: ai_response, status: "ready")
     end
 
     it "Sally reviews the preview, edits a dinner, and confirms it" do
       visit meal_plan_path(draft_plan)
 
       # Preview is visible with editable fields
-      expect(page).to have_text("Review Your Plan")
+      expect(page).to have_text("Review your plan")
       expect(page).to have_field("meals[0][dinner]", with: "Roast Chicken")
 
       # Edit one dinner
@@ -60,7 +61,7 @@ RSpec.describe "Meal plan chat journey", type: :system do
       click_button "Confirm plan"
 
       # Confirmed plan view shows the updated meal
-      expect(page).to have_text("This Week")
+      expect(page).to have_text("This week")
       expect(page).to have_text("Lemon Herb Chicken")
       expect(page).to have_text("Ground beef")
     end

@@ -1,57 +1,44 @@
-<div class="min-h-screen flex items-center justify-center px-4">
+<% user_errors = ->(attr) { @user ? @user.errors.full_messages_for(attr) : [] } %>
+<div class="flex items-center justify-center">
   <div class="w-full max-w-sm">
 
-    <div class="text-center mb-8">
-      <h1 class="<%= ui.page_heading %>">Clempo</h1>
-      <p class="<%= ui.label(:secondary) %> mt-2">Join <%= @invitation.account.name %></p>
+    <div class="mt-8 mb-4">
+      <%= image_tag "logos/logo.svg", class: "h-16 w-auto", alt: "Clempo" %>
+      <h1 class="<%= ui.section_heading(extra: "mt-4") %>">Join <%= @invitation.account.name %></h1>
+      <p class="<%= ui.label(:secondary) %> mt-1">You've been invited to share a budget on Clempo. Pick the email and password you'll sign in with.</p>
     </div>
 
-    <% if flash[:alert].present? %>
-      <div class="<%= ui.warning_banner %> mb-4" role="alert">
-        <%= flash[:alert] %>
-      </div>
-    <% end %>
-
     <div class="<%= ui.card %>">
-      <%= form_with url: accept_invitation_path(token: @invitation.token), data: { turbo: false } do |f| %>
+      <%= form_with url: accept_invitation_path(token: @invitation.token), data: { turbo: false, controller: "submit-feedback", action: "submit->submit-feedback#busy" } do |f| %>
 
-        <div class="mb-4">
-          <label for="email_address" class="<%= ui.label %> block mb-1">Email address</label>
-          <%= f.email_field :email_address,
-                id: "email_address",
-                required: true,
-                autofocus: true,
-                autocomplete: "email",
-                placeholder: "you@example.com",
-                value: params[:email_address],
-                class: ui.input %>
-        </div>
+        <%= render FormErrorsComponent.new(record: @user) %>
 
-        <div class="mb-4">
-          <label for="password" class="<%= ui.label %> block mb-1">Password</label>
-          <%= f.password_field :password,
-                id: "password",
-                required: true,
-                autocomplete: "new-password",
-                maxlength: 72,
-                class: ui.input %>
-        </div>
+        <%= render "shared/text_field",
+              f: f, type: :email_field, field: :email_address, label: "Email address",
+              errors: user_errors.(:email_address),
+              required: true,
+              autofocus: true,
+              autocomplete: "email",
+              placeholder: "you@example.com",
+              value: params[:email_address] %>
 
-        <div class="mb-6">
-          <label for="password_confirmation" class="<%= ui.label %> block mb-1">Confirm password</label>
-          <%= f.password_field :password_confirmation,
-                id: "password_confirmation",
-                required: true,
-                autocomplete: "new-password",
-                maxlength: 72,
-                class: ui.input %>
-        </div>
+        <%= render "shared/password_field",
+              f: f, field: :password, label: "Password",
+              autocomplete: "new-password",
+              hint: "At least 8 characters",
+              errors: user_errors.(:password) %>
 
-        <%= f.submit "Join account", class: "#{ui.button(:primary)} w-full" %>
+        <%= render "shared/password_field",
+              f: f, field: :password_confirmation, label: "Confirm password",
+              autocomplete: "new-password",
+              errors: user_errors.(:password_confirmation),
+              wrapper_class: "mb-6" %>
+
+        <%= f.submit "Join account", class: "#{ui.button(:primary)} w-full", data: { turbo_submits_with: "Creating account…" } %>
 
       <% end %>
 
-      <div class="mt-4 text-center">
+      <div class="mt-4">
         <%= link_to "Already have an account? Sign in", new_session_path, class: ui.link(:subtle) %>
       </div>
     </div>

@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe "Log expense journey", type: :system do
+RSpec.describe "Log a purchase", type: :system do
   let(:account)  { create(:account) }
   let(:sally)    { create(:user, account: account, email_address: "sally@test.com", password: "password123", password_confirmation: "password123") }
-  let(:envelope) { create(:envelope, account: account, name: "Groceries", position: 1) }
+  let!(:envelope) { create(:envelope, account: account, name: "Groceries", position: 1) }
 
   before do
     create(:envelope_budget, envelope: envelope, year: Date.current.year, month: Date.current.month, amount: 700)
@@ -14,30 +14,46 @@ RSpec.describe "Log expense journey", type: :system do
     expect(page).to have_current_path(root_path)
   end
 
-  it "shows the dashboard after sign in" do
-    expect(page).to have_current_path(root_path)
-    expect(page).to have_text("Groceries")
+  it "takes three taps: category, amount, Save — and can be undone" do
+    expect(page).to have_css("#row_envelope_#{envelope.id}", text: /\$700.00\s+left/)
+
+    find("button[aria-label^='Log a purchase in Groceries']").click
+    within("dialog[open]") do
+      expect(page).to have_text("Groceries")
+      %w[4 7 . 2 3].each { |key| tap_key(key) }
+      expect(page).to have_text("$652.77 left after this")
+      find_button("Save $47.23").click
+    end
+
+    expect(page).to have_no_css("dialog[open]")
+    expect(page).to have_text("Saved $47.23 to Groceries")
+    expect(page).to have_css("#row_envelope_#{envelope.id}", text: /\$652.77\s+left/)
+    within("#recent-expenses") { expect(page).to have_text("$47.23") }
+
+    find_button("Undo").click
+    expect(page).to have_text("Removed $47.23 from Groceries")
+    expect(page).to have_css("#row_envelope_#{envelope.id}", text: /\$700.00\s+left/)
+    expect(Expense.count).to eq(0)
   end
 
-  it "Sally logs an expense and the balance updates without a full page reload" do
-    # Confirm initial state
-    expect(page).to have_text("$700.00")
-    expect(page).to have_text("remaining")
+  it "accepts typing on a keyboard" do
+    find("button[aria-label^='Log a purchase in Groceries']").click
+    # Dispatch real keydown events at the sheet: headless Chrome 146 sometimes
+    # loses WebDriver keystrokes (see spec/support/capybara.rb).
+    press_keys find("dialog[open]"), *"12.5".chars, "Enter"
+    expect(page).to have_text("Saved $12.50 to Groceries")
+  end
 
-    # Click Log expense on the Groceries card
-    click_link "Log expense", match: :first
+  def press_keys(element, *keys)
+    keys.each do |key|
+      page.execute_script(<<~JS, element, key)
+        arguments[0].dispatchEvent(new KeyboardEvent("keydown", { key: arguments[1], bubbles: true, cancelable: true }))
+      JS
+    end
+  end
 
-    # The expense form loads in the Turbo Frame
-    expect(page).to have_text("Log Expense")
-    expect(page).to have_text("Groceries")
-
-    # Fill in the form (Chrome 146: use requestSubmit via JS after number-input JS set)
-    find("#expense_amount").set("47.23")
-    page.execute_script("document.querySelector('#expense_amount').form.requestSubmit()")
-
-    # Balance updates in the card via Turbo Stream — no full page reload
-    expect(page).to have_text("$652.77")
-    expect(page).to have_text("remaining")
+  def tap_key(key)
+    find(%([data-logger-key-param="#{key}"])).click
   end
 
   it "Sally cannot reach the settings page" do
@@ -45,8 +61,12 @@ RSpec.describe "Log expense journey", type: :system do
     expect(page).to have_current_path(root_path)
   end
 
-  it "shows the correct month on the dashboard" do
-    expect(page).to have_text("This Month")
-    expect(page).to have_text(Date.current.strftime("%b"))
+  it "shows the current month, labelled, with no way forward into the future" do
+    within("nav[aria-label='Choose month']") do
+      expect(page).to have_text(Date.current.strftime("%B %Y"))
+      expect(page).to have_text("This month")
+      expect(page).to have_link(href: dashboard_path(year: Date.current.prev_month.year, month: Date.current.prev_month.month))
+      expect(page).to have_css("[aria-disabled='true']", text: Date.current.next_month.strftime("%b"))
+    end
   end
 end

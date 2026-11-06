@@ -1,0 +1,61 @@
+<%# locals: (budget_month:) %>
+<section id="month-summary" aria-labelledby="month-heading" class="mb-7">
+  <div class="mb-4 rise">
+    <%= render "shared/month_switcher",
+          date: budget_month.date,
+          title: "Budget",
+          url: ->(d) { dashboard_path(year: d.year, month: d.month) } %>
+  </div>
+
+  <% if budget_month.total_budget.positive? %>
+    <% left  = budget_month.total_left %>
+    <% pct   = (budget_month.total_spent / budget_month.total_budget * 100).round %>
+    <% ring  = left.negative? ? "text-claret" : (pct >= 90 ? "text-gilt" : "text-sage") %>
+    <div class="shell rise" style="--i: 1">
+      <div class="shell-core p-5">
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-[14px] font-medium text-graphite">
+              <%= left.negative? ? "Over budget by" : (budget_month.current? ? "Left to spend" : "Left over") %>
+            </p>
+            <p class="mt-1 text-[44px] leading-none font-extrabold tracking-[-0.035em] tabular-nums <%= left.negative? ? "text-claret" : "text-ink" %>">
+              <%= money_with_cents(left) %>
+            </p>
+          </div>
+          <%= render RingComponent.new(percent: pct, size: 84, stroke: 8, color: ring,
+                label: "#{pct}% of this month's budget spent") do %>
+            <span class="text-[17px] font-bold tabular-nums text-ink"><%= [ pct, 999 ].min %>%</span>
+          <% end %>
+        </div>
+
+        <dl class="mt-5 grid grid-cols-2 gap-2">
+          <div class="flex items-center gap-2.5 rounded-[18px] bg-porcelain-2 pl-2.5 pr-2 py-2.5 min-w-0">
+            <span class="grid place-items-center w-8 h-8 shrink-0 rounded-full bg-rose text-rose-ink" aria-hidden="true">
+              <%= icon "arrow-up-right", classes: "w-4 h-4" %>
+            </span>
+            <div class="min-w-0">
+              <dt class="text-[12px] text-mute">Spent</dt>
+              <dd class="text-[14px] font-bold tabular-nums text-ink"><%= number_to_currency(budget_month.total_spent) %></dd>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5 rounded-[18px] bg-porcelain-2 pl-2.5 pr-2 py-2.5 min-w-0">
+            <span class="grid place-items-center w-8 h-8 shrink-0 rounded-full bg-mint text-mint-ink" aria-hidden="true">
+              <%= icon "wallet", classes: "w-4 h-4" %>
+            </span>
+            <div class="min-w-0">
+              <dt class="text-[12px] text-mute">Budget</dt>
+              <dd class="text-[14px] font-bold tabular-nums text-ink"><%= number_to_currency(budget_month.total_budget) %></dd>
+            </div>
+          </div>
+        </dl>
+      </div>
+    </div>
+  <% end %>
+
+  <% unless budget_month.current? %>
+    <p class="mt-4 text-[15px] text-graphite px-1">
+      You're looking at a past month.
+      <%= link_to "Back to #{Date.current.strftime("%B")}", root_path, class: ui.link %>
+    </p>
+  <% end %>
+</section>

@@ -1,0 +1,22 @@
+<% content_for :title, "Invite link expired" %>
+<div class="flex items-center justify-center">
+  <div class="w-full max-w-sm">
+
+    <div class="mt-8 mb-4">
+      <%= image_tag "logos/logo.svg", class: "h-16 w-auto", alt: "Clempo" %>
+    </div>
+
+    <div class="<%= ui.card %>">
+      <h1 class="<%= ui.subsection_heading %>">This invite link doesn't work anymore</h1>
+      <p class="<%= ui.label(:secondary) %> mt-2">
+        This invite link has expired or was already used. Ask the person who invited you to send a new one.
+      </p>
+
+      <div class="mt-6 flex flex-col items-start gap-3">
+        <%= link_to "Sign in", new_session_path, class: "#{ui.button(:primary)} block w-full text-center" %>
+        <p class="<%= ui.type(:small) %>">Already joined? Sign in with the email and password you chose.</p>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,21 +1,17 @@
-<%# Update the envelope card with new balance %>
-<%= turbo_stream.replace "envelope_card_#{@envelope.id}" do %>
-  <%= render EnvelopeCardComponent.new(
-        envelope:     @envelope,
-        budget:       @envelope.budget_for(year: Date.current.year, month: Date.current.month),
-        spent:        @envelope.spent_in(year: Date.current.year, month: Date.current.month),
-        current_user: current_user,
-        year:         Date.current.year,
-        month:        Date.current.month) %>
-<% end %>
+<%= render "expenses/dashboard_refresh" %>
 
-<%# Clear the modal frame %>
-<%= turbo_stream.update "modal", "" %>
-
-<%# Flash notice %>
-<%= turbo_stream.prepend "flash-messages" do %>
-  <div class="fixed top-4 right-4 z-50 bg-sage-soft border border-sage/30 text-ink text-[15px] px-4 py-3 rounded-[10px] shadow-[var(--shadow-1)]"
-       role="status">
-    Expense logged.
-  </div>
+<%
+  budget = @budget_month.budget_for(@envelope)
+  left   = budget - @budget_month.spent_for(@envelope)
+  detail = []
+  detail << friendly_day(@expense.transacted_on) unless @expense.transacted_on == Date.current
+  if budget.positive? && !@expense.prior_month?
+    detail << (left.negative? ? "#{number_to_currency(left.abs)} over budget" : "#{number_to_currency(left)} left")
+  end
+%>
+<%= turbo_stream.update "toasts" do %>
+  <%= render ToastComponent.new(
+        message:   "Saved #{number_to_currency(@expense.amount)} to #{@envelope.name}",
+        detail:    detail.join(" · ").presence,
+        undo_path: envelope_expense_path(@envelope, @expense)) %>
 <% end %>

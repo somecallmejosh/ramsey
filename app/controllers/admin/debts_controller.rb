@@ -3,7 +3,7 @@ module Admin
     include RequireOwner
 
     before_action :require_owner_role
-    before_action :set_debt, only: [ :edit, :update ]
+    before_action :set_debt, only: [ :edit, :update, :move ]
 
     def new
       @debt = current_account.debts.build
@@ -30,6 +30,11 @@ module Admin
       end
     end
 
+    def move
+      @debt.move!(params[:direction] == "up" ? :up : :down)
+      redirect_to debts_path
+    end
+
     private
 
     def set_debt
@@ -39,7 +44,7 @@ module Admin
     def debt_params
       params.require(:debt).permit(
         :name, :debt_type, :original_balance, :current_balance,
-        :minimum_payment, :interest_rate, :position
+        :minimum_payment, :interest_rate
       )
     end
   end

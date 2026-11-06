@@ -3,21 +3,7 @@ class ExpensesController < ApplicationController
   before_action :set_expense, only: [ :destroy ]
 
   def index
-    @year  = (params[:year]  || Date.current.year).to_i
-    @month = (params[:month] || Date.current.month).to_i
-    @selected_date = Date.new(@year, @month)
-    @expenses = @envelope.expenses
-      .for_month(@year, @month)
-      .includes(:user)
-      .order(transacted_on: :desc, created_at: :desc)
-    @budget = EnvelopeBudget.find_by(envelope: @envelope, year: @year, month: @month)
-    @weekly_spend = WeeklySpendQuery.new(@envelope).for_month(@year, @month)
-    @weekly_target = if @budget
-      weeks_in_month = ((@selected_date.end_of_month - @selected_date.beginning_of_month).to_f / 7).ceil
-      (@budget.amount / weeks_in_month).round(2)
-    else
-      0
-    end
+    @envelope_month = EnvelopeMonth.new(@envelope, requested_month)
   end
 
   def new
@@ -30,23 +16,44 @@ class ExpensesController < ApplicationController
 
     if @expense.save
       respond_to do |format|
-        format.html { redirect_to root_path, notice: "Expense logged." }
-        format.turbo_stream
+        format.html { redirect_to root_path, notice: "Saved #{helpers.number_to_currency(@expense.amount)} to #{@envelope.name}." }
+        format.turbo_stream { @budget_month = BudgetMonth.new(current_account) }
       end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :create_failed, status: :unprocessable_entity }
+      end
     end
   end
 
   def destroy
-    if can_delete?
-      @expense.destroy
+    unless can_delete?
+      return redirect_to envelope_expenses_path(@envelope),
+        alert: "Only the household owner can remove purchases from past months."
+    end
+
+    @expense.destroy
+    respond_to do |format|
+      format.html do
+        redirect_to envelope_expenses_path(@envelope, year: @expense.transacted_on.year, month: @expense.transacted_on.month),
+          notice: "Removed #{helpers.number_to_currency(@expense.amount)} from #{@envelope.name}."
+      end
+      format.turbo_stream { refresh_for(@expense) }
+    end
+  end
+
+  # Undo for a delete: puts the purchase back exactly as it was.
+  def restore
+    @expense = Expense.restore_from(params[:token], envelope: @envelope)
+
+    if @expense&.persisted?
       respond_to do |format|
-        format.html { redirect_to root_path, notice: "Expense deleted." }
-        format.turbo_stream
+        format.html { redirect_to envelope_expenses_path(@envelope), notice: "Put back #{helpers.number_to_currency(@expense.amount)}." }
+        format.turbo_stream { refresh_for(@expense) }
       end
     else
-      redirect_to root_path, alert: "Not authorized."
+      redirect_to envelope_expenses_path(@envelope), alert: "That purchase can't be put back any more. Log it again if you still need it."
     end
   end
 
@@ -64,8 +71,21 @@ class ExpensesController < ApplicationController
     params.require(:expense).permit(:amount, :note, :transacted_on)
   end
 
+  def requested_month
+    return Date.current unless params[:year] && params[:month]
+
+    date = Date.new(params[:year].to_i, params[:month].to_i.clamp(1, 12))
+    date > Date.current ? Date.current : date
+  rescue Date::Error
+    Date.current
+  end
+
+  def refresh_for(expense)
+    @budget_month   = BudgetMonth.new(current_account)
+    @envelope_month = EnvelopeMonth.new(@envelope, expense.transacted_on)
+  end
+
   def can_delete?
-    return true if current_user.owner?
-    !@expense.prior_month?
+    @expense.deletable_by?(current_user)
   end
 end

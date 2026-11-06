@@ -39,6 +39,27 @@ RSpec.describe "Envelopes", type: :request do
         expect(response).to have_http_status(:ok)
       end
 
+      it "POST /envelopes creates the category with this month's budget" do
+        expect {
+          post envelopes_path, params: { envelope: { name: "Gas" }, envelope_budget_amount: "150" }
+        }.to change(account.envelopes, :count).by(1)
+        expect(account.envelopes.find_by(name: "Gas").budget_for(year: Date.current.year, month: Date.current.month)).to eq(150)
+        expect(response).to redirect_to(admin_settings_path)
+      end
+
+      it "POST /envelopes with blanks shows both errors and keeps the amount typed" do
+        post envelopes_path, params: { envelope: { name: "" }, envelope_budget_amount: "" }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("Name can&#39;t be blank")
+        expect(response.body).to include("Monthly budget can&#39;t be blank")
+      end
+
+      it "PATCH /envelopes/:id with a blank name shows the error" do
+        patch envelope_path(envelope), params: { envelope: { name: "" } }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("Name can&#39;t be blank")
+      end
+
       it "GET /envelopes/:id/edit is accessible" do
         create(:envelope_budget, envelope: envelope, year: Date.current.year, month: Date.current.month)
         get edit_envelope_path(envelope)

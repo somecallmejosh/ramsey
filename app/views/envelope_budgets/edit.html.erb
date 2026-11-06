@@ -1,28 +1,31 @@
-<div class="max-w-2xl mx-auto">
-<h1 class="<%= ui.page_heading %> mb-2">Edit Budget</h1>
-<p class="<%= ui.label(:secondary) %> mb-6">
-  <%= @envelope_budget.envelope.name %> — <%= Date::MONTHNAMES[@envelope_budget.month] %> <%= @envelope_budget.year %>
-</p>
+<% content_for :title, "Edit budget · Clempo" %>
+<% month_name = "#{Date::MONTHNAMES[@envelope_budget.month]} #{@envelope_budget.year}" %>
+<% amount_error = @envelope_budget.errors[:amount].first %>
+<div class="max-w-lg mx-auto">
+  <%= render "shared/breadcrumbs", trail: [ [ "Settings", admin_settings_path ], [ "#{@envelope_budget.envelope.name} budget" ] ] %>
+  <h1 class="<%= ui.page_heading %> mb-1"><%= @envelope_budget.envelope.name %> budget</h1>
+  <p class="text-[15px] text-graphite mb-6"><%= month_name %></p>
 
-<div class="<%= ui.card %>">
-  <%= form_with model: @envelope_budget, url: envelope_budget_path(@envelope_budget), method: :patch do |f| %>
-    <div class="mb-6">
-      <label for="envelope_budget_amount" class="<%= ui.label %> block mb-1">
-        Budget amount <span aria-hidden="true">*</span>
-      </label>
-      <%= f.number_field :amount,
-            id: "envelope_budget_amount",
-            step: "0.01",
-            min: "0",
-            class: ui.input,
-            aria: { required: true },
-            autofocus: true %>
-    </div>
+  <div class="<%= ui.card %>">
+    <%= form_with model: @envelope_budget, url: envelope_budget_path(@envelope_budget), method: :patch, class: "space-y-5" do |f| %>
+      <%= render FormErrorsComponent.new(messages: @envelope_budget.errors[:base].map { "Budgets for past months can't be changed." }.presence || (amount_error && "Budget #{amount_error}")) %>
+      <div>
+        <label for="envelope_budget_amount" class="<%= ui.label %> block mb-1">Amount for <%= month_name %></label>
+        <%= f.number_field :amount,
+              id: "envelope_budget_amount",
+              step: "0.01", min: "0", inputmode: "decimal", required: true,
+              class: ui.input(amount_error ? :error : :default),
+              aria: { invalid: amount_error.present?, describedby: ("envelope_budget_error" if amount_error) },
+              autofocus: true %>
+        <% if amount_error %>
+          <p id="envelope_budget_error" class="<%= ui.field_error %>">Budget <%= amount_error %></p>
+        <% end %>
+      </div>
 
-    <div class="flex gap-3">
-      <%= f.submit "Save", class: ui.button(:primary) %>
-      <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary) %>
-    </div>
-  <% end %>
-</div>
+      <div class="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+        <%= link_to "Cancel", admin_settings_path, class: ui.button(:secondary, extra: "text-center") %>
+        <%= f.submit "Save", class: ui.button(:primary), data: { turbo_submits_with: "Saving…" } %>
+      </div>
+    <% end %>
+  </div>
 </div>

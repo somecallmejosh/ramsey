@@ -1,32 +1,48 @@
 <%= turbo_frame_tag "modal" do %>
-  <%= render ModalComponent.new(title: "Log Payment", id: "payment-modal", open: true) do |m| %>
+  <%= render ModalComponent.new(title: "Log payment", id: "payment-modal", open: true) do |m| %>
     <% m.with_body do %>
       <p class="<%= ui.label(:secondary) %> -mt-4 mb-6"><%= @debt.name %></p>
 
       <%= form_with model: [@debt, @debt_payment], class: "space-y-5" do |f| %>
-        <% if @debt_payment.errors.any? %>
-          <div class="<%= ui.warning_banner %>">
-            <%= icon "info", classes: "w-5 h-5 flex-none text-claret" %>
-            <span><%= @debt_payment.errors.full_messages.first %></span>
-          </div>
-        <% end %>
+        <%= render FormErrorsComponent.new(record: @debt_payment) %>
+        <% error_for = ->(attr) { @debt_payment.errors.full_messages_for(attr).first } %>
 
         <div>
           <%= f.label :amount, "Amount paid", class: ui.label %>
-          <%= f.number_field :amount, step: "0.01", min: "0.01",
-                class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
+          <%= f.number_field :amount, step: "0.01", min: "0.01", inputmode: "decimal",
+                class: "#{ui.input(error_for.(:amount) ? :error : :default)} mt-1",
+                placeholder: "0.00", required: true,
+                aria: { invalid: error_for.(:amount).present?,
+                        describedby: ("debt_payment_amount_error" if error_for.(:amount)) } %>
+          <% if error_for.(:amount) %>
+            <p id="debt_payment_amount_error" class="<%= ui.field_error %>"><%= error_for.(:amount) %></p>
+          <% end %>
         </div>
 
         <div>
           <%= f.label :balance_after, "New balance (from statement)", class: ui.label %>
-          <%= f.number_field :balance_after, step: "0.01", min: "0",
-                class: "#{ui.input} mt-1", placeholder: "0.00", required: true %>
-          <p class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Enter the balance shown on your loan statement after this payment.</p>
+          <%= f.number_field :balance_after, step: "0.01", min: "0", inputmode: "decimal",
+                class: "#{ui.input(error_for.(:balance_after) ? :error : :default)} mt-1",
+                placeholder: "0.00", required: true,
+                aria: { invalid: error_for.(:balance_after).present?,
+                        describedby: [ ("debt_payment_balance_after_error" if error_for.(:balance_after)),
+                                       "debt_payment_balance_after_hint" ].compact.join(" ") } %>
+          <% if error_for.(:balance_after) %>
+            <p id="debt_payment_balance_after_error" class="<%= ui.field_error %>"><%= error_for.(:balance_after) %></p>
+          <% end %>
+          <p id="debt_payment_balance_after_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Enter the balance shown on your loan statement after this payment.</p>
         </div>
 
         <div>
           <%= f.label :paid_on, "Date", class: ui.label %>
-          <%= f.date_field :paid_on, class: "#{ui.input} mt-1", required: true %>
+          <%= f.date_field :paid_on, max: Date.current,
+                class: "#{ui.input(error_for.(:paid_on) ? :error : :default)} mt-1",
+                required: true,
+                aria: { invalid: error_for.(:paid_on).present?,
+                        describedby: ("debt_payment_paid_on_error" if error_for.(:paid_on)) } %>
+          <% if error_for.(:paid_on) %>
+            <p id="debt_payment_paid_on_error" class="<%= ui.field_error %>"><%= error_for.(:paid_on) %></p>
+          <% end %>
         </div>
 
         <div>
@@ -34,7 +50,8 @@
           <%= f.text_field :note, class: "#{ui.input} mt-1", placeholder: "Extra principal, etc." %>
         </div>
 
-        <%= f.submit "Log Payment", class: "#{ui.button(:primary)} w-full mt-2" %>
+        <%= f.submit "Log payment", class: "#{ui.button(:primary)} w-full mt-2",
+              data: { turbo_submits_with: "Saving…" } %>
       <% end %>
 
       <div class="mt-4">

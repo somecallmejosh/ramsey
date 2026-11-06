@@ -17,9 +17,10 @@ RSpec.describe "EnvelopeBudgets", type: :request do
         expect(budget.reload.amount).to eq(500)
       end
 
-      it "renders edit with unprocessable_entity status" do
+      it "renders edit with unprocessable_entity status and says why" do
         patch envelope_budget_path(budget), params: { envelope_budget: { amount: 999 } }
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("Budgets for past months can&#39;t be changed.")
       end
     end
 

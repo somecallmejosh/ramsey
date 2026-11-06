@@ -1,25 +1,29 @@
-<div id="lunch-stats">
-  <div class="<%= ui.stat_card %> mb-4 flex justify-between">
-    <div>
-      <p class="<%= ui.label %> mb-1">Packed lunches</p>
-      <p class="<%= ui.stat_value %>"><%= @days_packed %> <%= "day".pluralize(@days_packed) %></p>
+<div id="lunch-stats" class="shell">
+  <div class="shell-core p-5">
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <p class="text-[14px] font-medium text-graphite">Saved by packing lunch</p>
+        <p class="mt-1 text-[44px] leading-none font-extrabold tracking-[-0.035em] tabular-nums text-ink"><%= money_with_cents(@estimated_savings) %></p>
+      </div>
+      <span class="grid place-items-center w-16 h-16 rounded-full bg-mint text-mint-ink shrink-0" aria-hidden="true">
+        <%= icon "bowl-food", classes: "w-8 h-8" %>
+      </span>
     </div>
-    <div>
-      <p class="<%= ui.label %> mb-1">Estimated savings</p>
-       <p class="<%= ui.stat_value %>"><%= number_to_currency(@estimated_savings) %></p>
-    </div>
-  </div>
+    <p class="mt-2 text-[13px] text-mute">Savings assume about <%= number_to_currency(LunchLog::SAVINGS_PER_LUNCH, precision: 0) %> saved per packed lunch.</p>
 
-  <% if @work_meals_envelope %>
-    <div class="<%= ui.stat_card %>">
-      <p class="<%= ui.label %> mb-1">Work Meals</p>
-      <p class="<%= ui.stat_value(variant: @work_meals_remaining&.negative? ? :danger : :default) %>">
-        <%= number_to_currency(@work_meals_remaining&.abs) %>
-      </p>
-      <p class="<%= ui.label(:secondary) %>">
-        <%= @work_meals_remaining&.negative? ? "over budget" : "remaining" %>
-        <span class="ml-2 opacity-60">of <%= number_to_currency(@work_meals_budget) %></span>
-      </p>
-    </div>
-  <% end %>
+    <dl class="mt-4 grid grid-cols-2 gap-2">
+      <div class="rounded-[18px] bg-porcelain-2 px-3 py-2.5">
+        <dt class="text-[12px] text-mute">Packed lunches</dt>
+        <dd class="text-[15px] font-bold tabular-nums text-ink"><%= @days_packed %> <%= "day".pluralize(@days_packed) %></dd>
+      </div>
+      <% if @work_meals_envelope %>
+        <div class="rounded-[18px] bg-porcelain-2 px-3 py-2.5">
+          <dt class="text-[12px] text-mute">Work meals <%= @work_meals_remaining&.negative? ? "over" : "left" %></dt>
+          <dd class="text-[15px] font-bold tabular-nums <%= @work_meals_remaining&.negative? ? "text-claret" : "text-ink" %>">
+            <%= number_to_currency(@work_meals_remaining&.abs) %> <span class="font-medium text-mute">of <%= number_to_currency(@work_meals_budget) %></span>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
 </div>

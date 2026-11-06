@@ -1,0 +1,34 @@
+<%# Page title plus a labelled month bar: "‹ Oct · November 2026 · Dec ›".
+    Shared by Budget, category history and Lunch. Both sides always show;
+    the next month is greyed out when it hasn't happened yet.
+    locals: date (any day in the shown month), url (lambda: date -> path),
+            title (page heading), heading_id %>
+<%# locals: (date:, url:, title:, heading_id: "month-heading") %>
+<% month     = date.beginning_of_month %>
+<% current   = month == Date.current.beginning_of_month %>
+<% previous  = month.prev_month %>
+<% following = month.next_month %>
+<% side      = "press flex items-center gap-1 min-h-[44px] px-3 rounded-full text-[14px] font-semibold" %>
+<h1 id="<%= heading_id %>" class="text-[30px] font-extrabold tracking-[-0.03em] text-ink truncate mb-3"><%= title %></h1>
+<nav class="flex items-center gap-1 p-1 rounded-full bg-surface shadow-[var(--shadow-1)]" aria-label="Choose month">
+  <%= link_to url.call(previous),
+        class: "#{side} text-graphite hover:bg-porcelain-2 hover:text-ink",
+        aria: { label: "Previous month, #{previous.strftime("%B %Y")}" } do %>
+    <%= icon "caret-left", classes: "w-4 h-4" %><span><%= previous.strftime("%b") %></span>
+  <% end %>
+  <p class="flex-1 text-center leading-tight" aria-live="polite">
+    <span class="block text-[15px] font-bold text-ink"><%= month.strftime("%B %Y") %></span>
+    <span class="block text-[11px] font-semibold <%= current ? "text-sage" : "text-mute" %>"><%= current ? "This month" : "Past month" %></span>
+  </p>
+  <% if current %>
+    <span class="<%= side %> text-silver cursor-default" aria-disabled="true" title="<%= following.strftime("%B") %> hasn't started yet">
+      <span><%= following.strftime("%b") %></span><%= icon "caret-right", classes: "w-4 h-4" %>
+    </span>
+  <% else %>
+    <%= link_to url.call(following),
+          class: "#{side} text-graphite hover:bg-porcelain-2 hover:text-ink",
+          aria: { label: "Next month, #{following.strftime("%B %Y")}" } do %>
+      <span><%= following.strftime("%b") %></span><%= icon "caret-right", classes: "w-4 h-4" %>
+    <% end %>
+  <% end %>
+</nav>

@@ -1,0 +1,15 @@
+<div class="<%= ui.warning_banner %> mb-4 !items-start" role="alert" tabindex="-1">
+  <%= icon "warning", classes: "w-5 h-5 shrink-0 mt-0.5 text-claret" %>
+  <% if @messages.one? %>
+    <p><%= @messages.first %></p>
+  <% else %>
+    <div>
+      <p>Please fix these and try again:</p>
+      <ul class="list-disc pl-5 font-normal">
+        <% @messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

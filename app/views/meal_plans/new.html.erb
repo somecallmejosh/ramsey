@@ -1,25 +1,26 @@
-<div class="max-w-3xl mx-auto">
+<div class="max-w-lg mx-auto">
+<%= render "shared/breadcrumbs", trail: [ [ "Meals", meal_plans_path ], [ "New plan" ] ] %>
 <h1 class="<%= ui.page_heading %> mb-2">Meal Planner</h1>
 <p class="<%= ui.label(:secondary) %> mb-6">Describe your week and I'll build a meal plan and shopping list.</p>
 
 <%= form_with url: meal_plans_path, method: :post,
       html: { enctype: "multipart/form-data" },
-      data: { turbo: false } do |f| %>
+      data: { turbo: false, controller: "submit-feedback", action: "submit->submit-feedback#busy" } do |f| %>
 
   <%# Message input %>
   <div class="mb-4">
     <label for="message" class="<%= ui.label %> block mb-1">What are you working with this week?</label>
     <%= text_area_tag :message,
-          nil,
+          @message,
           id: "message",
           placeholder: "e.g. We have chicken breasts and frozen veggies. Keep it simple — busy week.",
           rows: 4,
           class: "#{ui.input} resize-none",
-          aria: { required: true } %>
+          required: true %>
   </div>
 
   <%# Photo upload %>
-  <div class="mb-6">
+  <div class="mb-6" data-controller="photo-picker" data-photo-picker-max-bytes-value="<%= MealPlan::MAX_IMAGE_BYTES %>">
     <label for="pantry_images" class="<%= ui.label %> block mb-1">
       Pantry or freezer photos <span class="font-normal text-mute">(optional)</span>
     </label>
@@ -28,20 +29,24 @@
            name="pantry_images[]"
            multiple
            accept="image/*"
+           aria-describedby="pantry_images_hint pantry_images_status"
+           data-photo-picker-target="input"
+           data-action="change->photo-picker#update"
            class="w-full text-[15px] text-graphite
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-full file:border-0
                   file:text-[13px] file:font-semibold
                   file:bg-bg-inset file:text-accent
                   hover:file:bg-porcelain-3" />
-    <p class="<%= ui.label(:secondary) %> mt-1">Any photo format including iPhone HEIC · max 3.75 MB each</p>
+    <p id="pantry_images_hint" class="<%= ui.label(:secondary) %> mt-1">Any photo format, including iPhone photos. Up to 3.75 MB each.</p>
+    <p id="pantry_images_status" class="text-[15px] font-medium text-ink mt-1" aria-live="polite" data-photo-picker-target="status"></p>
   </div>
 
   <%# Submit %>
-  <div class="">
+  <div>
     <%= f.submit "Generate meal plan",
           class: "#{ui.button(:primary)}",
-          data: { disable_with: "Thinking…" } %>
+          data: { turbo_submits_with: "Sending…" } %>
   </div>
 
 <% end %>

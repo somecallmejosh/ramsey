@@ -7,17 +7,17 @@ class UiPresenter
   # (page_heading, section_heading, label, stat_value, etc.).
   # -------------------------------------------------------------------
   TYPE = {
-    display:     "font-display font-medium text-[48px] leading-[1.08] tracking-[-0.02em] text-ink",
-    heading_1:   "font-display font-medium text-[32px] leading-[1.15] tracking-[-0.02em] text-ink",
-    heading_2:   "font-display font-medium text-[24px] leading-[1.2] tracking-[-0.02em] text-ink",
+    display:     "font-display font-bold text-[44px] leading-[1.05] tracking-[-0.03em] text-ink",
+    heading_1:   "font-display font-bold text-[30px] leading-[1.15] tracking-[-0.025em] text-ink",
+    heading_2:   "font-display font-bold text-[20px] leading-[1.25] tracking-[-0.015em] text-ink",
     heading_3:   "font-sans font-semibold text-[18px] leading-[1.3] text-ink",
     body_strong: "font-sans font-medium text-[15px] leading-[1.55] text-ink",
     body:        "font-sans text-[15px] leading-[1.55] text-ink-2",
     label:       "font-sans font-medium text-[13px] leading-[1.4] text-graphite",
     small:       "font-sans text-[13px] leading-[1.5] text-graphite",
-    meta:        "font-sans font-medium text-[11px] leading-[1.2] uppercase tracking-[0.12em] text-mute",
-    num_hero:    "font-display font-medium text-[56px] leading-none tracking-[-0.02em] tabular-nums",
-    num:         "font-sans font-medium text-[20px] leading-[1.2] tabular-nums text-ink"
+    meta:        "font-sans font-semibold text-[11px] leading-[1.2] uppercase tracking-[0.12em] text-mute",
+    num_hero:    "font-display font-bold text-[52px] leading-none tracking-[-0.03em] tabular-nums",
+    num:         "font-sans font-bold text-[20px] leading-[1.2] tabular-nums text-ink"
   }.freeze
 
   def type(key, extra: nil)
@@ -56,14 +56,14 @@ class UiPresenter
 
   # -- Numeric display -------------------------------------------------
   def stat_value(variant: :default)
-    base  = "font-display font-medium text-[32px] leading-[1.1] tracking-[-0.02em] tabular-nums"
+    base  = "font-display font-bold text-[32px] leading-[1.1] tracking-[-0.03em] tabular-nums"
     color = { default: "text-ink", danger: "text-claret" }[variant]
     [ base, color ].join(" ")
   end
 
   # -- Surfaces --------------------------------------------------------
   def card
-    "bg-porcelain-2 rounded-[10px] border border-line shadow-[var(--shadow-1)] p-6"
+    "panel p-5"
   end
 
   def card_header
@@ -71,41 +71,49 @@ class UiPresenter
   end
 
   def stat_card
-    "bg-bg-inset rounded-[10px] p-5 border border-line"
+    "panel p-5"
   end
 
   # -- Controls --------------------------------------------------------
   def button(variant = :primary, extra: nil)
-    base = "font-sans font-medium text-[15px] leading-[1.2] rounded-[10px] px-6 py-3 transition-colors " \
+    base = "press inline-flex items-center justify-center gap-2 font-sans font-semibold text-[15px] leading-[1.2] " \
+           "rounded-full px-6 py-3.5 min-h-[48px] cursor-pointer " \
            "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed"
     variants = {
-      primary:   "bg-accent text-porcelain hover:brightness-95 focus-visible:ring-accent",
-      secondary: "bg-porcelain-2 text-ink border border-line hover:bg-porcelain-3 focus-visible:ring-accent",
-      error:     "bg-claret text-porcelain hover:brightness-95 focus-visible:ring-claret"
+      primary:   "bg-ink text-surface shadow-[0_8px_20px_-8px_oklch(0.2_0.02_265/0.6)] hover:bg-ink-2 focus-visible:ring-ink",
+      secondary: "bg-surface text-ink shadow-[var(--shadow-1)] hover:bg-porcelain-2 focus-visible:ring-accent",
+      error:     "bg-claret text-surface hover:brightness-95 focus-visible:ring-claret"
     }
     [ base, variants[variant], extra ].compact.join(" ")
   end
 
   def input(state = :default)
-    base = "w-full rounded-[6px] border bg-porcelain px-4 py-3 font-sans text-[15px] leading-[1.4] " \
-           "text-ink placeholder:text-mute shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] " \
-           "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 " \
-           "transition-colors hover:border-silver"
+    # 16px keeps iOS Safari from zooming the page when the field is focused.
+    base = "w-full rounded-[16px] border bg-porcelain-2 px-4 py-3.5 font-sans text-[16px] leading-[1.4] " \
+           "text-ink placeholder:text-mute " \
+           "focus:outline-none focus:bg-surface focus-visible:ring-4 " \
+           "transition-[background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
     states = {
-      default: "border-line focus-visible:border-accent focus-visible:ring-accent",
-      error:   "border-claret focus-visible:border-claret focus-visible:ring-claret"
+      default: "border-transparent hover:border-line focus-visible:border-accent focus-visible:ring-accent-soft",
+      error:   "border-claret bg-claret-soft focus-visible:border-claret focus-visible:ring-claret-soft"
     }
     [ base, states[state] ].join(" ")
   end
 
+  # Message under a field that failed validation (give it an id and point
+  # the input's aria-describedby at it).
+  def field_error
+    "font-sans text-[13px] leading-[1.5] text-claret mt-1"
+  end
+
   # -- Pills / badges --------------------------------------------------
   def badge(variant = :neutral, extra: nil)
-    base = "#{type(:meta)} inline-flex items-center px-2 py-1 rounded-full border"
+    base = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-sans font-semibold text-[12px] leading-none"
     variants = {
-      neutral: "bg-bg-inset border-line text-mute",
-      accent:  "bg-bg-inset border-accent/30 text-accent",
-      success: "bg-sage-soft border-sage/30 text-sage",
-      danger:  "bg-claret-soft border-claret/30 text-claret"
+      neutral: "bg-porcelain-3 text-graphite",
+      accent:  "bg-lilac text-lilac-ink",
+      success: "bg-mint text-mint-ink",
+      danger:  "bg-claret-soft text-claret"
     }
     [ base, variants[variant], extra ].compact.join(" ")
   end
@@ -113,28 +121,28 @@ class UiPresenter
   # -- Links -----------------------------------------------------------
   def link(variant = :default)
     {
-      default: "font-sans font-medium text-[15px] text-ink underline underline-offset-[3px] decoration-accent hover:decoration-ink",
+      default: "font-sans font-semibold text-[15px] text-accent hover:underline underline-offset-[3px]",
       subtle:  "font-sans text-[13px] text-mute hover:text-ink transition-colors"
     }[variant]
   end
 
   # -- Banners ---------------------------------------------------------
   def warning_banner
-    "#{type(:body_strong)} bg-claret-soft border border-claret/30 rounded-[10px] px-4 py-3 flex items-center gap-2"
+    "#{type(:body_strong)} bg-surface shadow-[var(--shadow-1)] ring-1 ring-claret/25 rounded-[20px] px-4 py-3.5 flex items-center gap-3"
   end
 
   def tag_label
-    "flex items-center gap-2 px-3 py-2 rounded-[4px] border " \
-    "border-line cursor-pointer has-[:checked]:border-accent has-[:checked]:bg-accent-soft"
+    "flex items-center gap-2 px-3 py-2 rounded-full bg-porcelain-2 border " \
+    "border-transparent cursor-pointer has-[:checked]:border-accent has-[:checked]:bg-accent-soft"
   end
 
   # -- Modal -----------------------------------------------------------
   def modal_overlay
-    "fixed inset-0 bg-ink/40 backdrop-blur-[24px] flex items-start justify-center overflow-y-auto py-16 z-50"
+    "fixed inset-0 bg-ink/35 backdrop-blur-[6px] flex items-start justify-center overflow-y-auto py-16 z-50"
   end
 
   def modal_card
-    "bg-porcelain-2 rounded-[20px] border border-line p-8 w-full max-w-md mx-4 my-auto relative animate-modal-in shadow-[var(--shadow-2)]"
+    "bg-surface rounded-[32px] p-7 w-full max-w-md mx-4 my-auto relative animate-modal-in shadow-[var(--shadow-2)]"
   end
 
   def modal_close
@@ -143,7 +151,7 @@ class UiPresenter
 
   # -- Dropdown --------------------------------------------------------
   def dropdown_card
-    "absolute right-0 top-full mt-2 bg-porcelain-2 rounded-[10px] border border-line shadow-[var(--shadow-1)] p-5 w-56 z-40"
+    "absolute right-0 top-full mt-2 panel p-5 w-56 z-40"
   end
 
   def dropdown_row
@@ -151,13 +159,26 @@ class UiPresenter
   end
 
   # -- Navigation ------------------------------------------------------
+  # Floating "island" tab bar, lifted off the bottom edge.
   def nav_bar
-    "fixed bottom-0 left-0 right-0 bg-porcelain/80 backdrop-blur-[24px] border-t border-line px-4 py-2 z-30"
+    "fixed inset-x-0 bottom-[max(12px,env(safe-area-inset-bottom))] z-30 flex justify-center px-4 pointer-events-none"
+  end
+
+  def nav_island
+    "pointer-events-auto flex items-center gap-1 p-1.5 rounded-full bg-surface/85 backdrop-blur-xl " \
+    "shadow-[0_1px_0_oklch(1_0_0)_inset,0_18px_40px_-12px_oklch(0.25_0.03_265/0.35)] ring-1 ring-ink/5"
   end
 
   def nav_item(active: false)
-    state = active ? "text-ink" : "text-mute hover:text-ink"
-    "#{type(:meta)} #{state} flex flex-col items-center gap-1 px-3 py-2 transition-colors min-w-[44px] min-h-[44px] justify-center"
+    state = active ? "bg-ink text-surface" : "text-graphite hover:bg-porcelain-2 hover:text-ink"
+    "press flex flex-col items-center justify-center gap-0.5 rounded-full min-w-[68px] h-14 px-3 " \
+    "font-sans font-semibold text-[11px] leading-none #{state} focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+  end
+
+  # Round icon button (back, settings, sign out, month arrows).
+  def icon_button(extra: nil)
+    [ "press grid place-items-center w-11 h-11 rounded-full bg-surface text-ink shadow-[var(--shadow-1)] " \
+      "hover:bg-porcelain-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent", extra ].compact.join(" ")
   end
 
   # -- Misc ------------------------------------------------------------

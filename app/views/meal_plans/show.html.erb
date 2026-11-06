@@ -1,75 +1,84 @@
-<div class="max-w-3xl mx-auto">
-<% if @meal_plan.pending? || @meal_plan.processing? %>
+<% week_label    = @meal_plan.week_start.strftime("%B %-d") %>
+<% start_over_ok = "Delete your plan for the week of #{week_label} and start over?" %>
+<div class="max-w-lg mx-auto">
+<%= render "shared/breadcrumbs", trail: [ [ "Meals", meal_plans_path ], [ "Week of #{week_label}" ] ] %>
+<% if @meal_plan.confirmed? %>
+  <%# ── Confirmed plan view ──────────────────────────────────────────────── %>
+
+  <h1 class="<%= ui.page_heading %> mb-6"><%= @meal_plan.current_week? ? "This week" : "Week of #{week_label}" %></h1>
+
+  <% if @meal_plan.current_week? %>
+    <p class="<%= ui.label(:secondary) %> mb-4">Week of <%= week_label %></p>
+  <% end %>
+
+  <% unless @meal_plan.current_week? %>
+    <%= button_to "Use this meal plan this week", reuse_meal_plan_path(@meal_plan), method: :post,
+          class: "#{ui.button(:primary, extra: "mb-6")}" %>
+  <% end %>
+
+  <%# Meal list %>
+  <% day_tints = %w[bg-mint\ text-mint-ink bg-lilac\ text-lilac-ink bg-sky\ text-sky-ink bg-peach\ text-peach-ink bg-rose\ text-rose-ink bg-butter\ text-butter-ink bg-mint\ text-mint-ink] %>
+  <ul class="panel p-1.5 mb-8 rise" style="--i: 1" role="list">
+    <% @meal_plan.meals.order(:day_of_week).each do |meal| %>
+      <li class="flex items-start gap-3 px-3 py-3">
+        <span class="grid place-items-center w-11 h-11 shrink-0 rounded-full text-[13px] font-bold <%= day_tints[meal.day_of_week.to_i] %>" aria-hidden="true">
+          <%= meal.day_name.first(3) %>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="sr-only"><%= meal.day_name %></p>
+          <p class="text-[16px] font-bold text-ink leading-snug"><%= meal.dinner %></p>
+          <p class="text-[13px] text-graphite">Lunch: <%= meal.lunch %></p>
+          <% if meal.prep_note.present? %>
+            <p class="text-[13px] text-mute mt-0.5"><%= meal.prep_note %></p>
+          <% end %>
+        </div>
+        <% if meal.estimated_cost&.positive? %>
+          <span class="text-[14px] font-semibold tabular-nums text-graphite"><%= number_to_currency(meal.estimated_cost) %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+
+  <%# Shopping list %>
+  <h2 class="<%= ui.section_heading %> mb-4">Shopping list</h2>
+  <%= render "shopping_list", meal_plan: @meal_plan %>
+
+<% elsif @meal_plan.pending? || @meal_plan.processing? %>
   <%# ── Processing spinner ─────────────────────────────────────────────────── %>
   <% content_for :head do %>
     <meta http-equiv="refresh" content="3">
     <meta name="turbo-cache-control" content="no-cache">
   <% end %>
 
-  <div class="flex flex-col items-center justify-center py-20 gap-4 text-center px-4">
-    <div class="w-10 h-10 border-4 border-porcelain-3 border-t-accent rounded-full animate-spin"></div>
-    <p class="text-lg font-semibold text-ink">Cool, I can work with these!</p>
-    <p class="<%= ui.label(:secondary) %>">Give me a minute to think about it, and I'll have your menu ready shortly.</p>
-    <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
-          class: "mt-6 #{ui.link(:subtle)}" %>
+  <div class="flex flex-col items-center justify-center py-20 gap-4 text-center px-4" role="status">
+    <div class="w-10 h-10 border-4 border-porcelain-3 border-t-accent rounded-full animate-spin" aria-hidden="true"></div>
+    <% if @meal_plan.taking_too_long? %>
+      <p class="text-lg font-semibold text-ink">This is taking longer than usual.</p>
+      <p class="<%= ui.label(:secondary) %>">You can keep waiting, or start over and try again.</p>
+      <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
+            class: "mt-4 #{ui.button(:primary)}",
+            form: { data: { turbo_confirm: start_over_ok } } %>
+    <% else %>
+      <p class="text-lg font-semibold text-ink">
+        <%= @meal_plan.pantry_images.attached? ? "Got your photos. Planning your week…" : "Planning your week…" %>
+      </p>
+      <p class="<%= ui.label(:secondary) %>">This usually takes about a minute. This page updates on its own.</p>
+      <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
+            class: "mt-6 #{ui.link(:subtle)}",
+            form: { data: { turbo_confirm: start_over_ok } } %>
+    <% end %>
   </div>
 
 <% elsif @meal_plan.failed? %>
   <%# ── Error state ─────────────────────────────────────────────────────────── %>
   <h1 class="<%= ui.page_heading %> mb-2">Something went wrong</h1>
   <p class="<%= ui.label(:secondary) %> mb-6"><%= @meal_plan.error_message || "An unexpected error occurred." %></p>
-  <%= link_to "Try again", new_meal_plan_path, class: ui.button(:primary) %>
-
-<% elsif @meal_plan.confirmed? %>
-  <%# ── Confirmed plan view ──────────────────────────────────────────────── %>
-
-  <div class="flex items-center gap-2 mb-6">
-  <h1 class="<%= ui.page_heading %> flex-1">This Week</h1>
-    <%= link_to new_meal_plan_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" do %>
-      New plan
-    <% end %>
-    <%= link_to "History", meal_plans_path, class: "#{ui.button(:secondary, extra: "text-sm px-5 py-2")}" %>
-
-  </div>
-
-  <p class="<%= ui.label(:secondary) %> mb-4">
-    Week of <%= @meal_plan.week_start.strftime("%B %-d") %>
-  </p>
-
-  <% unless @meal_plan.week_start == Date.current.beginning_of_week(:sunday) %>
-    <%= button_to "Use this meal plan this week", reuse_meal_plan_path(@meal_plan), method: :post,
-          class: "#{ui.button(:primary, extra: "text-sm mb-6")}" %>
-  <% end %>
-
-  <%# Meal grid %>
-  <div class="grid grid-cols-1 gap-3 mb-8">
-    <% @meal_plan.meals.order(:day_of_week).each do |meal| %>
-      <div class="<%= ui.card %>">
-        <div class="<%= ui.card_header %>">
-          <h2 class="<%= ui.label %>"><%= meal.day_name %></h2>
-          <% if meal.estimated_cost&.positive? %>
-            <span class="<%= ui.label(:secondary) %>"><%= number_to_currency(meal.estimated_cost) %></span>
-          <% end %>
-        </div>
-        <p class="text-lg font-semibold text-ink"><%= meal.dinner %></p>
-        <p class="<%= ui.label(:secondary) %>">Lunch: <%= meal.lunch %></p>
-        <% if meal.prep_note.present? %>
-          <p class="<%= ui.label(:secondary) %> mt-1 italic"><%= meal.prep_note %></p>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
-  <%# Shopping list %>
-  <% if @meal_plan.shopping_items.any? %>
-    <h2 class="<%= ui.section_heading %> mb-4">Shopping List</h2>
-    <%= render "shopping_list", meal_plan: @meal_plan %>
-  <% end %>
+  <%= link_to "Try again", new_meal_plan_path(retry: 1), class: ui.button(:primary) %>
 
 <% else %>
   <%# ── Preview (unconfirmed) ──────────────────────────────────────────────── %>
 
-  <h1 class="<%= ui.page_heading %> mb-2">Review Your Plan</h1>
+  <h1 class="<%= ui.page_heading %> mb-2">Review your plan</h1>
   <p class="<%= ui.label(:secondary) %> mb-6">Edit any meals before confirming.</p>
 
   <% ai = @meal_plan.ai_response || {} %>
@@ -77,7 +86,7 @@
   <% shopping_items = ai["shopping_items"] || [] %>
 
   <%= form_with url: confirm_meal_plan_path(@meal_plan), method: :patch,
-        data: { turbo: false } do |f| %>
+        data: { turbo: false, controller: "submit-feedback", action: "submit->submit-feedback#busy" } do |f| %>
 
     <%# Editable meal rows %>
     <div class="grid grid-cols-1 gap-3 mb-6">
@@ -89,15 +98,19 @@
           <input type="hidden" name="meals[<%= i %>][day_of_week]" value="<%= meal["day_of_week"] %>">
 
           <div class="mb-2">
-            <label class="<%= ui.label(:secondary) %> block mb-1">Dinner</label>
+            <label for="meal_<%= i %>_dinner" class="<%= ui.label(:secondary) %> block mb-1">Dinner</label>
             <input type="text"
+                   id="meal_<%= i %>_dinner"
+                   required
                    name="meals[<%= i %>][dinner]"
                    value="<%= meal["dinner"] %>"
                    class="<%= ui.input %>" />
           </div>
           <div class="mb-2">
-            <label class="<%= ui.label(:secondary) %> block mb-1">Lunch</label>
+            <label for="meal_<%= i %>_lunch" class="<%= ui.label(:secondary) %> block mb-1">Lunch</label>
             <input type="text"
+                   id="meal_<%= i %>_lunch"
+                   required
                    name="meals[<%= i %>][lunch]"
                    value="<%= meal["lunch"] %>"
                    class="<%= ui.input %>" />
@@ -112,10 +125,10 @@
 
     <%# Shopping items (read-only in preview) %>
     <% if shopping_items.any? %>
-      <h2 class="<%= ui.section_heading %> mb-4">Shopping List</h2>
+      <h2 class="<%= ui.section_heading %> mb-4">Shopping list</h2>
       <div class="<%= ui.card %> mb-6">
         <% shopping_items.each_with_index do |item, i| %>
-          <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
+          <div class="flex items-center justify-between py-3 border-b border-line last:border-0">
             <div>
               <p class="text-lg text-ink"><%= item["name"] %></p>
               <p class="<%= ui.label(:secondary) %>"><%= item["quantity"] %> · <%= item["store"] %></p>
@@ -130,21 +143,30 @@
           <input type="hidden" name="shopping_items[<%= i %>][store]"          value="<%= item["store"] %>">
         <% end %>
       </div>
+    <% else %>
+      <div class="<%= ui.card %> mb-6 text-center py-8">
+        <p class="text-ink font-medium">No shopping list this time.</p>
+        <p class="<%= ui.label(:secondary) %> mt-1">You can add items after you confirm the plan.</p>
+      </div>
     <% end %>
 
-    <%# Confirm button %>
+    <%# Confirm button (fixed above the bottom nav) %>
     <div class="fixed bottom-20 left-0 right-0 px-4 max-w-md mx-auto">
       <%= f.submit "Confirm plan",
             class: "#{ui.button(:primary)} w-full",
-            data: { disable_with: "Saving…" } %>
+            data: { turbo_submits_with: "Saving…" } %>
     </div>
 
   <% end %>
 
-  <div class="text-center mt-4 pb-6 mb-10">
+  <div class="text-center mt-4">
     <%= button_to "Start over", meal_plan_path(@meal_plan), method: :delete,
-          class: ui.link(:subtle) %>
+          class: "min-h-11 px-4 #{ui.link(:subtle)}",
+          form: { data: { turbo_confirm: start_over_ok } } %>
   </div>
+
+  <%# Room so the fixed Confirm button never covers the last item. %>
+  <div class="h-24" aria-hidden="true"></div>
 
 <% end %>
 </div>

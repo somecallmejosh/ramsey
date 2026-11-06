@@ -11,7 +11,7 @@ class InvitationsController < ApplicationController
     @invitation = current_account.invitations.build(
       invited_by: current_user,
       email: params[:email],
-      expires_at: 7.days.from_now
+      expires_at: Invitation::VALID_FOR.from_now
     )
 
     if @invitation.save

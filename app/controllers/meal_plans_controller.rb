@@ -1,41 +1,60 @@
 class MealPlansController < ApplicationController
+  # Kept in the cookie session for "Try again", so cap its size.
+  MESSAGE_MEMORY_LIMIT = 1_000
+
   before_action :set_meal_plan, only: [ :show, :confirm, :reuse, :destroy ]
 
   # GET /meal_plans
   def index
-    @meal_plans = current_account.meal_plans.confirmed.order(week_start: :desc)
+    @meal_plans = current_account.meal_plans.confirmed.includes(:meals).order(week_start: :desc)
   end
 
   # GET /meal_plans/new
   def new
     this_week = Date.current.beginning_of_week(:sunday)
 
-    # Redirect to any in-progress plan for this week (don't block if already confirmed)
-    if (plan = current_account.meal_plans.where(week_start: this_week).first)
-      redirect_to meal_plan_path(plan) and return if plan.pending? || plan.processing?
+    # Send them back to a plan that's still generating or waiting for review,
+    # rather than letting a new request silently replace it.
+    plan = current_account.meal_plans.unconfirmed.find_by(week_start: this_week)
+    if plan && (plan.pending? || plan.processing? || plan.ready?)
+      redirect_to meal_plan_path(plan) and return
     end
+
+    # "Try again" after a failure brings back what they typed.
+    @message = session[:meal_plan_message] if params[:retry].present?
   end
 
   # POST /meal_plans
   def create
     week_start = Date.current.beginning_of_week(:sunday)
+    @message   = params[:message].to_s.strip
 
-    # Destroy any existing unconfirmed plan for this week so the user can retry
-    current_account.meal_plans.unconfirmed.where(week_start: week_start).destroy_all
+    if (confirmed = current_account.meal_plans.confirmed.find_by(week_start: week_start))
+      redirect_to meal_plan_path(confirmed), alert: "You already have a meal plan for this week." and return
+    end
+
+    if @message.blank?
+      flash.now[:alert] = "Tell me a little about your week so I can plan around it."
+      render :new, status: :unprocessable_content and return
+    end
 
     @meal_plan = current_account.meal_plans.build(user: current_user, week_start: week_start)
+    @meal_plan.pantry_images.attach(params[:pantry_images]) if params[:pantry_images].present?
 
-    if params[:pantry_images].present?
-      @meal_plan.pantry_images.attach(params[:pantry_images])
+    # Replace any unfinished plan for this week, but keep it if the new one is rejected.
+    saved = MealPlan.transaction do
+      current_account.meal_plans.unconfirmed.where(week_start: week_start).destroy_all
+      @meal_plan.save || raise(ActiveRecord::Rollback)
     end
 
-    unless @meal_plan.save
+    unless saved
       flash.now[:alert] = @meal_plan.errors.full_messages.first
-      render :new, status: :unprocessable_entity and return
+      render :new, status: :unprocessable_content and return
     end
 
+    session[:meal_plan_message] = @message.first(MESSAGE_MEMORY_LIMIT)
     groceries_remaining = helpers.current_groceries_remaining
-    MealPlannerJob.perform_later(@meal_plan.id, params[:message].to_s.strip, groceries_remaining)
+    MealPlannerJob.perform_later(@meal_plan.id, @message, groceries_remaining)
 
     redirect_to meal_plan_path(@meal_plan)
   end
@@ -54,7 +73,7 @@ class MealPlansController < ApplicationController
 
     current_account.meal_plans.unconfirmed.where(week_start: this_week).destroy_all
 
-    new_plan = current_account.meal_plans.create!(user: current_user, week_start: this_week, confirmed_at: Time.current)
+    new_plan = current_account.meal_plans.create!(user: current_user, week_start: this_week, status: "ready", confirmed_at: Time.current)
 
     @meal_plan.meals.each do |m|
       new_plan.meals.create!(m.slice(:day_of_week, :dinner, :lunch, :prep_note, :estimated_cost))
@@ -66,10 +85,10 @@ class MealPlansController < ApplicationController
     redirect_to meal_plan_path(new_plan), notice: "Meal plan applied for this week!"
   end
 
-  # DELETE /meal_plans/:id
+  # DELETE /meal_plans/:id  — "Start over"
   def destroy
     @meal_plan.destroy
-    redirect_to meal_plans_path
+    redirect_to new_meal_plan_path(retry: (1 unless @meal_plan.confirmed?))
   end
 
   # PATCH /meal_plans/:id/confirm
@@ -111,9 +130,9 @@ class MealPlansController < ApplicationController
     end
 
     redirect_to meal_plan_path(@meal_plan), notice: "Meal plan confirmed!"
-  rescue ActiveRecord::RecordInvalid => e
-    flash.now[:alert] = e.message
-    render :show, status: :unprocessable_entity
+  rescue ActiveRecord::RecordInvalid
+    flash.now[:alert] = "We couldn't save this plan. Make sure every day has a dinner and a lunch, then try again."
+    render :show, status: :unprocessable_content
   end
 
   private

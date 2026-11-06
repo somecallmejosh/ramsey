@@ -14,7 +14,7 @@ RSpec.describe Expense, type: :model do
     it "rejects future-dated transactions" do
       expense = build(:expense, transacted_on: Date.current + 1.day)
       expect(expense).not_to be_valid
-      expect(expense.errors[:transacted_on]).to include("cannot be a future date")
+      expect(expense.errors[:transacted_on]).to include("can't be in the future")
     end
 
     it "accepts today's date" do
@@ -51,6 +51,31 @@ RSpec.describe Expense, type: :model do
     it "returns false for today's expense" do
       expense = build(:expense, transacted_on: Date.current)
       expect(expense.prior_month?).to be false
+    end
+  end
+
+  describe "#deletable_by?" do
+    let(:account) { create(:account) }
+    let(:member)  { create(:user, account: account) }
+    let(:owner)   { create(:user, :owner, account: account) }
+    let(:envelope) { create(:envelope, account: account) }
+
+    it "lets the owner delete anything" do
+      expect(create(:expense, :prior_month, envelope: envelope, user: member).deletable_by?(owner)).to be true
+    end
+
+    it "lets members delete this month's expenses only" do
+      expect(create(:expense, envelope: envelope, user: owner).deletable_by?(member)).to be true
+      old = create(:expense, :prior_month, envelope: envelope, user: owner, created_at: 1.hour.ago)
+      expect(old.deletable_by?(member)).to be false
+    end
+
+    it "lets the person who just logged a past-dated expense undo it" do
+      expense = create(:expense, :prior_month, envelope: envelope, user: member)
+      expect(expense.deletable_by?(member)).to be true
+
+      expense.update_column(:created_at, (Expense::UNDO_WINDOW + 1.minute).ago)
+      expect(expense.deletable_by?(member)).to be false
     end
   end
 end
