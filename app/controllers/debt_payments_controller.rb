@@ -3,10 +3,7 @@ class DebtPaymentsController < ApplicationController
   before_action :set_debt_payment, only: [ :destroy ]
 
   def new
-    @debt_payment = @debt.debt_payments.build(
-      paid_on: Date.current,
-      balance_after: @debt.current_balance
-    )
+    @debt_payment = @debt.debt_payments.build(paid_on: Date.current)
   end
 
   def create

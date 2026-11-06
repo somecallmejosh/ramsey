@@ -20,17 +20,17 @@
         </div>
 
         <div>
-          <%= f.label :balance_after, "New balance (from statement)", class: ui.label %>
+          <%= f.label :balance_after, "New balance (optional)", class: ui.label %>
           <%= f.number_field :balance_after, step: "0.01", min: "0", inputmode: "decimal",
                 class: "#{ui.input(error_for.(:balance_after) ? :error : :default)} mt-1",
-                placeholder: "0.00", required: true,
+                placeholder: "From your statement",
                 aria: { invalid: error_for.(:balance_after).present?,
                         describedby: [ ("debt_payment_balance_after_error" if error_for.(:balance_after)),
                                        "debt_payment_balance_after_hint" ].compact.join(" ") } %>
           <% if error_for.(:balance_after) %>
             <p id="debt_payment_balance_after_error" class="<%= ui.field_error %>"><%= error_for.(:balance_after) %></p>
           <% end %>
-          <p id="debt_payment_balance_after_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Enter the balance shown on your loan statement after this payment.</p>
+          <p id="debt_payment_balance_after_hint" class="<%= ui.type(:small, extra: "text-mute mt-1") %>">Leave blank to take the amount off <%= number_to_currency(@debt.current_balance) %>. If your statement shows a different balance (interest or fees), enter that instead.</p>
         </div>
 
         <div>

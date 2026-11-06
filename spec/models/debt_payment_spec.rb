@@ -58,6 +58,33 @@ RSpec.describe DebtPayment, type: :model do
       expect(payment.balance_before).to eq(3_000)
     end
 
+    context "when the new balance is left blank" do
+      it "takes the amount off the current balance" do
+        payment = pay(250, nil)
+        expect(payment.balance_after).to eq(2_750)
+        expect(debt.reload.current_balance).to eq(2_750)
+      end
+
+      it "never goes below zero, and marks the debt paid off" do
+        pay(5_000, nil)
+        expect(debt.reload.current_balance).to eq(0)
+        expect(debt).to be_paid_off
+      end
+
+      it "takes a backdated amount off the balance as of that date" do
+        pay(100, 2_900, 2.days.ago.to_date)
+        older = pay(50, nil, 5.days.ago.to_date)
+        expect(older.balance_after).to eq(4_950)
+        expect(debt.reload.current_balance).to eq(2_900)
+      end
+
+      it "is still invalid without an amount" do
+        payment = build(:debt_payment, debt: debt, user: user, amount: nil, balance_after: nil)
+        expect(payment).not_to be_valid
+        expect(payment.errors[:balance_after]).to be_present
+      end
+    end
+
     it "does not move the balance for a backdated payment older than the latest" do
       pay(100, 2_900, 2.days.ago.to_date)
       pay(50, 2_950, 5.days.ago.to_date)

@@ -18,6 +18,13 @@ RSpec.describe "DebtPayments", type: :request do
         expect(debt.reload.current_balance).to eq(9_500)
       end
 
+      it "takes the amount off the balance when the new balance is left blank" do
+        post debt_debt_payments_path(debt), params: {
+          debt_payment: { amount: "500", balance_after: "", paid_on: Date.current.to_s }
+        }
+        expect(debt.reload.current_balance).to eq(9_500)
+      end
+
       it "refreshes the whole page for Turbo submissions from the modal frame" do
         post debt_debt_payments_path(debt),
           params: { debt_payment: { amount: "500", balance_after: "9500", paid_on: Date.current.to_s } },

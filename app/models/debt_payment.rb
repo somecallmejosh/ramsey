@@ -10,6 +10,9 @@ class DebtPayment < ApplicationRecord
 
   scope :chronological, -> { order(:paid_on, :created_at, :id) }
 
+  # Left blank, the new balance is the amount taken off the balance as of
+  # the payment date. A statement balance, when entered, wins.
+  before_validation :default_balance_after, on: :create
   before_create :capture_balance_before
   after_create  :sync_debt_balance
   after_destroy :restore_debt_balance, unless: :destroyed_by_association
@@ -41,13 +44,23 @@ class DebtPayment < ApplicationRecord
     scope.last
   end
 
+  # The debt's balance just before this payment.
+  def prior_balance
+    if latest?
+      debt.current_balance
+    else
+      debt.debt_payments.where(paid_on: ..paid_on).chronological.last&.balance_after || debt.original_balance
+    end
+  end
+
+  def default_balance_after
+    return if balance_after.present? || paid_on.blank? || !amount.to_d.positive?
+
+    self.balance_after = [ prior_balance - amount, 0 ].max
+  end
+
   def capture_balance_before
-    self.balance_before =
-      if latest?
-        debt.current_balance
-      else
-        debt.debt_payments.where(paid_on: ..paid_on).chronological.last&.balance_after
-      end
+    self.balance_before = prior_balance
   end
 
   def sync_debt_balance
